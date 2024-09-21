@@ -1,4 +1,4 @@
-<img src="https://github.com/user-attachments/assets/c9956250-1e95-4c23-aae9-312d02cbbac1" height="200px" />
+<img src="https://github.com/user-attachments/assets/bb41b21e-fd7e-4747-87a3-1f69c1d23e8b" height="200px" />
 
 # Via Mallorca
 
