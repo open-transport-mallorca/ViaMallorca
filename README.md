@@ -6,6 +6,14 @@ An app to track buses all over Mallorca, check schedules, routes, and much more!
 
 **This app is not affiliated with the government or the respective companies.**
 
+## Screenshots
+<img src="https://github.com/user-attachments/assets/b38c7cde-b256-4179-b1ca-5f9953cf63c3" height="360px" />
+<img src="https://github.com/user-attachments/assets/b0b5f01e-6ce6-4c01-b68c-aeb8d9ca3bce" height="360px" />
+<img src="https://github.com/user-attachments/assets/a94fce72-e45b-447a-ad8a-a1e97b9247b0" height="360px" />
+<img src="https://github.com/user-attachments/assets/bb8a228a-e29a-44f2-844a-cc056ad703f0" height="360px" />
+<img src="https://github.com/user-attachments/assets/c2e94fde-815b-4a32-89cc-d67b9a1376b0" height="360px" />
+<img src="https://github.com/user-attachments/assets/0fef3ff2-7687-46f1-a6c9-630c664cf79b" height="360px" />
+
 ## Motivation behind this project
 
 **[@YarosMallorca's](https://github.com/YarosMallorca) take:**
