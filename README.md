@@ -6,6 +6,10 @@ An app to track buses all over Mallorca, check schedules, routes, and much more!
 
 **This app is not affiliated with the government or the respective companies.**
 
+<a href="https://play.google.com/store/apps/details?id=es.opentransportmallorca.via"><img src="https://github.com/user-attachments/assets/bd5e335e-dcdd-4f99-bdb5-623553c79f53"  height="50px"/></a>
+<a href="https://apps.apple.com/app/via-mallorca/id6670362143"><img src="https://github.com/user-attachments/assets/5a393152-0330-4e1f-ae52-343fa0131276"  height="50px"/></a>
+
+
 ## Screenshots
 <img src="https://github.com/user-attachments/assets/b38c7cde-b256-4179-b1ca-5f9953cf63c3" height="360px" />
 <img src="https://github.com/user-attachments/assets/b0b5f01e-6ce6-4c01-b68c-aeb8d9ca3bce" height="360px" />
