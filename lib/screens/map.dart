@@ -246,9 +246,7 @@ class _MapScreenState extends State<MapScreen>
                         .toList()),
 
               // Stations Marker
-              if (
-                  // (layersShown[2] || layersShown[0]) &&
-                  mapProvider.customRoutes == null)
+              if (mapProvider.customRoutes == null)
                 MarkerClusterLayerWidget(
                   options: MarkerClusterLayerOptions(
                     builder: (context, markers) {
@@ -356,79 +354,91 @@ class _MapScreenState extends State<MapScreen>
             ],
           ),
           // Bus Info Container
-          AnimatedOpacity(
-            duration: const Duration(milliseconds: 300),
-            opacity: trackingProvider.currentLocation == null ? 0 : 1,
-            child: Align(
-                alignment: Alignment.topRight,
-                child: Skeletonizer(
-                  enabled: trackingProvider.routeStationInfo == null,
-                  child: Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Container(
-                        width: 250,
-                        height: 150,
-                        decoration: BoxDecoration(
-                            color: Theme.of(context)
-                                .colorScheme
-                                .surface
-                                .withOpacity(0.7),
-                            borderRadius: BorderRadius.circular(12)),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            mainAxisAlignment:
-                                trackingProvider.routeStationInfo != null
-                                    ? MainAxisAlignment.spaceEvenly
-                                    : MainAxisAlignment.center,
-                            children: [
-                              if (trackingProvider.routeStationInfo !=
-                                  null) ...[
-                                Text(
-                                  "${trackingProvider.routeCode} - ${mapProvider.customRouteDestinations![mapProvider.customWay == Way.way ? 0 : 1]}",
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold),
-                                ),
-                                Text(
-                                  "${AppLocalizations.of(context)!.passengers}: ${trackingProvider.routeStationInfo!.passangers.inBus}/${trackingProvider.routeStationInfo!.passangers.totalCapacity}",
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      color: trackingProvider.routeStationInfo!
-                                                  .passangers.inBus <
-                                              trackingProvider.routeStationInfo!
-                                                  .passangers.totalCapacity
-                                          ? Theme.of(context)
-                                              .colorScheme
-                                              .onSurface
-                                          : Theme.of(context)
-                                              .colorScheme
-                                              .error),
-                                ),
-                                if (trackingProvider.currentSpeed != null)
+          IgnorePointer(
+            child: AnimatedOpacity(
+              duration: const Duration(milliseconds: 300),
+              opacity: trackingProvider.currentLocation == null ? 0 : 1,
+              child: Align(
+                  alignment: Alignment.topRight,
+                  child: Skeletonizer(
+                    enabled: trackingProvider.routeStationInfo == null,
+                    child: Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Container(
+                          width: 250,
+                          height: 150,
+                          decoration: BoxDecoration(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .surface
+                                  .withOpacity(0.7),
+                              borderRadius: BorderRadius.circular(12)),
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              mainAxisAlignment:
+                                  trackingProvider.routeStationInfo != null
+                                      ? MainAxisAlignment.spaceEvenly
+                                      : MainAxisAlignment.center,
+                              children: [
+                                if (trackingProvider.routeStationInfo !=
+                                    null) ...[
                                   Text(
-                                      "${AppLocalizations.of(context)!.speed}: ${trackingProvider.currentSpeed} km/h"),
-                                FittedBox(
-                                    child: Text(
-                                        "${AppLocalizations.of(context)!.nextStop}: ${trackingProvider.routeStationInfo!.stops.first.stopName}")),
-                                FittedBox(
-                                    child: Text(
-                                        "${AppLocalizations.of(context)!.finalStop}: ${trackingProvider.routeStationInfo!.stops.last.stopName}"))
-                              ] else ...[
-                                Text(AppLocalizations.of(context)!.loading),
-                              ]
-                            ],
+                                    "${trackingProvider.routeCode} - ${mapProvider.customRouteDestinations![mapProvider.customWay == Way.way ? 0 : 1]}",
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold),
+                                  ),
+                                  Text(
+                                    "${AppLocalizations.of(context)!.passengers}: ${trackingProvider.routeStationInfo!.passangers.inBus}/${trackingProvider.routeStationInfo!.passangers.totalCapacity}",
+                                    style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: trackingProvider
+                                                    .routeStationInfo!
+                                                    .passangers
+                                                    .inBus <
+                                                trackingProvider
+                                                    .routeStationInfo!
+                                                    .passangers
+                                                    .totalCapacity
+                                            ? Theme.of(context)
+                                                .colorScheme
+                                                .onSurface
+                                            : Theme.of(context)
+                                                .colorScheme
+                                                .error),
+                                  ),
+                                  if (trackingProvider.currentSpeed != null)
+                                    Text(
+                                        "${AppLocalizations.of(context)!.speed}: ${trackingProvider.currentSpeed} km/h"),
+                                  FittedBox(
+                                      child: Text(
+                                          "${AppLocalizations.of(context)!.nextStop}: ${trackingProvider.routeStationInfo!.stops.first.stopName}")),
+                                  FittedBox(
+                                      child: Text(
+                                          "${AppLocalizations.of(context)!.finalStop}: ${trackingProvider.routeStationInfo!.stops.last.stopName}"))
+                                ] else ...[
+                                  Text(AppLocalizations.of(context)!.loading),
+                                ]
+                              ],
+                            ),
                           ),
-                        ),
-                      )),
-                )),
+                        )),
+                  )),
+            ),
           ),
 
           // Bottom Buttons
           Align(
               alignment: Alignment.bottomLeft,
               child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                      vertical: 64.0, horizontal: 24.0),
+                  padding: EdgeInsets.symmetric(
+                      vertical:
+                          Provider.of<TrackingProvider>(context, listen: false)
+                                      .currentLocation !=
+                                  null
+                              ? 24.0
+                              : 82.0,
+                      horizontal: 24.0),
                   child: Column(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
