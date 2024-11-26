@@ -25,6 +25,17 @@ I have noticed that Mallorca's public transport system lacks good digital integr
 
 This motivated me to start this project, **Via Mallorca**, to help people (locals and travelers alike) use public transport efficiently on this island.
 
+# Attributions
+
+This project uses the following CC BY 4.0-licensed works:
+
+- **[CTM Datos Abiertos](https://www.tib.org/es/sobre-ctm/portal-de-transparencia/datos-abiertos)**  
+  Author: [CTM](https://www.tib.org/)  
+  License: [Creative Commons Attribution 4.0 International (CC BY 4.0)](https://creativecommons.org/licenses/by/4.0/)  
+  Changes made: No changes were made, data is fetched dynamically.
+
+For more information on the license, visit [https://creativecommons.org/licenses/by/4.0/](https://creativecommons.org/licenses/by/4.0/).
+
 ## Contributing
 
 We're happy to receive contributions to the project! However, please read the [Contributing Guide](CONTRIBUTING.md) before!
