@@ -1,7 +1,7 @@
 name: via_mallorca
 description: An open source app for tracking Mallorca Transit.
 publish_to: "none"
-version: 1.0.0+1
+version: 1.0.1+1
 
 environment:
   sdk: ">=3.4.0 <4.0.0"
