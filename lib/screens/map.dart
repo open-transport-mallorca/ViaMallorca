@@ -245,7 +245,7 @@ class _MapScreenState extends State<MapScreen>
                             ))
                         .toList()),
 
-              // Stations Marker
+              // Stations Markers
               if (mapProvider.customRoutes == null)
                 MarkerClusterLayerWidget(
                   options: MarkerClusterLayerOptions(
@@ -263,6 +263,12 @@ class _MapScreenState extends State<MapScreen>
                       );
                     },
                     markers: cachedStations
+                        .where((station) {
+                          final bounds = mapProvider.mapController!
+                              .mapController.camera.visibleBounds;
+                          return bounds
+                              .contains(LatLng(station.lat, station.long));
+                        })
                         .map((station) => Marker(
                               width: mapProvider.mapController!.mapController
                                       .camera.zoom *
