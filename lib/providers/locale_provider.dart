@@ -12,7 +12,9 @@ class LocaleProvider with ChangeNotifier {
   /// If [newLocale] is not supported or is null, the current locale remains unchanged.
   void setLocale(Locale? newLocale) {
     if (!AppLocalizations.supportedLocales.contains(newLocale) &&
-        newLocale != null) return;
+        newLocale != null) {
+      return;
+    }
     locale = newLocale;
     notifyListeners();
   }

@@ -340,7 +340,7 @@ class _MapScreenState extends State<MapScreen>
                                 color: Theme.of(context)
                                     .colorScheme
                                     .tertiaryContainer
-                                    .withOpacity(0.9)),
+                                    .withValues(alpha: 0.9)),
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
                               child: Image.asset(
@@ -377,7 +377,7 @@ class _MapScreenState extends State<MapScreen>
                               color: Theme.of(context)
                                   .colorScheme
                                   .surface
-                                  .withOpacity(0.7),
+                                  .withValues(alpha: 0.7),
                               borderRadius: BorderRadius.circular(12)),
                           child: Padding(
                             padding: const EdgeInsets.all(8.0),
@@ -530,7 +530,7 @@ class _MapScreenState extends State<MapScreen>
                       color: Theme.of(context)
                           .colorScheme
                           .surface
-                          .withOpacity(0.7)),
+                          .withValues(alpha: 0.7)),
                   child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Row(
@@ -615,8 +615,10 @@ class _MapScreenState extends State<MapScreen>
               width: double.infinity,
               height: double.infinity,
               decoration: BoxDecoration(
-                  color:
-                      Theme.of(context).colorScheme.surface.withOpacity(0.5)),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .surface
+                      .withValues(alpha: 0.5)),
               child: Center(
                   child: SizedBox(
                       width: 100,

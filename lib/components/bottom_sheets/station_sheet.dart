@@ -161,7 +161,7 @@ class _StationSheetState extends State<StationSheet> {
                                                       color: Theme.of(context)
                                                           .colorScheme
                                                           .tertiary
-                                                          .withOpacity(1),
+                                                          .withValues(alpha: 1),
                                                       width: 3)
                                                   : null),
                                           child: Card(
