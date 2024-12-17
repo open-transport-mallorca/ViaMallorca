@@ -36,7 +36,10 @@ dependencies:
   geolocator: ^11.0.0
   connectivity_plus: ^6.0.3
   flutter_map_animations: ^0.6.0
-  timelines: ^0.1.0
+  timelines:
+    git:
+      url: https://github.com/quqo-dev/timelines.git
+      ref: main
   material_design_icons_flutter: ^7.0.7296
 
 dependency_overrides:
