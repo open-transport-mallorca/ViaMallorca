@@ -198,7 +198,7 @@ class _MapScreenState extends State<MapScreen>
                               mapProvider.customWay == Way.way)
                           ? 0
                           : 1]
-                ], polylineCulling: true),
+                ]),
 
               // Highlighted Route Stations
               if (mapProvider.customRoutes != null &&
