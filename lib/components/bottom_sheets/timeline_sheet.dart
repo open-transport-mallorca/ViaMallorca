@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:via_mallorca/cache/cache_manager.dart';
-import 'package:via_mallorca/components/station_line_labels.dart';
+import 'package:via_mallorca/components/station_line_labels/station_line_labels_view.dart';
 import 'package:via_mallorca/providers/tracking_provider.dart';
 import 'package:timelines/timelines.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';

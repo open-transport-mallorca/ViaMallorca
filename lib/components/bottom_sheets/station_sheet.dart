@@ -3,7 +3,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:via_mallorca/apis/local_storage.dart';
-import 'package:via_mallorca/components/station_line_labels.dart';
+import 'package:via_mallorca/components/station_line_labels/station_line_labels_view.dart';
 import 'package:via_mallorca/providers/map_provider.dart';
 import 'package:via_mallorca/providers/tracking_provider.dart';
 import 'package:mallorca_transit_services/mallorca_transit_services.dart';
