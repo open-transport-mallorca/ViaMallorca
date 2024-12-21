@@ -21,7 +21,9 @@ class StationSheetViewModel extends ChangeNotifier {
   Future<void> _loadFavouriteStatus() async {
     final favourites = await LocalStorageApi.getFavouriteStations();
     isFavourite = favourites.contains(station.code.toString());
-    notifyListeners();
+    if (!_isDisposed) {
+      notifyListeners();
+    }
   }
 
   Future<void> toggleFavourite() async {
@@ -34,14 +36,18 @@ class StationSheetViewModel extends ChangeNotifier {
     }
     await LocalStorageApi.setFavouriteStations(favourites);
     isFavourite = !isFavourite;
-    notifyListeners();
+    if (!_isDisposed) {
+      notifyListeners();
+    }
   }
 
   Future<void> fetchDepartures() async {
     try {
       isLoading = true;
       hasError = false;
-      notifyListeners();
+      if (!_isDisposed) {
+        notifyListeners();
+      }
 
       departures = await Departures.getDepartures(
         stationCode: station.code,
@@ -51,7 +57,17 @@ class StationSheetViewModel extends ChangeNotifier {
       hasError = true;
     } finally {
       isLoading = false;
-      notifyListeners();
+      if (!_isDisposed) {
+        notifyListeners();
+      }
     }
+  }
+
+  bool _isDisposed = false;
+
+  @override
+  void dispose() {
+    _isDisposed = true;
+    super.dispose();
   }
 }
