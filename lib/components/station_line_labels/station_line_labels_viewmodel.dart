@@ -16,8 +16,7 @@ class StationViewModel extends ChangeNotifier {
   /// Returns whether the data has been loaded.
   bool get isDataLoaded => _cachedLines != null;
 
-  /// Loads the lines that pass through the
-  /// station from the API or cache.
+  /// Loads the lines that pass through the station from the API or cache.
   Future<void> loadLines() async {
     if (_cachedLines != null) return;
 
@@ -27,7 +26,18 @@ class StationViewModel extends ChangeNotifier {
           cached.isNotEmpty ? cached : await Station.getLines(station.code);
       CacheManager.setLines(station.code, _cachedLines!);
     } finally {
-      notifyListeners();
+      // notifyListeners() is only called if the object is still valid
+      if (!_isDisposed) {
+        notifyListeners();
+      }
     }
+  }
+
+  bool _isDisposed = false;
+
+  @override
+  void dispose() {
+    _isDisposed = true;
+    super.dispose();
   }
 }
