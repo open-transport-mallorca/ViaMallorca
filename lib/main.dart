@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -31,27 +30,13 @@ class ViaMallorca extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = LocalStorageApi.getThemeMode();
-    Locale? locale = LocalStorageApi.getLocale();
-
-    /// Change the language to Ukrainian if the device locale is Russian
-    /// Designed specifically to annoy russians and keep them away
-    /// from using the app if they're annoyed by the Ukrainian language
-    ///
-    /// Added by @YarosMallorca
-    if (locale == null && Platform.localeName.contains("ru")) {
-      locale = const Locale("uk");
-    }
-
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => NavigationProvider()),
         ChangeNotifierProvider(create: (context) => MapProvider()),
         ChangeNotifierProvider(create: (context) => TrackingProvider()),
-        ChangeNotifierProvider(
-            create: (context) => ThemeProvider(selectedThemeMode: theme)),
-        ChangeNotifierProvider(
-            create: (context) => LocaleProvider(locale: locale)),
+        ChangeNotifierProvider(create: (context) => ThemeProvider()),
+        ChangeNotifierProvider(create: (context) => LocaleProvider()),
       ],
       child: DynamicColorBuilder(builder: (lightDynamic, darkDynamic) {
         return Consumer2<ThemeProvider, LocaleProvider>(
@@ -65,7 +50,7 @@ class ViaMallorca extends StatelessWidget {
                     ColorScheme.fromSeed(
                         seedColor: Colors.cyan, brightness: Brightness.dark),
                 brightness: Brightness.dark),
-            themeMode: themeProvider.selectedThemeMode,
+            themeMode: themeProvider.themeMode,
             localizationsDelegates: const [
               AppLocalizations.delegate,
               GlobalMaterialLocalizations.delegate,
