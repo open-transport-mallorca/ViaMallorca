@@ -6,7 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:via_mallorca/apis/location.dart';
 import 'package:via_mallorca/cache/cache_manager.dart';
-import 'package:via_mallorca/components/bottom_sheets/station_sheet.dart';
+import 'package:via_mallorca/components/bottom_sheets/station/station_view.dart';
 import 'package:via_mallorca/components/station_line_labels/station_line_labels_view.dart';
 import 'package:via_mallorca/providers/map_provider.dart';
 import 'package:via_mallorca/providers/navigation_provider.dart';
