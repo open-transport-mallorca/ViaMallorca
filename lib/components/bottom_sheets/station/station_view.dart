@@ -89,8 +89,23 @@ class StationSheet extends StatelessWidget {
   Widget _buildDeparturesList(
       BuildContext context, StationSheetViewModel viewModel) {
     if (viewModel.hasError) {
-      return Text(AppLocalizations.of(context)!.noDepartures,
-          style: TextStyle(color: Theme.of(context).colorScheme.error));
+      return Padding(
+        padding: const EdgeInsets.only(bottom: 32.0),
+        child: Card(
+            color: Theme.of(context).colorScheme.errorContainer,
+            child: Padding(
+              padding: const EdgeInsets.all(4.0),
+              child: ListTile(
+                title: Text(AppLocalizations.of(context)!.info,
+                    style: const TextStyle(fontSize: 24)),
+                subtitle: Text(
+                  AppLocalizations.of(context)!.noDepartures,
+                  style: TextStyle(
+                      fontSize: 16, color: Theme.of(context).colorScheme.error),
+                ),
+              ),
+            )),
+      );
     }
 
     final departures = viewModel.departures ?? [];
