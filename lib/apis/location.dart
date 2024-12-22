@@ -7,15 +7,14 @@ class LocationApi {
   /// Checks the permission status for accessing the device's location.
   ///
   /// Returns the current permission status.
-  Future<LocationPermission> checkPermission() async {
-    permission = await Geolocator.checkPermission();
-    return permission;
+  Future<LocationPermission> permissionStatus() async {
+    return await Geolocator.checkPermission();
   }
 
   /// Requests permission to access the device's location.
   ///
   /// Returns `true` if the permission is granted, `false` otherwise.
-  Future<bool> requestPermission() async {
+  Future<LocationPermission> requestPermission() async {
     permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
@@ -24,8 +23,7 @@ class LocationApi {
       }
     }
 
-    return permission == LocationPermission.whileInUse ||
-        permission == LocationPermission.always;
+    return permission;
   }
 
   /// Retrieves the current device location.

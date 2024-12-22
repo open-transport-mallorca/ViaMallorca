@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'package:flutter_map_cancellable_tile_provider/flutter_map_cancellable_tile_provider.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_animations/flutter_map_animations.dart';
@@ -49,7 +47,6 @@ class _MapScreenState extends State<MapScreen>
     CacheManager.getAllStations().then((value) {
       cachedStations = value;
     }).then((_) => loadStations());
-    getLocationPermissions();
     context
         .read<MapProvider>()
         .setMapController(AnimatedMapController(vsync: this));
@@ -74,63 +71,9 @@ class _MapScreenState extends State<MapScreen>
     }
   }
 
-  void getLocationPermissions() async {
-    havePermission = await (locationApi.checkPermission()) ==
-            LocationPermission.always ||
-        await (locationApi.checkPermission()) == LocationPermission.whileInUse;
-    setState(() {});
-  }
-
-  Future<bool> requestLocationPermissions() async {
-    // Check if location permission is granted
-    final locationPermission = await locationApi.checkPermission();
-    if (locationPermission == LocationPermission.denied) {
-      final gotPermission = await locationApi.requestPermission();
-      havePermission = gotPermission;
-      setState(() {});
-      return gotPermission;
-    } else if (locationPermission == LocationPermission.deniedForever) {
-      if (mounted) {
-        showDialog(
-            context: context,
-            builder: (context) {
-              return AlertDialog(
-                title:
-                    Text(AppLocalizations.of(context)!.locationDeniedForever),
-                content: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(AppLocalizations.of(context)!.locationDeniedText),
-                    const SizedBox(height: 8),
-                    Text(AppLocalizations.of(context)!.locationDeniedAction),
-                  ],
-                ),
-                actions: [
-                  TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: Text(AppLocalizations.of(context)!.cancel)),
-                  TextButton(
-                      onPressed: () =>
-                          {openAppSettings(), Navigator.pop(context)},
-                      child: Text(AppLocalizations.of(context)!.goToSettings))
-                ],
-              );
-            });
-      }
-    }
-
-    setState(() {
-      havePermission = locationPermission == LocationPermission.always ||
-          locationPermission == LocationPermission.whileInUse;
-    });
-
-    return havePermission;
-  }
-
   @override
   void dispose() {
     super.dispose();
-    timer?.cancel();
     _alignPositionStreamController.close();
     WidgetsBinding.instance.removeObserver(this);
   }
