@@ -14,7 +14,7 @@ import 'package:via_mallorca/providers/theme_provider.dart';
 import 'package:via_mallorca/providers/tracking_provider.dart';
 import 'package:via_mallorca/screens/nearby.dart';
 import 'package:via_mallorca/screens/routes/routes_view.dart';
-import 'package:via_mallorca/screens/stations.dart';
+import 'package:via_mallorca/screens/stations/stations_view.dart';
 import 'package:via_mallorca/screens/map.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
