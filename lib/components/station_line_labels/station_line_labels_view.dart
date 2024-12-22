@@ -39,51 +39,48 @@ class StationLineLabels extends StatelessWidget {
 
           if (activeLines.isEmpty) {
             return Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(
-                AppLocalizations.of(context)!.loading,
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Theme.of(context).colorScheme.onSecondaryContainer,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            );
+                padding: const EdgeInsets.all(8.0), child: Container());
           }
 
-          return Wrap(
-            spacing: 10,
-            runSpacing: 10,
-            children: activeLines.map((line) {
-              return Material(
-                color: Theme.of(context).colorScheme.secondaryContainer,
-                borderRadius: BorderRadius.circular(10),
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(10),
-                  onTap: () async {
-                    Provider.of<NavigationProvider>(context, listen: false)
-                        .setIndex(1);
-                    final routeLine = await RouteLine.getLine(line.code);
-                    if (context.mounted) {
-                      Provider.of<MapProvider>(context, listen: false)
-                          .viewRoute(routeLine, context);
-                    }
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Text(
-                      line.code,
-                      style: TextStyle(
-                        fontSize: 16,
-                        color:
-                            Theme.of(context).colorScheme.onSecondaryContainer,
-                        fontWeight: FontWeight.bold,
+          return ConstrainedBox(
+            constraints: BoxConstraints(maxHeight: 100),
+            child: SingleChildScrollView(
+              child: Wrap(
+                spacing: 10,
+                runSpacing: 10,
+                children: activeLines.map((line) {
+                  return Material(
+                    color: Theme.of(context).colorScheme.secondaryContainer,
+                    borderRadius: BorderRadius.circular(10),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(10),
+                      onTap: () async {
+                        Provider.of<NavigationProvider>(context, listen: false)
+                            .setIndex(1);
+                        final routeLine = await RouteLine.getLine(line.code);
+                        if (context.mounted) {
+                          Provider.of<MapProvider>(context, listen: false)
+                              .viewRoute(routeLine, context);
+                        }
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(8.0),
+                        child: Text(
+                          line.code,
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSecondaryContainer,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                     ),
-                  ),
-                ),
-              );
-            }).toList(),
+                  );
+                }).toList(),
+              ),
+            ),
           );
         },
       ),
