@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:via_mallorca/components/bottom_sheets/station/station_view.dart';
+import 'package:via_mallorca/components/popups/location_denied_popup.dart';
 import 'package:via_mallorca/components/station_line_labels/station_line_labels_view.dart';
 import 'package:via_mallorca/providers/map_provider.dart';
 import 'package:via_mallorca/providers/navigation_provider.dart';
@@ -143,7 +143,7 @@ class NearbyStops extends StatelessWidget {
                     showDialog(
                         context: context,
                         builder: (context) {
-                          return _locationDeniedAlert(context);
+                          return LocationDeniedPopup();
                         });
                   }
                 }
@@ -153,28 +153,6 @@ class NearbyStops extends StatelessWidget {
           ],
         ),
       ),
-    );
-  }
-
-  Widget _locationDeniedAlert(BuildContext context) {
-    return AlertDialog(
-      title: Text(AppLocalizations.of(context)!.locationDeniedForever),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(AppLocalizations.of(context)!.locationDeniedText),
-          const SizedBox(height: 8),
-          Text(AppLocalizations.of(context)!.locationDeniedAction),
-        ],
-      ),
-      actions: [
-        TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: Text(AppLocalizations.of(context)!.cancel)),
-        TextButton(
-            onPressed: () => {openAppSettings(), Navigator.pop(context)},
-            child: Text(AppLocalizations.of(context)!.goToSettings))
-      ],
     );
   }
 }

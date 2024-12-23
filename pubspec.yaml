@@ -41,6 +41,7 @@ dependencies:
       url: https://github.com/quqo-dev/timelines.git
       ref: main
   material_design_icons_flutter: ^7.0.7296
+  lazy_load_indexed_stack: ^1.1.0
 
 dependency_overrides:
   flutter_compass:

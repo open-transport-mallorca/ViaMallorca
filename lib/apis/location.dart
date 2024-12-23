@@ -2,8 +2,6 @@ import 'package:geolocator/geolocator.dart';
 
 /// A class that provides methods for interacting with location services.
 class LocationApi {
-  LocationPermission permission = LocationPermission.denied;
-
   /// Checks the permission status for accessing the device's location.
   ///
   /// Returns the current permission status.
@@ -15,7 +13,7 @@ class LocationApi {
   ///
   /// Returns `true` if the permission is granted, `false` otherwise.
   Future<LocationPermission> requestPermission() async {
-    permission = await Geolocator.checkPermission();
+    LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
