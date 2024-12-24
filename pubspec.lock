@@ -438,6 +438,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "0.9.1"
+  lazy_load_indexed_stack:
+    dependency: "direct main"
+    description:
+      name: lazy_load_indexed_stack
+      sha256: e581426391c44708210b1f571046320ea52dea46740d4972d9e1820b4ef94827
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.1.0"
   leak_tracker:
     dependency: transitive
     description:
@@ -498,10 +506,10 @@ packages:
     dependency: "direct main"
     description:
       name: mallorca_transit_services
-      sha256: fb8a7fb0969b26fe7a4f7845b7e8d54f645f7b41a7c0267bb8d7e3599a5f3108
+      sha256: "4443ddfc762658f728137cf421e3f2ffaff339b9855dd4362df300c441f86166"
       url: "https://pub.dev"
     source: hosted
-    version: "1.0.1"
+    version: "1.0.2"
   matcher:
     dependency: transitive
     description:
