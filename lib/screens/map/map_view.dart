@@ -31,7 +31,7 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => MapViewModel()..initialize(),
+      create: (_) => MapViewModel()..initialize(context, this),
       child: Consumer2<MapProvider, TrackingProvider>(
           builder: (context, mapProvider, trackingProvider, _) {
         return Consumer<MapViewModel>(
@@ -110,7 +110,7 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                 _routeWaySwitcher(context),
 
               // Update location button
-              _updateLocationButton(context),
+              _updateLocationButtons(context),
 
               if (mapProvider.loadingProgress < 1)
                 _loadingOverlay(context, mapProvider)
@@ -121,7 +121,7 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
     );
   }
 
-  Widget _updateLocationButton(BuildContext context) {
+  Widget _updateLocationButtons(BuildContext context) {
     final mapProvider = Provider.of<MapProvider>(context, listen: false);
     final trackingProvider =
         Provider.of<TrackingProvider>(context, listen: false);
@@ -132,8 +132,10 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
           padding: const EdgeInsets.all(16.0),
           child: Row(
             mainAxisSize: MainAxisSize.min,
+            spacing: 10,
             children: [
               if (trackingProvider.currentLocation != null)
+                // Move to Bus
                 FloatingActionButton(
                     mini: true,
                     onPressed: () {
@@ -141,7 +143,8 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                           trackingProvider.currentLocation!, 16);
                     },
                     child: const Icon(Icons.directions_bus)),
-              const SizedBox(width: 10),
+
+              // Move to Current Location
               FloatingActionButton(
                   onPressed: () async =>
                       mapProvider.moveToCurrentLocation(context),
