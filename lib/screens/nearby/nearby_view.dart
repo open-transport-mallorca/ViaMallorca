@@ -31,6 +31,8 @@ class NearbyStops extends StatelessWidget {
             );
           }
 
+          final cardColor = Theme.of(context).colorScheme.surfaceContainer;
+
           return RefreshIndicator(
             onRefresh: viewModel.loadStations,
             child: Column(
@@ -51,7 +53,6 @@ class NearbyStops extends StatelessWidget {
                           LocationPermission.whileInUse)
                     Expanded(
                       child: ListView.builder(
-                        shrinkWrap: true,
                         itemCount: viewModel.nearbyStations.length,
                         itemBuilder: (context, index) {
                           final station = viewModel.nearbyStations[index];
@@ -65,8 +66,7 @@ class NearbyStops extends StatelessWidget {
                                 .round();
                           }
                           return Card(
-                            surfaceTintColor:
-                                Theme.of(context).colorScheme.tertiary,
+                            color: cardColor,
                             child: ListTile(
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10),

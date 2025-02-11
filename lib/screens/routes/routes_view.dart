@@ -20,6 +20,8 @@ class RoutesScreen extends StatelessWidget {
             return const Center(child: CircularProgressIndicator());
           }
 
+          final cardColor = Theme.of(context).colorScheme.surfaceContainer;
+
           final lines = viewModel.filteredLines;
           final searchQuery = viewModel.searchQuery;
 
@@ -53,6 +55,7 @@ class RoutesScreen extends StatelessWidget {
                           final tileIcon = _getIconForLine(line);
 
                           return Card(
+                            color: cardColor,
                             child: ListTile(
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(10),
