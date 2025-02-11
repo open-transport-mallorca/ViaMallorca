@@ -46,7 +46,7 @@ android {
     defaultConfig {
         applicationId = "es.opentransportmallorca.via"
         minSdk = 23
-        targetSdk = 34
+        targetSdk = 35
         versionCode = flutterVersionCode.toInteger()
         versionName = flutterVersionName
     }
