@@ -1,6 +1,10 @@
 [
   {
     "language": "en-US",
-    "text": "General improvements and bug fixes."
+    "text": "UI Improvements and bug fixes"
+  },
+  {
+    "language": "es-ES",
+    "text": "Mejoras en la interfaz de usuario y correcciones de errores"
   }
 ]
