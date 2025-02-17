@@ -16,6 +16,7 @@ class StationsScreen extends StatelessWidget {
       create: (_) => StationsViewModel(),
       child: Consumer<StationsViewModel>(
         builder: (context, viewModel, _) {
+          final cardColor = Theme.of(context).colorScheme.surfaceContainer;
           final stations = viewModel.filteredStations;
           return Column(
             children: [
@@ -69,6 +70,7 @@ class StationsScreen extends StatelessWidget {
                         itemBuilder: (context, index) {
                           final station = stations[index];
                           return Card(
+                            color: cardColor,
                             child: ListTile(
                               title: Text(station.name,
                                   style: const TextStyle(fontSize: 18)),

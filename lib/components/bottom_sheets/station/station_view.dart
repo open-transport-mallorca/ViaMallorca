@@ -152,6 +152,7 @@ class StationSheet extends StatelessWidget {
                                 width: 3)
                             : null),
                     child: Card(
+                      color: Theme.of(context).colorScheme.surfaceContainerHigh,
                       child: Padding(
                         padding: const EdgeInsets.all(4.0),
                         child: ListTile(

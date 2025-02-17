@@ -8,20 +8,16 @@ environment:
 
 dependencies:
   mallorca_transit_services: ^1.0.2
-  dart_rss: ^3.0.3
   dynamic_color: ^1.7.0
   flutter:
     sdk: flutter
   flutter_localizations:
     sdk: flutter
   intl: any
-  flutter_background_service: ^5.0.5
   flutter_local_notifications: ^18.0.1
   flutter_map: ^7.0.2
   flutter_map_marker_cluster: ^1.3.5
-  http: ^1.2.1
   latlong2: ^0.9.1
-  modal_bottom_sheet: ^3.0.0
   permission_handler: ^11.3.1
   provider: ^6.1.2
   shared_preferences: ^2.2.3
@@ -29,7 +25,6 @@ dependencies:
   syncfusion_flutter_pdfviewer: ^28.1.33
   timezone: ^0.10.0
   url_launcher: ^6.2.5
-  in_app_review: ^2.0.9
   locale_names: ^1.1.1
   flutter_map_cancellable_tile_provider: ^3.0.2
   flutter_map_location_marker: ^9.1.1
@@ -41,7 +36,6 @@ dependencies:
       url: https://github.com/quqo-dev/timelines.git
       ref: main
   material_design_icons_flutter: ^7.0.7296
-  lazy_load_indexed_stack: ^1.1.0
 
 dependency_overrides:
   flutter_compass:
@@ -50,8 +44,6 @@ dependency_overrides:
       ref: master
 
 dev_dependencies:
-  flutter_test:
-    sdk: flutter
   flutter_lints: ^5.0.0
 
 flutter:
