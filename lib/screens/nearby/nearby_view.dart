@@ -31,7 +31,7 @@ class NearbyStops extends StatelessWidget {
             );
           }
 
-          final cardColor = Theme.of(context).colorScheme.surfaceContainer;
+          final cardColor = Theme.of(context).colorScheme.surfaceContainerHigh;
 
           return RefreshIndicator(
             onRefresh: viewModel.loadStations,

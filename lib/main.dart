@@ -42,13 +42,17 @@ class ViaMallorca extends StatelessWidget {
         return Consumer2<ThemeProvider, LocaleProvider>(
           builder: (context, themeProvider, localeProvider, _) => MaterialApp(
             debugShowCheckedModeBanner: false,
+
+            /// Not using dynamic schemes directly because of an issue with the
+            /// dynamicColor package.
+            /// https://github.com/material-foundation/flutter-packages/issues/649
             theme: ThemeData(
-                colorScheme: lightDynamic ??
-                    ColorScheme.fromSeed(seedColor: Colors.cyan)),
+                colorScheme: ColorScheme.fromSeed(
+                    seedColor: lightDynamic?.primary ?? Colors.cyan)),
             darkTheme: ThemeData(
-                colorScheme: darkDynamic ??
-                    ColorScheme.fromSeed(
-                        seedColor: Colors.cyan, brightness: Brightness.dark),
+                colorScheme: ColorScheme.fromSeed(
+                    seedColor: darkDynamic?.primary ?? Colors.cyan,
+                    brightness: Brightness.dark),
                 brightness: Brightness.dark),
             themeMode: themeProvider.themeMode,
             localizationsDelegates: const [

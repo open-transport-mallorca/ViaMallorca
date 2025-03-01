@@ -20,7 +20,7 @@ class RoutesScreen extends StatelessWidget {
             return const Center(child: CircularProgressIndicator());
           }
 
-          final cardColor = Theme.of(context).colorScheme.surfaceContainer;
+          final cardColor = Theme.of(context).colorScheme.surfaceContainerHigh;
 
           final lines = viewModel.filteredLines;
           final searchQuery = viewModel.searchQuery;
