@@ -20,11 +20,16 @@ class StationsScreen extends StatelessWidget {
           final stations = viewModel.filteredStations;
           return Column(
             children: [
+              const SizedBox(height: 4),
               Padding(
                 padding: const EdgeInsets.all(8),
                 child: SearchBar(
+                  elevation: WidgetStateProperty.all(2.0),
                   controller: viewModel.searchController,
-                  leading: const Icon(Icons.search_rounded),
+                  leading: Padding(
+                    padding: const EdgeInsets.only(left: 8.0),
+                    child: const Icon(Icons.search_rounded),
+                  ),
                   onTapOutside: (event) =>
                       FocusManager.instance.primaryFocus?.unfocus(),
                   trailing: [

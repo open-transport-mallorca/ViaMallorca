@@ -29,12 +29,16 @@ class RoutesScreen extends StatelessWidget {
             children: [
               const SizedBox(height: 4),
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                padding: const EdgeInsets.all(8),
                 child: SearchBar(
+                  elevation: WidgetStateProperty.all(2.0),
                   controller: viewModel.searchController,
                   onTapOutside: (event) =>
                       FocusManager.instance.primaryFocus?.unfocus(),
-                  leading: const Icon(Icons.search_rounded),
+                  leading: Padding(
+                    padding: const EdgeInsets.only(left: 8.0),
+                    child: const Icon(Icons.search_rounded),
+                  ),
                   trailing: [
                     IconButton(
                       icon: const Icon(Icons.clear),
