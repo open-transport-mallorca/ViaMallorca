@@ -1,6 +1,7 @@
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_map_tile_caching/flutter_map_tile_caching.dart';
 import 'package:provider/provider.dart';
 import 'package:via_mallorca/apis/local_storage.dart';
 import 'package:via_mallorca/cache/cache_manager.dart';
@@ -22,6 +23,10 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await LocalStorageApi.init();
   await CacheManager.init();
+  await FMTCObjectBoxBackend().initialise(maxDatabaseSize: 300000);
+  await FMTCStore('mapStore').manage.removeTilesOlderThan(
+      expiry: DateTime.timestamp().subtract(const Duration(days: 14)));
+  await FMTCStore('mapStore').manage.create();
   runApp(const ViaMallorca());
 }
 
