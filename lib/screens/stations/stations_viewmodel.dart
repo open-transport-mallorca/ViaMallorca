@@ -17,6 +17,10 @@ class StationsViewModel extends ChangeNotifier {
 
   Future<void> _loadInitialData() async {
     cachedStations = await CacheManager.getAllStations();
+    if (cachedStations.isEmpty) {
+      cachedStations = await Station.getAllStations();
+      CacheManager.setAllStations(cachedStations);
+    }
     favourites = await _getFavouriteStations();
     notifyListeners();
   }
