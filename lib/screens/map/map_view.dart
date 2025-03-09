@@ -1,4 +1,3 @@
-import 'package:flutter_map_cancellable_tile_provider/flutter_map_cancellable_tile_provider.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -58,7 +57,7 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                 children: [
                   TileLayer(
                       retinaMode: true,
-                      tileProvider: CancellableNetworkTileProvider(),
+                      tileProvider: viewModel.tileProvider,
                       tileBuilder:
                           Theme.of(context).brightness == Brightness.dark
                               ? (context, tileWidget, tile) =>
