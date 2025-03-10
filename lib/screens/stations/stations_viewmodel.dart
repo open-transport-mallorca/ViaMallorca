@@ -11,11 +11,7 @@ class StationsViewModel extends ChangeNotifier {
   List<Station>? favourites = [];
   bool onlyFavourites = false;
 
-  StationsViewModel() {
-    _loadInitialData();
-  }
-
-  Future<void> _loadInitialData() async {
+  Future<void> loadStations() async {
     cachedStations = await CacheManager.getAllStations();
     if (cachedStations.isEmpty) {
       cachedStations = await Station.getAllStations();
@@ -34,7 +30,7 @@ class StationsViewModel extends ChangeNotifier {
 
   void toggleFavouritesFilter(bool value) {
     onlyFavourites = value;
-    _filterStations();
+    notifyListeners();
   }
 
   void searchStations(String query) {
@@ -83,9 +79,5 @@ class StationsViewModel extends ChangeNotifier {
     return searchResults.isEmpty && searchController.text.isEmpty
         ? cachedStations
         : searchResults;
-  }
-
-  void _filterStations() {
-    notifyListeners();
   }
 }
