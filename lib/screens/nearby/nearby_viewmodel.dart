@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:mallorca_transit_services/mallorca_transit_services.dart';
+import 'package:via_mallorca/apis/local_storage.dart';
 import 'package:via_mallorca/apis/location.dart';
 import 'package:via_mallorca/cache/cache_manager.dart';
 import 'package:via_mallorca/utils/station_sort.dart';
@@ -10,12 +11,14 @@ class NearbyStopsViewModel extends ChangeNotifier {
   LocationPermission _locationPermission = LocationPermission.denied;
   List<Station> _cachedStations = [];
   List<Station> _nearbyStations = [];
+  List<Station> _favouriteStations = [];
   Position? _currentLocation;
   bool _isLoading = false;
   String? _errorMessage;
 
   LocationPermission get locationPermission => _locationPermission;
   List<Station> get nearbyStations => _nearbyStations;
+  List<Station> get favouriteStations => _favouriteStations;
   Position? get currentLocation => _currentLocation;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
@@ -30,6 +33,13 @@ class NearbyStopsViewModel extends ChangeNotifier {
     }
 
     notifyListeners();
+  }
+
+  Future<List<Station>> _getFavouriteStations() async {
+    final favouriteCodes = await LocalStorageApi.getFavouriteStations();
+    return _cachedStations.where((station) {
+      return favouriteCodes.contains(station.code.toString());
+    }).toList();
   }
 
   Future<void> loadStations() async {
@@ -47,6 +57,8 @@ class NearbyStopsViewModel extends ChangeNotifier {
           StationSort.sortByDistance(_cachedStations, _currentLocation!)
               .take(10)
               .toList();
+
+      _favouriteStations = await _getFavouriteStations();
     } catch (e) {
       _errorMessage = e.toString();
     }

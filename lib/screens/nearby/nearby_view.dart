@@ -32,6 +32,7 @@ class NearbyStops extends StatelessWidget {
           }
 
           final cardColor = Theme.of(context).colorScheme.surfaceContainerHigh;
+          final favoriteBorder = Theme.of(context).colorScheme.primaryContainer;
 
           return RefreshIndicator(
             onRefresh: viewModel.loadStations,
@@ -69,6 +70,11 @@ class NearbyStops extends StatelessWidget {
                             color: cardColor,
                             child: ListTile(
                               shape: RoundedRectangleBorder(
+                                side: viewModel.favouriteStations
+                                        .contains(station)
+                                    ? BorderSide(
+                                        color: favoriteBorder, width: 3.0)
+                                    : BorderSide.none,
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               title: Skeletonizer(
