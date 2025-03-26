@@ -89,16 +89,32 @@ class NearbyStops extends StatelessWidget {
                                   mainAxisSize: MainAxisSize.min,
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(AppLocalizations.of(context)!
-                                        .distance(distanceInMeters)),
-                                    const SizedBox(height: 5),
-                                    StationLineLabels(station: station)
+                                    if (station.ref != null) ...[
+                                      Text(station.ref!),
+                                      const SizedBox(height: 5),
+                                    ],
+                                    StationLineLabels(station: station),
                                   ],
                                 ),
                               ),
                               isThreeLine: false,
-                              trailing:
+                              trailing: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(Icons.location_pin),
+                                  const SizedBox(width: 5),
+                                  SizedBox(
+                                    width: 80,
+                                    child: Text(
+                                      '$distanceInMeters m',
+                                      style: const TextStyle(fontSize: 16),
+                                    ),
+                                  ),
+                                  const SizedBox(width: 12),
                                   const Icon(Icons.arrow_forward_ios_rounded),
+                                ],
+                              ),
                               onTap: () {
                                 Provider.of<NavigationProvider>(context,
                                         listen: false)

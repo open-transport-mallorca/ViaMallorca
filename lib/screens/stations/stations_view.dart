@@ -83,7 +83,7 @@ class StationsScreen extends StatelessWidget {
                               child: ListTile(
                                 title: Text(station.name,
                                     style: const TextStyle(fontSize: 18)),
-                                subtitle: Text(station.code.toString()),
+                                subtitle: Text(station.ref ?? ""),
                                 trailing: IconButton(
                                   icon: Icon(
                                     viewModel.favourites?.contains(station) ==
