@@ -85,10 +85,13 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                   // My Location Marker
                   Consumer<NavigationProvider>(
                       builder: (context, navigationProvider, child) {
-                    return CurrentLocationLayer(
-                      alignPositionStream:
-                          mapProvider.alignPositionStreamController.stream,
-                      alignPositionOnUpdate: mapProvider.alignPositionOnUpdate,
+                    return IgnorePointer(
+                      child: CurrentLocationLayer(
+                        alignPositionStream:
+                            mapProvider.alignPositionStreamController.stream,
+                        alignPositionOnUpdate:
+                            mapProvider.alignPositionOnUpdate,
+                      ),
                     );
                   }),
 
