@@ -124,6 +124,7 @@ class StationSheet extends StatelessWidget {
                 if (departures.isEmpty) {
                   // Show a loading skeleton if there are no departures yet.
                   return Card(
+                      color: Theme.of(context).colorScheme.surfaceContainerHigh,
                       child: Padding(
                           padding: const EdgeInsets.all(4.0),
                           child: ListTile(
