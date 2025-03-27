@@ -128,12 +128,14 @@ class StationSheet extends StatelessWidget {
                       child: Padding(
                           padding: const EdgeInsets.all(4.0),
                           child: ListTile(
+                            leading: Icon(Icons.directions_bus),
                             title: Text(AppLocalizations.of(context)!.loading,
                                 style: const TextStyle(fontSize: 20)),
                             subtitle: Text(
                               AppLocalizations.of(context)!.pleaseWait,
                               style: const TextStyle(fontSize: 16),
                             ),
+                            trailing: Icon(Icons.directions_bus),
                           )));
                 }
                 Departure departure = departures[index];
@@ -157,6 +159,7 @@ class StationSheet extends StatelessWidget {
                       child: Padding(
                         padding: const EdgeInsets.all(4.0),
                         child: ListTile(
+                          leading: _getIconForLine(departure.lineCode),
                           title: Text(
                               "${departure.lineCode}${departure.destination != null ? " - ${departure.destination}" : ""}",
                               style: const TextStyle(fontSize: 20)),
@@ -243,7 +246,7 @@ class StationSheet extends StatelessWidget {
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
                                       children: [
-                                        const Icon(Icons.directions_bus),
+                                        const Icon(Icons.location_pin),
                                         const SizedBox(height: 4),
                                         Text(AppLocalizations.of(context)!
                                             .track),
@@ -263,5 +266,17 @@ class StationSheet extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Icon _getIconForLine(String line) {
+    if (line.startsWith("M")) {
+      return const Icon(Icons.subway_outlined);
+    } else if (line.startsWith("T")) {
+      return const Icon(Icons.train);
+    } else if (line.startsWith("A")) {
+      return const Icon(Icons.airplanemode_active_outlined);
+    } else {
+      return const Icon(Icons.directions_bus);
+    }
   }
 }
