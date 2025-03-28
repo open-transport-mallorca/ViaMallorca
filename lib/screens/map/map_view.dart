@@ -161,6 +161,7 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
     final mapProvider = Provider.of<MapProvider>(context, listen: false);
     return MarkerClusterLayerWidget(
       options: MarkerClusterLayerOptions(
+        showPolygon: false,
         builder: (context, markers) {
           return Container(
             decoration: BoxDecoration(

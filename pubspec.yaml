@@ -16,7 +16,7 @@ dependencies:
   intl: any
   flutter_local_notifications: ^18.0.1
   flutter_map: ^7.0.2
-  flutter_map_marker_cluster: ^1.3.5
+  flutter_map_marker_cluster: ^1.4.0
   latlong2: ^0.9.1
   permission_handler: ^11.3.1
   provider: ^6.1.2
