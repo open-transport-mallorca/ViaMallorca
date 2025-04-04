@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_map_animations/flutter_map_animations.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:mallorca_transit_services/mallorca_transit_services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:via_mallorca/apis/location.dart';
 import 'package:via_mallorca/cache/cache_manager.dart';
 import 'package:via_mallorca/providers/map_provider.dart';
 import 'package:flutter/widgets.dart';
@@ -26,8 +28,21 @@ class MapViewModel extends ChangeNotifier with WidgetsBindingObserver {
       await CacheManager.setAllStations(_cachedStations);
     }
 
-    cacheDirectory = await _getCachePath();
+    LocationPermission locationPermission =
+        await LocationApi().permissionStatus();
 
+    if (locationPermission == LocationPermission.whileInUse ||
+        locationPermission == LocationPermission.always) {
+      // Delay the location update to ensure the map is fully loaded
+      Future.delayed(
+        const Duration(seconds: 2),
+        () => context.mounted
+            ? context.read<MapProvider>().moveToCurrentLocation(context)
+            : null,
+      );
+    }
+
+    cacheDirectory = await _getCachePath();
     notifyListeners();
   }
 
