@@ -3,7 +3,6 @@ import 'dart:convert';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
-// import 'package:via_mallorca/apis/notification.dart';
 import 'package:mallorca_transit_services/mallorca_transit_services.dart';
 
 /// A provider class for tracking bus locations and information.
@@ -25,6 +24,13 @@ class TrackingProvider extends ChangeNotifier {
   /// Optionally, an [initialCoords] can be provided to set the initial location.
   Future<void> startTracking(int tripId, String lineCode, LatLng initialCoords,
       int trackingFrom) async {
+    // Properly clean up existing connections first
+    await stopTracking();
+
+    trackingFromStation = trackingFrom;
+    trackingTripId = tripId;
+    currentLocation = initialCoords;
+
     if (_locationStream != null) {
       _locationStream!.cancel();
     }
@@ -35,10 +41,17 @@ class TrackingProvider extends ChangeNotifier {
 
     _connectivitySubscription =
         Connectivity().onConnectivityChanged.listen((state) async {
-      _connectivitySubscription?.pause();
-      Future.delayed(Duration.zero, () async {
-        _connectivitySubscription?.resume();
-      });
+      if (state.contains(ConnectivityResult.none)) {
+        _locationStream?.pause();
+      } else {
+        _locationStream?.resume();
+        // Consider re-establishing the WebSocket connection if paused for too long
+        if (_locationStream?.isPaused ?? false) {
+          stopTracking();
+          await startTracking(
+              tripId, lineCode, currentLocation!, trackingFromStation!);
+        }
+      }
     });
 
     trackingFromStation = trackingFrom;
@@ -61,9 +74,11 @@ class TrackingProvider extends ChangeNotifier {
       if (action is RouteStationInfo) {
         routeStationInfo = action;
         stationsOnRoute = action.stops;
+        notifyListeners();
       }
       if (action is ConnectionClose) {
         stopTracking();
+        notifyListeners();
       }
     });
   }
@@ -73,19 +88,28 @@ class TrackingProvider extends ChangeNotifier {
   }
 
   void resume() {
-    _locationStream?.resume();
+    if (_locationStream != null) {
+      // Always restart the tracking when resuming the app
+      if (trackingTripId != null &&
+          routeCode != null &&
+          currentLocation != null &&
+          trackingFromStation != null) {
+        startTracking(trackingTripId!, routeCode!, currentLocation!,
+            trackingFromStation!);
+      }
+    }
   }
 
   /// Stops tracking the bus.
-  void stopTracking() {
-    currentLocation = null;
-    routeStationInfo = null;
-    _locationStream?.cancel();
-    _connectivitySubscription?.cancel();
+  Future<void> stopTracking() async {
+    await _locationStream?.cancel();
+    _locationStream = null;
+    await _connectivitySubscription?.cancel();
     _connectivitySubscription = null;
     routeCode = null;
     trackingTripId = null;
     trackingFromStation = null;
+    currentLocation = null;
     stationsOnRoute = null;
     notifyListeners();
   }

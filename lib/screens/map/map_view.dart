@@ -29,7 +29,32 @@ class MapScreen extends StatefulWidget {
   State<MapScreen> createState() => _MapScreenState();
 }
 
-class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
+class _MapScreenState extends State<MapScreen>
+    with TickerProviderStateMixin, WidgetsBindingObserver {
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    final trackingProvider =
+        Provider.of<TrackingProvider>(context, listen: false);
+
+    if (state == AppLifecycleState.resumed) {
+      trackingProvider.resume();
+    } else if (state == AppLifecycleState.paused) {
+      trackingProvider.pause();
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
@@ -418,7 +443,8 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                                 ? MainAxisAlignment.spaceEvenly
                                 : MainAxisAlignment.center,
                         children: [
-                          if (trackingProvider.routeStationInfo != null) ...[
+                          if (trackingProvider.routeStationInfo != null &&
+                              mapProvider.customRouteDestinations != null) ...[
                             Text(
                               "${trackingProvider.routeCode} - ${mapProvider.customRouteDestinations![mapProvider.customWay == Way.way ? 0 : 1]}",
                               style:
@@ -500,8 +526,8 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
               // Stop Tracking Bus Button
               if (trackingProvider.currentLocation != null)
                 ElevatedButton.icon(
-                    onPressed: () {
-                      context.read<TrackingProvider>().stopTracking();
+                    onPressed: () async {
+                      await context.read<TrackingProvider>().stopTracking();
                       mapProvider.setCustomPolylines(null);
                       mapProvider.setCustomStations([]);
                       mapProvider.setCustomWay(null);
