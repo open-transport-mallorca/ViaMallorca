@@ -10,6 +10,7 @@ import 'package:via_mallorca/providers/map_provider.dart';
 import 'package:via_mallorca/providers/navigation_provider.dart';
 import 'package:via_mallorca/screens/nearby/nearby_viewmodel.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:via_mallorca/utils/distance_formatter.dart';
 import 'package:via_mallorca/utils/station_sort.dart';
 
 class NearbyStops extends StatelessWidget {
@@ -30,9 +31,6 @@ class NearbyStops extends StatelessWidget {
               ),
             );
           }
-
-          final cardColor = Theme.of(context).colorScheme.surfaceContainerHigh;
-          final favoriteBorder = Theme.of(context).colorScheme.primaryContainer;
 
           return RefreshIndicator(
             onRefresh: viewModel.loadStations,
@@ -56,87 +54,12 @@ class NearbyStops extends StatelessWidget {
                       child: ListView.builder(
                         itemCount: viewModel.nearbyStations.length,
                         itemBuilder: (context, index) {
-                          final station = viewModel.nearbyStations[index];
-                          int distanceInMeters = 0;
-                          if (viewModel.currentLocation != null) {
-                            distanceInMeters = calculateDistance(
-                                    lat1: viewModel.currentLocation!.latitude,
-                                    lon1: viewModel.currentLocation!.longitude,
-                                    lat2: station.lat,
-                                    lon2: station.long)
-                                .round();
-                          }
-                          return Card(
-                            color: cardColor,
-                            child: ListTile(
-                              shape: RoundedRectangleBorder(
-                                side: viewModel.favouriteStations
-                                        .contains(station)
-                                    ? BorderSide(
-                                        color: favoriteBorder, width: 3.0)
-                                    : BorderSide.none,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              title: Skeletonizer(
-                                enabled: viewModel.isLoading,
-                                child: Text(
-                                  station.name,
-                                ),
-                              ),
-                              subtitle: Skeletonizer(
-                                enabled: viewModel.isLoading,
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    if (station.ref != null) ...[
-                                      Text(station.ref!),
-                                      const SizedBox(height: 5),
-                                    ],
-                                    StationLineLabels(station: station),
-                                  ],
-                                ),
-                              ),
-                              isThreeLine: false,
-                              trailing: Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Icon(Icons.location_pin),
-                                  const SizedBox(width: 5),
-                                  SizedBox(
-                                    width: 80,
-                                    child: Text(
-                                      '$distanceInMeters m',
-                                      style: const TextStyle(fontSize: 16),
-                                    ),
-                                  ),
-                                  const SizedBox(width: 12),
-                                  const Icon(Icons.arrow_forward_ios_rounded),
-                                ],
-                              ),
-                              onTap: () {
-                                Provider.of<NavigationProvider>(context,
-                                        listen: false)
-                                    .setIndex(1);
-                                Provider.of<MapProvider>(context, listen: false)
-                                    .updateLocation(
-                                        LatLng(station.lat, station.long), 18);
-                                showBottomSheet(
-                                    shape: const RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.vertical(
-                                            top: Radius.circular(10.0))),
-                                    context: context,
-                                    builder: (context) =>
-                                        StationSheet(station: station));
-                              },
-                            ),
-                          );
+                          return nearbyCard(viewModel, index, context);
                         },
                       ),
                     )
                   else
-                    _locationNotLoaded(context, viewModel),
+                    locationNotLoaded(context, viewModel),
                 ]),
           );
         },
@@ -144,7 +67,100 @@ class NearbyStops extends StatelessWidget {
     );
   }
 
-  Widget _locationNotLoaded(
+  Widget nearbyCard(
+      NearbyStopsViewModel viewModel, int index, BuildContext context) {
+    final cardColor = Theme.of(context).colorScheme.surfaceContainerHigh;
+    final favoriteBorder = Theme.of(context).colorScheme.primaryContainer;
+
+    final station = viewModel.nearbyStations[index];
+    String formattedDistance = '';
+    if (viewModel.currentLocation != null) {
+      int distanceInMeters = calculateDistance(
+              lat1: viewModel.currentLocation!.latitude,
+              lon1: viewModel.currentLocation!.longitude,
+              lat2: station.lat,
+              lon2: station.long)
+          .round();
+      formattedDistance = MetricDistanceFormatter.formatDistance(
+          distanceInMeters.toDouble(), context);
+    }
+    return Card(
+      color: cardColor,
+      child: ListTile(
+        shape: RoundedRectangleBorder(
+          side: viewModel.favouriteStations.contains(station)
+              ? BorderSide(color: favoriteBorder, width: 3.0)
+              : BorderSide.none,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        title: Skeletonizer(
+          enabled: viewModel.isLoading,
+          child: Text(
+            station.name,
+          ),
+        ),
+        subtitle: Skeletonizer(
+          enabled: viewModel.isLoading,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (station.ref != null) ...[
+                Text(station.ref!),
+                const SizedBox(height: 5),
+              ],
+              StationLineLabels(station: station),
+            ],
+          ),
+        ),
+        isThreeLine: false,
+        trailing: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Card(
+              color: Theme.of(context).colorScheme.secondaryContainer,
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: SizedBox(
+                  width: 80,
+                  height: 25,
+                  child: Center(
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(Icons.location_pin),
+                        const SizedBox(width: 5),
+                        Text(
+                          formattedDistance,
+                          style: const TextStyle(fontSize: 16),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            const Icon(Icons.arrow_forward_ios_rounded),
+          ],
+        ),
+        onTap: () {
+          Provider.of<NavigationProvider>(context, listen: false).setIndex(1);
+          Provider.of<MapProvider>(context, listen: false)
+              .updateLocation(LatLng(station.lat, station.long), 18);
+          showBottomSheet(
+              shape: const RoundedRectangleBorder(
+                  borderRadius:
+                      BorderRadius.vertical(top: Radius.circular(10.0))),
+              context: context,
+              builder: (context) => StationSheet(station: station));
+        },
+      ),
+    );
+  }
+
+  Widget locationNotLoaded(
       BuildContext context, NearbyStopsViewModel viewModel) {
     return Center(
       child: Padding(

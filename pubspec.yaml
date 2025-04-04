@@ -7,7 +7,7 @@ environment:
   sdk: ">=3.4.0 <4.0.0"
 
 dependencies:
-  mallorca_transit_services: ^1.0.2
+  mallorca_transit_services: ^1.1.0
   dynamic_color: ^1.7.0
   flutter:
     sdk: flutter

@@ -27,7 +27,7 @@ class StationLineLabels extends StatelessWidget {
                   AppLocalizations.of(context)!.loading,
                   style: TextStyle(
                     fontSize: 16,
-                    color: Theme.of(context).colorScheme.onSecondaryContainer,
+                    color: Theme.of(context).colorScheme.onPrimaryContainer,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -50,7 +50,7 @@ class StationLineLabels extends StatelessWidget {
                 runSpacing: 10,
                 children: activeLines.map((line) {
                   return Material(
-                    color: Theme.of(context).colorScheme.secondaryContainer,
+                    color: Theme.of(context).colorScheme.primaryContainer,
                     borderRadius: BorderRadius.circular(10),
                     child: InkWell(
                       borderRadius: BorderRadius.circular(10),
@@ -71,7 +71,7 @@ class StationLineLabels extends StatelessWidget {
                             fontSize: 16,
                             color: Theme.of(context)
                                 .colorScheme
-                                .onSecondaryContainer,
+                                .onPrimaryContainer,
                             fontWeight: FontWeight.bold,
                           ),
                         ),

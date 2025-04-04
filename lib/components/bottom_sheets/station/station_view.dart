@@ -9,6 +9,8 @@ import 'package:via_mallorca/components/station_line_labels/station_line_labels_
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:via_mallorca/providers/map_provider.dart';
 import 'package:via_mallorca/providers/tracking_provider.dart';
+import 'package:via_mallorca/utils/distance_formatter.dart';
+import 'package:via_mallorca/utils/station_sort.dart';
 import 'station_viewmodel.dart';
 
 class StationSheet extends StatelessWidget {
@@ -142,129 +144,166 @@ class StationSheet extends StatelessWidget {
                 return Consumer<TrackingProvider>(
                     builder: (context, trackingProvider, _) {
                   return Container(
-                    decoration: BoxDecoration(
-                        borderRadius: BorderRadius.circular(16),
-                        border: trackingProvider.trackingTripId ==
-                                    departure.realTrip?.id &&
-                                departure.realTrip != null
-                            ? Border.all(
-                                color: Theme.of(context)
-                                    .colorScheme
-                                    .tertiary
-                                    .withValues(alpha: 1),
-                                width: 3)
-                            : null),
-                    child: Card(
-                      color: Theme.of(context).colorScheme.surfaceContainerHigh,
-                      child: Padding(
-                        padding: const EdgeInsets.all(4.0),
-                        child: ListTile(
-                          leading: _getIconForLine(departure.lineCode),
-                          title: Text(
-                              "${departure.lineCode}${departure.destination != null ? " - ${departure.destination}" : ""}",
-                              style: const TextStyle(fontSize: 20)),
-                          subtitle: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(departure.name,
-                                  style: const TextStyle(fontSize: 16)),
-
-                              // Display the estimated arrival time of the departure.
-                              Builder(
-                                builder: (context) {
-                                  final minutesDifference = departure
-                                      .estimatedArrival
-                                      .difference(DateTime.now())
-                                      .inMinutes;
-                                  final estimatedArrivalTime = DateFormat.Hm()
-                                      .format(departure.estimatedArrival);
-                                  String arrivalText;
-                                  Color textColor;
-
-                                  if (minutesDifference < 0) {
-                                    arrivalText = AppLocalizations.of(context)!
-                                        .arrivingLate;
-                                    textColor =
-                                        Theme.of(context).colorScheme.error;
-                                  } else if (minutesDifference > 59) {
-                                    arrivalText = estimatedArrivalTime;
-                                    textColor =
-                                        Theme.of(context).colorScheme.onSurface;
-                                  } else {
-                                    arrivalText =
-                                        "$minutesDifference ${AppLocalizations.of(context)!.min} ($estimatedArrivalTime)";
-                                    textColor =
-                                        Theme.of(context).colorScheme.onSurface;
-                                  }
-
-                                  return Text(
-                                    arrivalText,
-                                    style: TextStyle(
-                                        fontSize: 16, color: textColor),
-                                  );
-                                },
-                              ),
-                            ],
-                          ),
-                          trailing: Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              if (departure.realTrip != null) ...[
-                                const SizedBox(width: 12),
-                                Material(
-                                  color: Colors.transparent,
-                                  borderRadius: BorderRadius.circular(50),
-                                  child: InkWell(
-                                    borderRadius: BorderRadius.circular(50),
-                                    onTap: () async {
-                                      final line = await RouteLine.getLine(
-                                          departure.lineCode);
-                                      if (context.mounted) {
-                                        Provider.of<MapProvider>(context,
-                                                listen: false)
-                                            .viewRoute(line, context, true);
-                                        Provider.of<TrackingProvider>(context,
-                                                listen: false)
-                                            .startTracking(
-                                                departure.realTrip!.id,
-                                                departure.lineCode,
-                                                LatLng(departure.realTrip!.lat,
-                                                    departure.realTrip!.long),
-                                                station.id);
-                                        Provider.of<MapProvider>(context,
-                                                listen: false)
-                                            .updateLocation(
-                                                LatLng(departure.realTrip!.lat,
-                                                    departure.realTrip!.long),
-                                                15);
-                                      }
-                                    },
-                                    child: Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        const Icon(Icons.location_pin),
-                                        const SizedBox(height: 4),
-                                        Text(AppLocalizations.of(context)!
-                                            .track),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ]
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
+                      decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(16),
+                          border: trackingProvider.trackingTripId ==
+                                      departure.realTrip?.id &&
+                                  departure.realTrip != null
+                              ? Border.all(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .tertiary
+                                      .withValues(alpha: 1),
+                                  width: 3)
+                              : null),
+                      child: departureCard(context, departure));
                 });
               }),
         ),
       ),
+    );
+  }
+
+  Widget departureCard(BuildContext context, Departure departure) {
+    return Card(
+      color: Theme.of(context).colorScheme.surfaceContainerHigh,
+      child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Row(
+            spacing: 12,
+            children: [
+              // Leading icon (left side)
+              _getIconForLine(departure.lineCode),
+
+              // Main content (middle)
+              Expanded(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Title line
+                    Text(
+                      "${departure.lineCode}${departure.destination != null ? " - ${departure.destination}" : ""}",
+                      style: const TextStyle(fontSize: 20),
+                    ),
+
+                    // Subtitle content
+                    Text(
+                      departure.name,
+                      style: const TextStyle(fontSize: 16),
+                    ),
+
+                    // Arrival time
+                    Builder(
+                      builder: (context) {
+                        final minutesDifference = departure.estimatedArrival
+                            .difference(DateTime.now())
+                            .inMinutes;
+                        final estimatedArrivalTime =
+                            DateFormat.Hm().format(departure.estimatedArrival);
+                        String arrivalText;
+                        Color textColor;
+
+                        if (minutesDifference < 0) {
+                          arrivalText =
+                              AppLocalizations.of(context)!.arrivingLate;
+                          textColor = Theme.of(context).colorScheme.error;
+                        } else if (minutesDifference > 59) {
+                          arrivalText = estimatedArrivalTime;
+                          textColor = Theme.of(context).colorScheme.onSurface;
+                        } else {
+                          arrivalText =
+                              "$minutesDifference ${AppLocalizations.of(context)!.min} ($estimatedArrivalTime)";
+                          textColor = Theme.of(context).colorScheme.onSurface;
+                        }
+
+                        return Text(
+                          arrivalText,
+                          style: TextStyle(fontSize: 14, color: textColor),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              Row(mainAxisSize: MainAxisSize.min, spacing: 12, children: [
+                // Trailing widgets (right side)
+                if (departure.realTrip != null) ...[
+                  // Passenger count
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Icon(Icons.people, size: 20),
+                      Text(
+                        "${departure.realTrip?.stats.passengers}",
+                        style: const TextStyle(fontSize: 16),
+                      ),
+                    ],
+                  ),
+
+                  // Track button
+                  Column(
+                    spacing: 2,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Material(
+                        color: Theme.of(context).colorScheme.secondaryContainer,
+                        borderRadius: BorderRadius.circular(12),
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(12),
+                          onTap: () async {
+                            final line =
+                                await RouteLine.getLine(departure.lineCode);
+                            if (context.mounted) {
+                              Provider.of<MapProvider>(context, listen: false)
+                                  .viewRoute(line, context, true);
+                              Provider.of<TrackingProvider>(context,
+                                      listen: false)
+                                  .startTracking(
+                                      departure.realTrip!.id,
+                                      departure.lineCode,
+                                      LatLng(departure.realTrip!.lat,
+                                          departure.realTrip!.long),
+                                      station.id);
+                              Provider.of<MapProvider>(context, listen: false)
+                                  .updateLocation(
+                                      LatLng(departure.realTrip!.lat,
+                                          departure.realTrip!.long),
+                                      15);
+                            }
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.all(8.0),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              spacing: 4,
+                              children: [
+                                const Icon(Icons.location_pin, size: 20),
+                                Text(
+                                  AppLocalizations.of(context)!.track,
+                                  style: const TextStyle(fontSize: 12),
+                                )
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                      Text(
+                        MetricDistanceFormatter.formatDistance(
+                            calculateDistance(
+                                lon1: station.long,
+                                lat1: station.lat,
+                                lon2: departure.realTrip!.long,
+                                lat2: departure.realTrip!.lat),
+                            context),
+                        style: TextStyle(fontSize: 11),
+                      )
+                    ],
+                  ),
+                ],
+              ])
+            ],
+          )),
     );
   }
 
