@@ -23,10 +23,11 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await LocalStorageApi.init();
   await CacheManager.init();
-  await FMTCObjectBoxBackend().initialise(maxDatabaseSize: 300000);
-  await FMTCStore('mapStore').manage.removeTilesOlderThan(
-      expiry: DateTime.timestamp().subtract(const Duration(days: 14)));
-  await FMTCStore('mapStore').manage.create();
+
+  /// Switched to another caching mechanism.
+  /// This is here to delete the cached tiles from the old caching mechanism.
+  await FMTCObjectBoxBackend().initialise();
+  await FMTCStore('mapStore').manage.reset();
   runApp(const ViaMallorca());
 }
 

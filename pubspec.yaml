@@ -36,6 +36,10 @@ dependencies:
       ref: main
   material_design_icons_flutter: ^7.0.7296
   flutter_map_tile_caching: ^10.0.0
+  flutter_map_cache: ^1.5.2
+  dio_cache_interceptor: ^3.5.1
+  dio_cache_interceptor_hive_store: ^4.0.0
+  path_provider: ^2.1.5
 
 dependency_overrides:
   flutter_compass:

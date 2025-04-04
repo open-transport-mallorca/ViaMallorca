@@ -1,3 +1,5 @@
+import 'package:dio_cache_interceptor_hive_store/dio_cache_interceptor_hive_store.dart';
+import 'package:flutter_map_cache/flutter_map_cache.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -58,7 +60,16 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                 children: [
                   TileLayer(
                       retinaMode: true,
-                      tileProvider: viewModel.tileProvider,
+                      // Uses cached tiles when the caching directory is loaded
+                      tileProvider: viewModel.cacheDir != null
+                          ? CachedTileProvider(
+                              maxStale: const Duration(days: 30),
+                              store: HiveCacheStore(
+                                viewModel.cacheDir,
+                                hiveBoxName: 'HiveCacheStore',
+                              ),
+                            )
+                          : null,
                       tileBuilder:
                           Theme.of(context).brightness == Brightness.dark
                               ? (context, tileWidget, tile) =>
