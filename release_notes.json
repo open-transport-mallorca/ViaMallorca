@@ -1,10 +1,10 @@
 [
   {
     "language": "en-US",
-    "text": "UI Improvements and bug fixes"
+    "text": "Fixed a bug that caused the app to crash on fresh installations"
   },
   {
     "language": "es-ES",
-    "text": "Mejoras en la interfaz de usuario y correcciones de errores"
+    "text": "Arreglado error que causaba que la aplicación se bloqueara en instalaciones nuevas"
   }
 ]

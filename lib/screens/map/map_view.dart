@@ -86,15 +86,15 @@ class _MapScreenState extends State<MapScreen>
                   TileLayer(
                       retinaMode: true,
                       // Uses cached tiles when the caching directory is loaded
-                      tileProvider: viewModel.cacheDir != null
-                          ? CachedTileProvider(
-                              maxStale: const Duration(days: 30),
-                              store: HiveCacheStore(
-                                viewModel.cacheDir,
-                                hiveBoxName: 'HiveCacheStore',
-                              ),
-                            )
-                          : null,
+                      // tileProvider: viewModel.cacheDir != null
+                      //     ? CachedTileProvider(
+                      //         maxStale: const Duration(days: 30),
+                      //         store: HiveCacheStore(
+                      //           viewModel.cacheDir,
+                      //           hiveBoxName: 'HiveCacheStore',
+                      //         ),
+                      //       )
+                      //     : null,
                       tileBuilder:
                           Theme.of(context).brightness == Brightness.dark
                               ? (context, tileWidget, tile) =>

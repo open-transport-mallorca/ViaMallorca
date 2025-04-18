@@ -26,8 +26,13 @@ void main() async {
 
   /// Switched to another caching mechanism.
   /// This is here to delete the cached tiles from the old caching mechanism.
-  await FMTCObjectBoxBackend().initialise();
-  await FMTCStore('mapStore').manage.reset();
+  try {
+    await FMTCObjectBoxBackend().initialise();
+    await FMTCStore('mapStore').manage.reset();
+  } catch (e) {
+    debugPrint("Error deleting old cache: $e");
+  }
+
   runApp(const ViaMallorca());
 }
 
