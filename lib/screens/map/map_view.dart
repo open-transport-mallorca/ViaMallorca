@@ -4,13 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_animations/flutter_map_animations.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:via_mallorca/components/bottom_sheets/station/station_view.dart';
 import 'package:via_mallorca/components/bottom_sheets/timeline/timeline_view.dart';
 import 'package:via_mallorca/providers/map_provider.dart';
-import 'package:via_mallorca/providers/navigation_provider.dart';
 import 'package:via_mallorca/providers/tracking_provider.dart';
 import 'package:via_mallorca/utils/adapt_color.dart';
 import 'package:mallorca_transit_services/mallorca_transit_services.dart';
@@ -106,17 +106,16 @@ class _MapScreenState extends State<MapScreen>
                     _stationsMarkers(context, viewModel),
 
                   // My Location Marker
-                  Consumer<NavigationProvider>(
-                      builder: (context, navigationProvider, child) {
-                    return IgnorePointer(
+                  if (viewModel.locationPermission ==
+                          LocationPermission.whileInUse ||
+                      viewModel.locationPermission == LocationPermission.always)
+                    IgnorePointer(
                       child: CurrentLocationLayer(
                         alignPositionStream:
-                            mapProvider.alignPositionStreamController.stream,
-                        alignPositionOnUpdate:
-                            mapProvider.alignPositionOnUpdate,
+                            viewModel.alignPositionStreamController.stream,
+                        alignPositionOnUpdate: viewModel.alignPositionOnUpdate,
                       ),
-                    );
-                  }),
+                    ),
 
                   // Bus Tracker Marker
                   _busTracker(context)
@@ -135,7 +134,7 @@ class _MapScreenState extends State<MapScreen>
                 _routeWaySwitcher(context),
 
               // Update location button
-              _updateLocationButtons(context),
+              _updateLocationButtons(context, viewModel),
 
               if (mapProvider.loadingProgress < 1)
                 _loadingOverlay(context, mapProvider)
@@ -146,7 +145,7 @@ class _MapScreenState extends State<MapScreen>
     );
   }
 
-  Widget _updateLocationButtons(BuildContext context) {
+  Widget _updateLocationButtons(BuildContext context, MapViewModel viewModel) {
     final mapProvider = Provider.of<MapProvider>(context, listen: false);
     final trackingProvider =
         Provider.of<TrackingProvider>(context, listen: false);
@@ -172,8 +171,13 @@ class _MapScreenState extends State<MapScreen>
               // Move to Current Location
               FloatingActionButton(
                   onPressed: () async =>
-                      mapProvider.moveToCurrentLocation(context),
-                  child: const Icon(Icons.my_location)),
+                      viewModel.moveToCurrentLocation(context),
+                  child: Icon((viewModel.locationPermission ==
+                              LocationPermission.whileInUse ||
+                          viewModel.locationPermission ==
+                              LocationPermission.always)
+                      ? Icons.my_location
+                      : Icons.location_searching)),
             ],
           ),
         ));

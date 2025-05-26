@@ -1,14 +1,9 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_animations/flutter_map_animations.dart';
-import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
-import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
-import 'package:via_mallorca/apis/location.dart';
-import 'package:via_mallorca/components/popups/location_denied_popup.dart';
 import 'package:via_mallorca/providers/navigation_provider.dart';
 import 'package:via_mallorca/providers/tracking_provider.dart';
 import 'package:via_mallorca/utils/adapt_color.dart';
@@ -21,10 +16,6 @@ class MapProvider extends ChangeNotifier {
   List<List<Station>> customStations = [];
   List<String>? customRouteDestinations;
   Way? customWay;
-  AlignOnUpdate alignPositionOnUpdate = AlignOnUpdate.never;
-
-  final StreamController<double?> alignPositionStreamController =
-      StreamController<double?>.broadcast();
 
   /// The loading progress, represented as a double value.
   ///
@@ -170,34 +161,5 @@ class MapProvider extends ChangeNotifier {
   void setMapLoadingProgress(double progress) {
     loadingProgress = progress;
     notifyListeners();
-  }
-
-  Future<void> moveToCurrentLocation(BuildContext context) async {
-    LocationApi locationApi = LocationApi();
-    LocationPermission locationPermission =
-        await locationApi.permissionStatus();
-    if (locationPermission == LocationPermission.denied) {
-      await locationApi.requestPermission();
-      locationPermission = await locationApi.permissionStatus();
-      if ((locationPermission == LocationPermission.denied ||
-              locationPermission == LocationPermission.deniedForever) &&
-          context.mounted) {
-        showDialog(
-            context: context,
-            builder: (context) => const LocationDeniedPopup());
-        return;
-      }
-    } else if (locationPermission == LocationPermission.deniedForever) {
-      if (context.mounted) {
-        showDialog(
-            context: context,
-            builder: (context) => const LocationDeniedPopup());
-      }
-      return;
-    }
-
-    /// This will move the map to the current location
-    /// and set the zoom level to 16
-    alignPositionStreamController.add(16);
   }
 }

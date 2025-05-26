@@ -7,7 +7,6 @@ import 'package:via_mallorca/cache/cache_manager.dart';
 import 'package:via_mallorca/utils/station_sort.dart';
 
 class NearbyStopsViewModel extends ChangeNotifier {
-  final LocationApi _locationApi = LocationApi();
   LocationPermission _locationPermission = LocationPermission.denied;
   List<Station> _cachedStations = [];
   List<Station> _nearbyStations = [];
@@ -26,7 +25,7 @@ class NearbyStopsViewModel extends ChangeNotifier {
   Future<void> initialize() async {
     notifyListeners();
 
-    _locationPermission = await _locationApi.permissionStatus();
+    _locationPermission = await LocationApi.permissionStatus();
     if (_locationPermission == LocationPermission.always ||
         _locationPermission == LocationPermission.whileInUse) {
       await loadStations();
@@ -43,6 +42,11 @@ class NearbyStopsViewModel extends ChangeNotifier {
   }
 
   Future<void> loadStations() async {
+    // This method is called before the user can interact with the screen.
+    if (_locationPermission == LocationPermission.denied ||
+        _locationPermission == LocationPermission.deniedForever) {
+      return;
+    }
     _isLoading = true;
     notifyListeners();
     try {
@@ -52,7 +56,7 @@ class NearbyStopsViewModel extends ChangeNotifier {
         await CacheManager.setAllStations(_cachedStations);
       }
 
-      _currentLocation = await _locationApi.getCurrentLocation();
+      _currentLocation = await LocationApi.getCurrentLocation();
       _nearbyStations =
           StationSort.sortByDistance(_cachedStations, _currentLocation!)
               .take(10)
@@ -67,7 +71,7 @@ class NearbyStopsViewModel extends ChangeNotifier {
   }
 
   Future<void> requestLocationPermission() async {
-    _locationPermission = await _locationApi.requestPermission();
+    _locationPermission = await LocationApi.requestPermission();
     notifyListeners();
 
     if (_locationPermission == LocationPermission.always ||
