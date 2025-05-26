@@ -40,6 +40,7 @@ dependencies:
   dio_cache_interceptor: ^3.5.1
   dio_cache_interceptor_hive_store: ^4.0.0
   path_provider: ^2.1.5
+  flutter_map_cancellable_tile_provider: ^3.0.2
 
 dependency_overrides:
   flutter_compass:
