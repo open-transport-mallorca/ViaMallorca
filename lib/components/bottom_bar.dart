@@ -18,6 +18,9 @@ class _BottomNavigationState extends State<BottomNavigation> {
         selectedIndex: navProvider.currentIndex,
         onDestinationSelected: (index) {
           navProvider.setIndex(index);
+          if (Navigator.canPop(context)) {
+            Navigator.pop(context);
+          }
         },
         labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
         destinations: [
