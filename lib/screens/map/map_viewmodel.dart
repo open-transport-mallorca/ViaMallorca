@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map_animations/flutter_map_animations.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:mallorca_transit_services/mallorca_transit_services.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
@@ -46,6 +47,14 @@ class MapViewModel extends ChangeNotifier with WidgetsBindingObserver {
 
     cacheDirectory = await _getCachePath();
     notifyListeners();
+  }
+
+  Future<void> moveToLocation(
+      {required BuildContext context,
+      required LatLng position,
+      double zoom = 16}) async {
+    final mapProvider = context.read<MapProvider>();
+    mapProvider.updateLocation(position, zoom);
   }
 
   Future<void> moveToCurrentLocation(BuildContext context) async {

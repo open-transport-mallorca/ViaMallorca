@@ -146,7 +146,6 @@ class _MapScreenState extends State<MapScreen>
   }
 
   Widget _updateLocationButtons(BuildContext context, MapViewModel viewModel) {
-    final mapProvider = Provider.of<MapProvider>(context, listen: false);
     final trackingProvider =
         Provider.of<TrackingProvider>(context, listen: false);
 
@@ -163,8 +162,10 @@ class _MapScreenState extends State<MapScreen>
                 FloatingActionButton(
                     mini: true,
                     onPressed: () {
-                      mapProvider.updateLocation(
-                          trackingProvider.currentLocation!, 16);
+                      viewModel.moveToLocation(
+                          context: context,
+                          position: trackingProvider.currentLocation!,
+                          zoom: 15);
                     },
                     child: const Icon(Icons.directions_bus)),
 
@@ -202,8 +203,8 @@ class _MapScreenState extends State<MapScreen>
         },
         markers: viewModel.cachedStations
             .map((station) => Marker(
-                  width: 40,
-                  height: 40,
+                  width: 50,
+                  height: 50,
                   alignment: Alignment.topCenter,
                   point: LatLng(station.lat, station.long),
                   child: GestureDetector(
@@ -235,10 +236,9 @@ class _MapScreenState extends State<MapScreen>
                 : mapProvider
                     .customStations[mapProvider.customWay == Way.way ? 0 : 1])
             .map((station) => Marker(
-                  width:
-                      mapProvider.mapController!.mapController.camera.zoom * 3,
-                  height:
-                      mapProvider.mapController!.mapController.camera.zoom * 3,
+                  width: 40,
+                  height: 40,
+                  alignment: Alignment.topCenter,
                   point: LatLng(station.lat, station.long),
                   child: GestureDetector(
                     onTap: () {
@@ -257,9 +257,7 @@ class _MapScreenState extends State<MapScreen>
                                   : 0)),
                       child: Image.asset(
                         "assets/stop_icon.png",
-                        height: mapProvider
-                                .mapController!.mapController.camera.zoom *
-                            3,
+                        height: 50,
                       ),
                     ),
                   ),
@@ -346,30 +344,22 @@ class _MapScreenState extends State<MapScreen>
   }
 
   Widget _busTracker(BuildContext context) {
-    final mapProvider = Provider.of<MapProvider>(context, listen: false);
     final trackingProvider =
         Provider.of<TrackingProvider>(context, listen: false);
 
     return AnimatedMarkerLayer(markers: [
       if (trackingProvider.currentLocation != null)
         AnimatedMarker(
-            width: mapProvider.mapController!.mapController.camera.zoom * 4,
-            height: mapProvider.mapController!.mapController.camera.zoom * 4,
+            width: 120,
+            height: 120,
             point: LatLng(trackingProvider.currentLocation!.latitude,
                 trackingProvider.currentLocation!.longitude),
             builder: (_, animation) {
               return Container(
-                  width: (mapProvider.mapController!.mapController.camera.zoom *
-                          4) *
-                      animation.value,
-                  height:
-                      (mapProvider.mapController!.mapController.camera.zoom *
-                              4) *
-                          animation.value,
+                  width: 60 * animation.value,
+                  height: 60 * animation.value,
                   decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular((mapProvider
-                              .mapController!.mapController.camera.zoom) *
-                          animation.value),
+                      borderRadius: BorderRadius.circular(12),
                       color: Theme.of(context)
                           .colorScheme
                           .tertiaryContainer
@@ -382,10 +372,7 @@ class _MapScreenState extends State<MapScreen>
                                 trackingProvider.lineType == null
                             ? "assets/bus.png"
                             : "assets/train.png",
-                        height: (mapProvider
-                                    .mapController!.mapController.camera.zoom *
-                                3) *
-                            animation.value),
+                        height: 50 * animation.value),
                   ));
             })
     ]);
