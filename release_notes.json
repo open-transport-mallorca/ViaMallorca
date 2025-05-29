@@ -1,10 +1,10 @@
 [
   {
     "language": "en-US",
-    "text": "Fixed a bug that caused the app to crash on fresh installations"
+    "text": "Improved map performance and fixed bugs"
   },
   {
     "language": "es-ES",
-    "text": "Arreglado error que causaba que la aplicación se bloqueara en instalaciones nuevas"
+    "text": "Mejorado el rendimiento del mapa y corregidos errores"
   }
 ]
