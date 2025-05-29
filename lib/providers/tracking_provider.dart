@@ -106,7 +106,6 @@ class TrackingProvider extends ChangeNotifier {
     _locationStream = null;
     await _connectivitySubscription?.cancel();
     _connectivitySubscription = null;
-    routeCode = null;
     trackingTripId = null;
     trackingFromStation = null;
     currentLocation = null;
