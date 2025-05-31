@@ -36,14 +36,54 @@ class StationSheet extends StatelessWidget {
                       const SizedBox(height: 24),
                       Column(
                         children: [
-                          Text(
-                            "${station.name} (${station.code})",
-                            style: const TextStyle(fontSize: 24),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  IconButton(
+                                    icon: const Icon(Icons.directions),
+                                    onPressed: () => launchUrl(Uri(
+                                      scheme: "geo",
+                                      path: "${station.lat},${station.long}",
+                                      query: "q=${station.lat},${station.long}",
+                                    )),
+                                  ),
+                                  IconButton(
+                                    icon: Icon(viewModel.isFavourite
+                                        ? Icons.star
+                                        : Icons.star_outline),
+                                    onPressed: viewModel.toggleFavourite,
+                                  ),
+                                ],
+                              ),
+                              Expanded(
+                                // This helps to center the text in the available space
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                      "${station.name} (${station.code})",
+                                      style: const TextStyle(fontSize: 24),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                    if (station.ref != null)
+                                      Text(
+                                        station.ref!,
+                                        textAlign: TextAlign.center,
+                                      ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: 48),
+                            ],
                           ),
-                          if (station.ref != null) Text(station.ref!),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 8),
                           StationLineLabels(station: station),
-                          const SizedBox(height: 32),
+                          const SizedBox(height: 16),
                           _buildDeparturesList(context, viewModel),
                         ],
                       ),
@@ -57,28 +97,6 @@ class StationSheet extends StatelessWidget {
                 child: IconButton(
                   icon: const Icon(Icons.close),
                   onPressed: () => Navigator.of(context).pop(),
-                ),
-              ),
-              Positioned(
-                top: 16,
-                left: 16,
-                child: Column(
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.directions),
-                      onPressed: () => launchUrl(Uri(
-                          scheme: "geo",
-                          path: "${station.lat},${station.long}",
-                          query: "q=${station.lat},${station.long}")),
-                    ),
-                    const SizedBox(height: 8),
-                    IconButton(
-                      icon: Icon(viewModel.isFavourite
-                          ? Icons.star
-                          : Icons.star_outline),
-                      onPressed: viewModel.toggleFavourite,
-                    ),
-                  ],
                 ),
               ),
             ],
@@ -196,50 +214,98 @@ class StationSheet extends StatelessWidget {
                     // Arrival time
                     Builder(
                       builder: (context) {
-                        final minutesDifference = departure.estimatedArrival
-                            .difference(DateTime.now())
-                            .inMinutes;
-                        final estimatedArrivalTime =
-                            DateFormat.Hm().format(departure.estimatedArrival);
-                        String arrivalText;
-                        Color textColor;
+                        final l10n = AppLocalizations.of(context)!;
+                        final now = DateTime.now();
 
-                        if (minutesDifference < 0) {
-                          arrivalText =
-                              AppLocalizations.of(context)!.arrivingLate;
-                          textColor = Theme.of(context).colorScheme.error;
-                        } else if (minutesDifference > 59) {
-                          arrivalText = estimatedArrivalTime;
-                          textColor = Theme.of(context).colorScheme.onSurface;
+                        final scheduledArrival = departure.estimatedArrival;
+                        final scheduledArrivalStr =
+                            DateFormat.Hm().format(scheduledArrival);
+                        final minutesToScheduled =
+                            scheduledArrival.difference(now).inMinutes;
+
+                        final estimatedArrival =
+                            departure.realTrip?.estimatedArrival;
+                        final minutesToEstimated =
+                            estimatedArrival?.difference(now).inMinutes ?? 0;
+                        final estimatedArrivalStr = estimatedArrival != null
+                            ? DateFormat.Hm().format(estimatedArrival)
+                            : null;
+
+                        // Define scheduledText and its color
+                        String scheduledText;
+                        Color scheduledColor;
+
+                        if (minutesToScheduled < 0) {
+                          scheduledText =
+                              "$scheduledArrivalStr - ${l10n.arrivingLate}";
+                          scheduledColor = Theme.of(context).colorScheme.error;
+                        } else if (minutesToScheduled > 59) {
+                          scheduledText = scheduledArrivalStr;
+                          scheduledColor =
+                              Theme.of(context).colorScheme.onSurface;
                         } else {
-                          arrivalText =
-                              "$minutesDifference ${AppLocalizations.of(context)!.min} ($estimatedArrivalTime)";
-                          textColor = Theme.of(context).colorScheme.onSurface;
+                          scheduledText =
+                              "${l10n.arrivingIn(minutesToScheduled)} ($scheduledArrivalStr)";
+                          scheduledColor =
+                              Theme.of(context).colorScheme.onSurface;
                         }
 
-                        return Text(
-                          arrivalText,
-                          style: TextStyle(fontSize: 14, color: textColor),
+                        // Show estimated only if it differs from scheduled and is valid
+                        final showEstimated = estimatedArrival != null &&
+                            estimatedArrival != scheduledArrival &&
+                            minutesToEstimated >= 0 &&
+                            minutesToEstimated != minutesToScheduled;
+
+                        return Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "${l10n.scheduled}: $scheduledText",
+                              style: TextStyle(
+                                  fontSize: 14, color: scheduledColor),
+                            ),
+                            if (showEstimated && estimatedArrivalStr != null)
+                              Text(
+                                "${l10n.estimated}: ${l10n.arrivingIn(minutesToEstimated).toLowerCase()} ($estimatedArrivalStr)",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                              ),
+                          ],
                         );
                       },
-                    ),
+                    )
                   ],
                 ),
               ),
+
+              // Trailing widgets (right side)
               Row(mainAxisSize: MainAxisSize.min, spacing: 12, children: [
-                // Trailing widgets (right side)
                 if (departure.realTrip != null) ...[
                   // Passenger count
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(Icons.people, size: 20),
-                      Text(
-                        "${departure.realTrip?.stats.passengers}",
-                        style: const TextStyle(fontSize: 16),
-                      ),
-                    ],
-                  ),
+                  Builder(builder: (context) {
+                    final color = departure.realTrip!.stats.passengers >
+                            departure.realTrip!.stats.placesToSit +
+                                departure.realTrip!.stats.placesToStand
+                        ? Theme.of(context).colorScheme.error
+                        : Theme.of(context).colorScheme.onSurface;
+                    return Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.people,
+                          size: 20,
+                          color: color,
+                        ),
+                        Text(
+                          "${departure.realTrip?.stats.passengers}",
+                          style: TextStyle(fontSize: 16, color: color),
+                        ),
+                      ],
+                    );
+                  }),
 
                   // Track button
                   Column(

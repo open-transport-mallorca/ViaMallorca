@@ -35,7 +35,6 @@
   "cancel": "Cancel·la",
   "info": "Informació",
   "noDepartures": "No hi ha sortides en les properes hores. Si us plau revisa més tard.",
-  "arrivingLate": "Arribant tard - En camí a la teva parada",
   "min": "minuts",
   "track": "Rastrejar",
   "searchLine": "Cerca una línia",
@@ -53,5 +52,17 @@
   "noStation": "Cap estació",
   "all": "Totes",
   "favourites": "Preferits",
-  "stationsOnRoute": "Estacions en la ruta"
+  "stationsOnRoute": "Estacions en la ruta",
+  "arrivingLate": "Arribant tard",
+  "arrivingNow": "Arribant ara",
+  "arrivingIn": "{count, plural, =0{now} one{1 minut} other{{count} minuts}}",
+  "@arrivingIn": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "estimated": "Estimat",
+  "scheduled": "Programat"
 }

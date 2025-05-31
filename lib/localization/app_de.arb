@@ -35,7 +35,6 @@
   "cancel": "Abbrechen",
   "info": "Info",
   "noDepartures": "In den nächsten Stunden gibt es keine Abfahrten. Bitte später erneut prüfen.",
-  "arrivingLate": "Verspätet - Unterwegs zu Ihrer Haltestelle",
   "min": "Minuten",
   "track": "Verfolgen",
   "searchLine": "Linie suchen",
@@ -53,5 +52,17 @@
   "noStation": "Keine Station",
   "all": "Alle",
   "favourites": "Favorit",
-  "stationsOnRoute": "Stationen auf der Route"
+  "stationsOnRoute": "Stationen auf der Route",
+  "arrivingLate": "Verspätet",
+  "arrivingNow": "Jetzt ankommend",
+  "arrivingIn": "{count, plural, =0{now} one{1 minute} other{{count} minuten}}",
+  "@arrivingIn": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "estimated": "Geschätzt",
+  "scheduled": "Geplant"
 }

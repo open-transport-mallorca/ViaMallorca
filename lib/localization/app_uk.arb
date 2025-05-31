@@ -35,7 +35,6 @@
   "cancel": "Скасувати",
   "info": "Інфо",
   "noDepartures": "Протягом наступних кількох годин відправлення відсутні. Будь ласка, перевірте пізніше.",
-  "arrivingLate": "Запізнюється - На шляху до вашої зупинки",
   "min": "хвилини",
   "track": "Слідкувати",
   "searchLine": "Шукати лінію",
@@ -53,5 +52,17 @@
   "noStation": "Станцій немає",
   "all": "Всі",
   "favourites": "Улюблені",
-  "stationsOnRoute": "Станції на маршруті"
+  "stationsOnRoute": "Станції на маршруті",
+  "estimated": "Очікується",
+  "scheduled": "Заплановано",
+  "arrivingLate": "Запізнюється",
+  "arrivingNow": "Прибуває",
+  "arrivingIn": "{count, plural, =0{now} one{1 хвилина} other{{count} хвилини}}",
+  "@arrivingIn": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

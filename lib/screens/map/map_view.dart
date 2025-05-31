@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_map_cancellable_tile_provider/flutter_map_cancellable_tile_provider.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:flutter/material.dart';
@@ -80,6 +81,7 @@ class _MapScreenState extends State<MapScreen>
                     initialCenter: const LatLng(39.607331, 2.983704)),
                 children: [
                   TileLayer(
+                      retinaMode: !kDebugMode,
                       tileProvider: CancellableNetworkTileProvider(),
                       tileBuilder:
                           Theme.of(context).brightness == Brightness.dark
