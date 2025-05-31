@@ -110,6 +110,8 @@ class TrackingProvider extends ChangeNotifier {
     trackingFromStation = null;
     currentLocation = null;
     stationsOnRoute = null;
+    routeStationInfo = null;
+    currentSpeed = null;
     notifyListeners();
   }
 }

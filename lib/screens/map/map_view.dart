@@ -391,62 +391,78 @@ class _MapScreenState extends State<MapScreen>
         opacity: trackingProvider.currentLocation == null ? 0 : 1,
         child: Align(
             alignment: Alignment.topRight,
-            child: Skeletonizer(
-              enabled: trackingProvider.routeStationInfo == null,
-              child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Container(
-                    width: 250,
-                    height: 150,
-                    decoration: BoxDecoration(
-                        color: Theme.of(context)
-                            .colorScheme
-                            .surface
-                            .withValues(alpha: 0.7),
-                        borderRadius: BorderRadius.circular(12)),
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Column(
-                        mainAxisAlignment:
-                            trackingProvider.routeStationInfo != null
-                                ? MainAxisAlignment.spaceEvenly
-                                : MainAxisAlignment.center,
+            child: Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Container(
+                  width: 250,
+                  height: 150,
+                  decoration: BoxDecoration(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .surface
+                          .withValues(alpha: 0.7),
+                      borderRadius: BorderRadius.circular(12)),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Builder(builder: (context) {
+                      final routeCode = trackingProvider.routeCode;
+                      final destinations = mapProvider.customRouteDestinations;
+                      final way = mapProvider.customWay;
+                      final stationInfo = trackingProvider.routeStationInfo;
+                      final speed = trackingProvider.currentSpeed;
+
+                      return Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          if (trackingProvider.routeStationInfo != null &&
-                              mapProvider.customRouteDestinations != null) ...[
-                            Text(
-                              "${trackingProvider.routeCode} - ${mapProvider.customRouteDestinations![mapProvider.customWay == Way.way ? 0 : 1]}",
+                          Skeletonizer(
+                            enabled: routeCode == null || destinations == null,
+                            child: Text(
+                              "${routeCode ?? ''} - ${destinations != null ? destinations[way == Way.way ? 0 : 1] : ''}",
                               style:
                                   const TextStyle(fontWeight: FontWeight.bold),
                             ),
-                            Text(
-                              "${AppLocalizations.of(context)!.passengers}: ${trackingProvider.routeStationInfo!.passangers.inBus}/${trackingProvider.routeStationInfo!.passangers.totalCapacity}",
+                          ),
+                          Skeletonizer(
+                            enabled: stationInfo == null,
+                            child: Text(
+                              "${AppLocalizations.of(context)!.passengers}: ${stationInfo?.passangers.inBus ?? '-'} / ${stationInfo?.passangers.totalCapacity ?? '-'}",
                               style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: trackingProvider.routeStationInfo!
-                                              .passangers.inBus <
-                                          trackingProvider.routeStationInfo!
-                                              .passangers.totalCapacity
-                                      ? Theme.of(context).colorScheme.onSurface
-                                      : Theme.of(context).colorScheme.error),
+                                fontWeight: FontWeight.bold,
+                                color: (stationInfo != null &&
+                                        stationInfo.passangers.inBus <
+                                            stationInfo
+                                                .passangers.totalCapacity)
+                                    ? Theme.of(context).colorScheme.onSurface
+                                    : Theme.of(context).colorScheme.error,
+                              ),
                             ),
-                            if (trackingProvider.currentSpeed != null)
-                              Text(
-                                  "${AppLocalizations.of(context)!.speed}: ${trackingProvider.currentSpeed} km/h"),
-                            FittedBox(
-                                child: Text(
-                                    "${AppLocalizations.of(context)!.nextStop}: ${trackingProvider.routeStationInfo!.stops.first.stopName}")),
-                            FittedBox(
-                                child: Text(
-                                    "${AppLocalizations.of(context)!.finalStop}: ${trackingProvider.routeStationInfo!.stops.last.stopName}"))
-                          ] else ...[
-                            Text(AppLocalizations.of(context)!.loading),
-                          ]
+                          ),
+                          Skeletonizer(
+                            enabled: speed == null,
+                            child: Text(
+                                "${AppLocalizations.of(context)!.speed}: ${speed ?? '-'} km/h"),
+                          ),
+                          Skeletonizer(
+                            enabled: stationInfo == null,
+                            child: FittedBox(
+                              child: Text(
+                                "${AppLocalizations.of(context)!.nextStop}: ${stationInfo?.stops.first.stopName ?? ''}",
+                              ),
+                            ),
+                          ),
+                          Skeletonizer(
+                            enabled: stationInfo == null,
+                            child: FittedBox(
+                              child: Text(
+                                "${AppLocalizations.of(context)!.finalStop}: ${stationInfo?.stops.last.stopName ?? ''}",
+                              ),
+                            ),
+                          ),
                         ],
-                      ),
-                    ),
-                  )),
-            )),
+                      );
+                    }),
+                  ),
+                ))),
       ),
     );
   }
