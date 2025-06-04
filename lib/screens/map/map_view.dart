@@ -15,7 +15,7 @@ import 'package:via_mallorca/providers/map_provider.dart';
 import 'package:via_mallorca/providers/tracking_provider.dart';
 import 'package:via_mallorca/utils/adapt_color.dart';
 import 'package:mallorca_transit_services/mallorca_transit_services.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:via_mallorca/localization/generated/app_localizations.dart';
 import 'package:via_mallorca/utils/dark_tile_builder.dart';
 
 import 'map_viewmodel.dart';

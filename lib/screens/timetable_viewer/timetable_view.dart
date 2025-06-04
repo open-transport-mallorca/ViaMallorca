@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import 'package:via_mallorca/components/app_bar.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:via_mallorca/localization/generated/app_localizations.dart';
 import 'timetable_viewmodel.dart';
 
 class TimetableViewer extends StatelessWidget {

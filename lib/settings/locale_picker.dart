@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:via_mallorca/extensions/capitalize_string.dart';
 import 'package:via_mallorca/providers/locale_provider.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:via_mallorca/localization/generated/app_localizations.dart';
 import 'package:locale_names/locale_names.dart';
 
 /// A widget that allows the user to pick a locale.

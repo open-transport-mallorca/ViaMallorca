@@ -1,7 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:via_mallorca/localization/generated/app_localizations.dart';
 import 'package:via_mallorca/apis/local_storage.dart';
 
 /// A provider class for managing the application's locale.

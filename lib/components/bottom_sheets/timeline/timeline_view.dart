@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:via_mallorca/components/station_line_labels/station_line_labels_view.dart';
 import 'package:via_mallorca/providers/tracking_provider.dart';
 import 'package:timelines/timelines.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:via_mallorca/localization/generated/app_localizations.dart';
 
 import 'timeline_viewmodel.dart';
 

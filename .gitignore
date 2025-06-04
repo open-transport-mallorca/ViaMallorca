@@ -46,6 +46,8 @@ app.*.map.json
 
 .VSCodeCounter/
 
+/lib/localization/generated
+
 .env
 lib/environment/*.g.dart
 ios/Runner.xcodeproj/project.pbxproj

@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:via_mallorca/providers/map_provider.dart';
 import 'package:via_mallorca/providers/navigation_provider.dart';
 import 'package:via_mallorca/screens/timetable_viewer/timetable_view.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:via_mallorca/localization/generated/app_localizations.dart';
 import 'package:mallorca_transit_services/mallorca_transit_services.dart';
 import 'routes_viewmodel.dart';
 

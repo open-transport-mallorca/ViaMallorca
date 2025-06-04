@@ -17,7 +17,7 @@ import 'package:via_mallorca/screens/nearby/nearby_view.dart';
 import 'package:via_mallorca/screens/routes/routes_view.dart';
 import 'package:via_mallorca/screens/stations/stations_view.dart';
 import 'package:via_mallorca/screens/map/map_view.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:via_mallorca/localization/generated/app_localizations.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

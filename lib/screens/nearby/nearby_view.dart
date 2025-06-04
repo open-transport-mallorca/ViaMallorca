@@ -9,7 +9,7 @@ import 'package:via_mallorca/components/station_line_labels/station_line_labels_
 import 'package:via_mallorca/providers/map_provider.dart';
 import 'package:via_mallorca/providers/navigation_provider.dart';
 import 'package:via_mallorca/screens/nearby/nearby_viewmodel.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:via_mallorca/localization/generated/app_localizations.dart';
 import 'package:via_mallorca/utils/distance_formatter.dart';
 import 'package:via_mallorca/utils/station_sort.dart';
 

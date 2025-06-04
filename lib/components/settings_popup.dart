@@ -3,7 +3,7 @@ import 'package:material_design_icons_flutter/material_design_icons_flutter.dart
 import 'package:url_launcher/url_launcher.dart';
 import 'package:via_mallorca/settings/locale_picker.dart';
 import 'package:via_mallorca/settings/theme_picker.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:via_mallorca/localization/generated/app_localizations.dart';
 
 class SettingsPopup extends StatefulWidget {
   const SettingsPopup({super.key});

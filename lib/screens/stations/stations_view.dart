@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:via_mallorca/components/bottom_sheets/station/station_view.dart';
 import 'package:via_mallorca/providers/map_provider.dart';
 import 'package:via_mallorca/providers/navigation_provider.dart';
-import 'package:flutter_gen/gen_l10n/app_localizations.dart';
+import 'package:via_mallorca/localization/generated/app_localizations.dart';
 import 'stations_viewmodel.dart';
 
 class StationsScreen extends StatelessWidget {
