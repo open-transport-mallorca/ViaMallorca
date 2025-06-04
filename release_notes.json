@@ -1,10 +1,10 @@
 [
   {
     "language": "en-US",
-    "text": "Improved map performance and fixed bugs"
+    "text": "Added ETA to departures & fixed route preview"
   },
   {
     "language": "es-ES",
-    "text": "Mejorado el rendimiento del mapa y corregidos errores"
+    "text": "Añadida ETA a las salidas y corregida la vista previa de rutas"
   }
 ]
