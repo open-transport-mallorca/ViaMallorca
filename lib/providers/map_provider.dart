@@ -54,7 +54,13 @@ class MapProvider extends ChangeNotifier {
   void updateLocation(LatLng location, [double? zoom]) {
     mapController!.animateTo(
         dest: location, zoom: zoom ?? mapController!.mapController.camera.zoom);
-    notifyListeners();
+  }
+
+  /// Adjusts the camera view to fit the specified bounds.
+  ///
+  /// Uses an animated transition to move the camera to the position defined by [cameraFit].
+  void fitToBounds(CameraFit cameraFit) {
+    mapController!.animatedFitCamera(cameraFit: cameraFit);
   }
 
   /// Sets the custom way for the map.
@@ -80,6 +86,11 @@ class MapProvider extends ChangeNotifier {
   /// The [isTracking] parameter is an optional boolean value indicating whether tracking is enabled.
   Future<void> viewRoute(RouteLine line, BuildContext context,
       [bool? isTracking]) async {
+    final trackingProvider =
+        Provider.of<TrackingProvider>(context, listen: false);
+    final navigationProvider =
+        Provider.of<NavigationProvider>(context, listen: false);
+
     customRouteDestinations = [];
     customRoutes = [[], []];
 
@@ -87,16 +98,14 @@ class MapProvider extends ChangeNotifier {
       Navigator.pop(context);
     }
 
-    if (Provider.of<TrackingProvider>(context, listen: false).currentLocation !=
-        null) {
-      Provider.of<TrackingProvider>(context, listen: false).stopTracking();
+    if (trackingProvider.currentLocation != null) {
+      trackingProvider.stopTracking();
     }
 
     setMapLoadingProgress(0);
 
-    if (Provider.of<NavigationProvider>(context, listen: false).currentIndex !=
-        3) {
-      Provider.of<NavigationProvider>(context, listen: false).setIndex(1);
+    if (navigationProvider.currentIndex != 3) {
+      navigationProvider.setIndex(1);
     }
     FocusScope.of(context).unfocus();
     final sublines = await Subline.getSublines(line);
@@ -140,14 +149,16 @@ class MapProvider extends ChangeNotifier {
     setMapLoadingProgress(0.8);
     setCustomStations(routeStations);
 
-    var centerLat =
-        (routeStations.first.first.lat + routeStations.first.last.lat) / 2;
-    var centerLon =
-        (routeStations.first.first.long + routeStations.first.last.long) / 2;
-    var centerPoint = LatLng(centerLat, centerLon);
-
     if (isTracking == null || !isTracking) {
-      updateLocation(centerPoint, 11);
+      fitToBounds(
+        CameraFit.bounds(
+          bounds: LatLngBounds.fromPoints(
+            customRoutes![0].expand((polyline) => polyline.points).toList(),
+          ),
+          padding: const EdgeInsets.all(60.0),
+          maxZoom: 18,
+        ),
+      );
     }
 
     setMapLoadingProgress(1);
