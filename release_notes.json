@@ -1,10 +1,10 @@
 [
   {
     "language": "en-US",
-    "text": "Fixed departures not loading"
+    "text": "Fixed translation error"
   },
   {
     "language": "es-ES",
-    "text": "Corregido error al cargar salidas"
+    "text": "Corregido error de traducción"
   }
 ]

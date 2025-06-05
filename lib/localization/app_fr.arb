@@ -54,8 +54,7 @@
   "favourites": "Favori",
   "stationsOnRoute": "Stations sur la route",
   "arrivingLate": "Arrivée tardive",
-  "arrivingNow": "Arrivée maintenant",
-  "arrivingIn": "{count, plural, =0{now} one{1 minute} other{{count} minutes}}",
+  "arrivingIn": "{count, plural, =0{maintenant} one{1 minute} other{{count} minutes}}",
   "@arrivingIn": {
     "placeholders": {
       "count": {

@@ -55,7 +55,6 @@
   "estimated": "Estimated",
   "scheduled": "Scheduled",
   "arrivingLate": "Arriving late",
-  "arrivingNow": "Arriving now",
   "arrivingIn": "{count, plural, =0{now} one{1 minute} other{{count} minutes}}",
   "@arrivingIn": {
     "placeholders": {

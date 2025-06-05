@@ -56,8 +56,7 @@
   "estimated": "Очікується",
   "scheduled": "Заплановано",
   "arrivingLate": "Запізнюється",
-  "arrivingNow": "Прибуває",
-  "arrivingIn": "{count, plural, =0{now} one{1 хвилина} other{{count} хвилини}}",
+  "arrivingIn": "{count, plural, =0{зараз} one{1 хвилина} other{{count} хвилини}}",
   "@arrivingIn": {
     "placeholders": {
       "count": {
