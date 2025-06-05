@@ -285,27 +285,28 @@ class StationSheet extends StatelessWidget {
               Row(mainAxisSize: MainAxisSize.min, spacing: 12, children: [
                 if (departure.realTrip != null) ...[
                   // Passenger count
-                  Builder(builder: (context) {
-                    final color = departure.realTrip!.stats.passengers >
-                            departure.realTrip!.stats.placesToSit +
-                                departure.realTrip!.stats.placesToStand
-                        ? Theme.of(context).colorScheme.error
-                        : Theme.of(context).colorScheme.onSurface;
-                    return Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.people,
-                          size: 20,
-                          color: color,
-                        ),
-                        Text(
-                          "${departure.realTrip?.stats.passengers}",
-                          style: TextStyle(fontSize: 16, color: color),
-                        ),
-                      ],
-                    );
-                  }),
+                  if (departure.realTrip?.stats != null)
+                    Builder(builder: (context) {
+                      final color = departure.realTrip!.stats!.passengers >
+                              departure.realTrip!.stats!.placesToSit +
+                                  departure.realTrip!.stats!.placesToStand
+                          ? Theme.of(context).colorScheme.error
+                          : Theme.of(context).colorScheme.onSurface;
+                      return Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            Icons.people,
+                            size: 20,
+                            color: color,
+                          ),
+                          Text(
+                            "${departure.realTrip!.stats!.passengers}",
+                            style: TextStyle(fontSize: 16, color: color),
+                          ),
+                        ],
+                      );
+                    }),
 
                   // Track button
                   Column(
