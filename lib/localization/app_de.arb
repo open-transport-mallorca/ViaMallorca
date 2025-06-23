@@ -55,6 +55,7 @@
   "notifyMe": "Erinnern in",
   "minutesBefore": "Minuten vorher",
   "alreadyScheduled": "Du hast bereits eine Benachrichtigung für diese Abfahrt geplant",
+  "viewPending": "Ausstehende anzeigen",
   "notificationChannelName": "Busabfahrten",
   "notificationTitle": "Abfahrterinnerung für {lineCode}",
   "notificationBody": "Dein Bus {lineCode} fährt in {minutes} Minuten ab",

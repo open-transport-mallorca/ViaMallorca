@@ -55,6 +55,7 @@
   "notifyMe": "Повідомити за",
   "minutesBefore": "хвилин",
   "alreadyScheduled": "Ви вже запланували нагадування для цього відправлення",
+  "viewPending": "Переглянути заплановані",
   "notificationChannelName": "Відправлення автобусів",
   "notificationTitle": "Нагадування про відправлення {lineCode}",
   "notificationBody": "Ваш автобус {lineCode} вирушає через {minutes} хвилин",

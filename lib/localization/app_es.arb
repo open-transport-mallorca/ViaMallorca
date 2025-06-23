@@ -55,6 +55,7 @@
   "notifyMe": "Notifícame",
   "minutesBefore": "minutos antes",
   "alreadyScheduled": "Ya tienes una notificación programada para esta salida",
+  "viewPending": "Ver pendientes",
   "notificationChannelName": "Salidas de autobús",
   "notificationTitle": "Recordatorio de salida para {lineCode}",
   "notificationBody": "Tu autobús {lineCode} sale en {minutes} minutos",

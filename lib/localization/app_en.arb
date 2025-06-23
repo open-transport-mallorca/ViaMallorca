@@ -75,6 +75,7 @@
   "notifyMe": "Notify me",
   "minutesBefore": "minutes before",
   "alreadyScheduled": "You already have a notification scheduled for this departure",
+  "viewPending": "View pending",
   "notificationChannelName": "Bus Departures",
   "notificationTitle": "Departure reminder for {lineCode}",
   "@notificationTitle": {

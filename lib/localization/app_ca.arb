@@ -55,6 +55,7 @@
   "notifyMe": "Notifica'm",
   "minutesBefore": "minuts abans",
   "alreadyScheduled": "Ja tens una notificació programada per a aquesta sortida",
+  "viewPending": "Veure pendents",
   "notificationChannelName": "Sortides d'autobús",
   "notificationTitle": "Recordatori de sortida per a {lineCode}",
   "notificationBody": "El teu autobús {lineCode} surt d'aquí a {minutes} minuts",

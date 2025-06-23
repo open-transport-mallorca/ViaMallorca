@@ -9,6 +9,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:via_mallorca/apis/local_storage.dart';
 import 'package:via_mallorca/apis/notification.dart';
+import 'package:via_mallorca/components/bottom_sheets/pending_notifications.dart';
 import 'package:via_mallorca/components/bottom_sheets/station/popup/departure_notification_viewmodel.dart';
 import 'package:timezone/timezone.dart' as tz;
 import 'package:via_mallorca/localization/generated/app_localizations.dart';
@@ -105,6 +106,15 @@ class DepartureNotification extends StatelessWidget {
     }
   }
 
+  void handleViewPending(BuildContext context) {
+    Provider.of<NotificationsProvider>(context, listen: false)
+        .reloadNotifications();
+    showModalBottomSheet(
+        showDragHandle: true,
+        context: context,
+        builder: (context) => NotificationsView());
+  }
+
   @override
   Widget build(BuildContext context) {
     return MediaQuery(
@@ -152,14 +162,34 @@ class DepartureNotification extends StatelessWidget {
                               departure.tripId)
                           : false))
                     Padding(
-                      padding: const EdgeInsets.only(top: 8.0),
-                      child: Text(
-                        AppLocalizations.of(context)!.alreadyScheduled,
-                        style: TextStyle(
-                          color: Theme.of(context).colorScheme.error,
-                        ),
-                      ),
-                    ),
+                        padding: const EdgeInsets.only(top: 8.0),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: Text(
+                                AppLocalizations.of(context)!.alreadyScheduled,
+                                style: TextStyle(
+                                  color: Theme.of(context).colorScheme.error,
+                                ),
+                                softWrap: true,
+                              ),
+                            ),
+                            OutlinedButton(
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: Theme.of(context)
+                                    .colorScheme
+                                    .secondary, // Text color
+                                side: BorderSide(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .secondary, // Border color
+                                ),
+                              ),
+                              onPressed: () => handleViewPending(context),
+                              child: Text("View pending"),
+                            )
+                          ],
+                        )),
                 ],
               ),
               actions: [

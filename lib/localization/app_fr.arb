@@ -55,6 +55,7 @@
   "notifyMe": "Me notifier",
   "minutesBefore": "minutes avant",
   "alreadyScheduled": "Vous avez déjà une notification programmée pour ce départ",
+  "viewPending": "Voir en attente",
   "notificationChannelName": "Départs de bus",
   "notificationTitle": "Rappel de départ pour {lineCode}",
   "notificationBody": "Votre bus {lineCode} part dans {minutes} minutes",
