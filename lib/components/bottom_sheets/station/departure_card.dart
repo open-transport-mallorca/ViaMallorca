@@ -70,10 +70,11 @@ class _DepartureCardState extends State<DepartureCard> {
     final alarmStatus = await Permission.scheduleExactAlarm.status;
 
     // Check if the user has granted notification permissions
-    if (notificationStatus.isDenied || notificationStatus.isRestricted) {
-      await Permission.notification.request();
-    } else if (notificationStatus.isPermanentlyDenied && mounted) {
-      Navigator.of(context).pop();
+    if (Platform.isAndroid && notificationStatus.isDenied) {
+      await Permission.notification.request(); // This only works on Android
+    } else if ((notificationStatus.isPermanentlyDenied ||
+            (Platform.isIOS && notificationStatus.isDenied)) &&
+        mounted) {
       showDialog(
         context: context,
         builder: (context) => notificationsDeniedDialog(),
@@ -121,7 +122,7 @@ class _DepartureCardState extends State<DepartureCard> {
       child: Stack(
         children: [
           if (departure.estimatedArrival.difference(DateTime.now()).inMinutes >=
-              5)
+              4)
             Consumer<NotificationsProvider>(
                 builder: (context, notifications, _) {
               return Positioned(

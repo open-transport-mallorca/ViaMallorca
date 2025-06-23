@@ -25,7 +25,7 @@ class DepartureNotification extends StatelessWidget {
       BuildContext context, DepartureNotificationViewModel viewModel) async {
     final random = Random();
     final scheduledDateTime = departure.estimatedArrival
-        .subtract(Duration(minutes: viewModel.timeBeforeDeparture + 1));
+        .subtract(Duration(minutes: viewModel.timeBeforeDeparture));
     // Convert DateTime to TZDateTime
     final scheduledDateTime0s = DateTime(
       scheduledDateTime.year,
@@ -48,8 +48,10 @@ class DepartureNotification extends StatelessWidget {
     }
 
     final alarmStatus = await Permission.scheduleExactAlarm.status;
-    bool useInexactNotifications = LocalStorageApi.useInexactNotifications() ||
-        (alarmStatus.isDenied || alarmStatus.isRestricted);
+    bool useInexactNotifications = Platform.isAndroid &&
+        (LocalStorageApi.useInexactNotifications() ||
+            alarmStatus.isDenied ||
+            alarmStatus.isRestricted);
 
     if (!context.mounted) return;
 
@@ -131,8 +133,8 @@ class DepartureNotification extends StatelessWidget {
                       NumberPicker(
                         haptics: true,
                         itemWidth: 60,
-                        minValue: 3,
-                        maxValue: viewModel.departureInMinutes,
+                        minValue: 2,
+                        maxValue: viewModel.departureInMinutes - 1,
                         value: viewModel.timeBeforeDeparture,
                         onChanged: (value) {
                           viewModel.setTimeBeforeDeparture(value);

@@ -63,7 +63,7 @@
       }
     }
   },
-  "notificationDialogTitle": "Departure notification for {lineCode}",
+  "notificationDialogTitle": "Departure reminder for {lineCode}",
   "@notificationDialogTitle": {
     "placeholders": {
       "lineCode": {
@@ -76,7 +76,7 @@
   "minutesBefore": "minutes before",
   "alreadyScheduled": "You already have a notification scheduled for this departure",
   "notificationChannelName": "Bus Departures",
-  "notificationTitle": "Depareture reminder for {lineCode}",
+  "notificationTitle": "Departure reminder for {lineCode}",
   "@notificationTitle": {
     "placeholders": {
       "lineCode": {
