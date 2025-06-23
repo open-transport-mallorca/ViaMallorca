@@ -19,24 +19,16 @@
   "nearby": "Поблизу",
   "nearbyStations": "Станції поблизу",
   "distance": "Відстань {distance} м",
-  "@distance": {
-    "placeholders": {
-      "distance": {
-        "type": "int"
-      }
-    }
-  },
   "locationDisabled": "Служби локації вимкнені",
   "enableLocation": "Увімкнути служби локації",
   "locationDeniedForever": "Доступ до локацій заборонено назавжди",
   "locationDeniedText": "Ви назавжди відмовилися від дозволів на локацію",
   "locationDeniedAction": "Будь ласка, увімкніть служби локації у налаштуваннях додатка для використання цієї функції",
-  "goToSettings": "Перейти до налаштувань",
   "cancel": "Скасувати",
   "info": "Інфо",
   "noDepartures": "Протягом наступних кількох годин відправлення відсутні. Будь ласка, перевірте пізніше.",
   "min": "хвилини",
-  "track": "Слідкувати",
+  "track": "Стежити",
   "searchLine": "Шукати лінію",
   "noResults": "Результатів не знайдено",
   "searchStation": "Шукати станцію",
@@ -56,12 +48,30 @@
   "estimated": "Очікується",
   "scheduled": "Заплановано",
   "arrivingLate": "Запізнюється",
-  "arrivingIn": "{count, plural, =0{зараз} one{1 хвилина} other{{count} хвилини}}",
-  "@arrivingIn": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  }
+  "arrivingIn": "{count, plural, =0{зараз} one{1 хвилина} other{{count} хвилин}}",
+  "openSettings": "Відкрити налаштування",
+  "notificationDialogTitle": "Нагадування про відправлення {lineCode}",
+  "notificationDialogSubtitle": "Заплануйте нагадування для цього відправлення",
+  "notifyMe": "Повідомити за",
+  "minutesBefore": "хвилин",
+  "alreadyScheduled": "Ви вже запланували нагадування для цього відправлення",
+  "notificationChannelName": "Відправлення автобусів",
+  "notificationTitle": "Нагадування про відправлення {lineCode}",
+  "notificationBody": "Ваш автобус {lineCode} вирушає через {minutes} хвилин",
+  "notificationBodyApprox": "Ваш автобус {lineCode} скоро вирушає",
+  "notificationScheduled": "Нагадування заплановано для {lineCode} о {time}",
+  "notificationScheduledApprox": "Нагадування заплановано для {lineCode} приблизно о {time}",
+  "scheduleNotification": "Запланувати нагадування",
+  "pendingNotifications": "Очікувані нагадування",
+  "noPendingNotifications": "У вас немає очікуваних нагадувань",
+  "scheduledFor": "Заплановано на: {time}",
+  "cancelAllNotifications": "Скасувати всі нагадування",
+  "notificationDeniedDialogTitle": "Дозвіл на сповіщення",
+  "notificationDeniedDialogSubtitle": "Ви відхилили дозвіл на сповіщення. \nБудь ласка, увімкніть його в налаштуваннях програми, щоб отримувати сповіщення.",
+  "remindersDeniedDialogTitle": "Точні сповіщення",
+  "remindersDeniedDialogSubtitle": "Щоб отримувати точні сповіщення, дозвольте заплановані будильники для Via Mallorca.",
+  "useInexact": "Використовувати неточні",
+  "allowExact": "Дозволити точні",
+  "switchToExact": "Перемкнутися на точні сповіщення",
+  "switchToInexact": "Перемкнутися на неточні сповіщення"
 }

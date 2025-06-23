@@ -19,19 +19,11 @@
   "nearby": "Nahe",
   "nearbyStations": "Nahegelegene Stationen",
   "distance": "Entfernung {distance} m",
-  "@distance": {
-    "placeholders": {
-      "distance": {
-        "type": "int"
-      }
-    }
-  },
   "locationDisabled": "Standortdienste sind deaktiviert",
   "enableLocation": "Standortdienste aktivieren",
   "locationDeniedForever": "Standortzugriff dauerhaft verweigert",
   "locationDeniedText": "Sie haben den Standortzugriff dauerhaft verweigert",
   "locationDeniedAction": "Bitte aktivieren Sie die Standortdienste in den App-Einstellungen, um diese Funktion zu nutzen",
-  "goToSettings": "Zu den Einstellungen gehen",
   "cancel": "Abbrechen",
   "info": "Info",
   "noDepartures": "In den nächsten Stunden gibt es keine Abfahrten. Bitte später erneut prüfen.",
@@ -55,13 +47,31 @@
   "stationsOnRoute": "Stationen auf der Route",
   "arrivingLate": "Verspätet",
   "arrivingIn": "{count, plural, =0{jetzt} one{1 minute} other{{count} minuten}}",
-  "@arrivingIn": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "estimated": "Geschätzt",
-  "scheduled": "Geplant"
+  "scheduled": "Geplant",
+  "openSettings": "Einstellungen öffnen",
+  "notificationDialogTitle": "Abfahrtsbenachrichtigung für {lineCode}",
+  "notificationDialogSubtitle": "Benachrichtigung für diese Abfahrt planen",
+  "notifyMe": "Erinnern in",
+  "minutesBefore": "Minuten vorher",
+  "alreadyScheduled": "Du hast bereits eine Benachrichtigung für diese Abfahrt geplant",
+  "notificationChannelName": "Busabfahrten",
+  "notificationTitle": "Abfahrterinnerung für {lineCode}",
+  "notificationBody": "Dein Bus {lineCode} fährt in {minutes} Minuten ab",
+  "notificationBodyApprox": "Dein Bus {lineCode} fährt bald ab",
+  "notificationScheduled": "Benachrichtigung geplant für {lineCode} um {time}",
+  "notificationScheduledApprox": "Benachrichtigung geplant für {lineCode} ca. um {time}",
+  "scheduleNotification": "Benachrichtigung planen",
+  "pendingNotifications": "Ausstehende Benachrichtigungen",
+  "noPendingNotifications": "Keine ausstehenden Benachrichtigungen",
+  "scheduledFor": "Geplant für: {time}",
+  "cancelAllNotifications": "Alle Benachrichtigungen abbrechen",
+  "notificationDeniedDialogTitle": "Benachrichtigungsberechtigung",
+  "notificationDeniedDialogSubtitle": "Du hast die Benachrichtigungsberechtigung verweigert. \nBitte aktiviere sie in den App-Einstellungen, um Benachrichtigungen zu erhalten.",
+  "remindersDeniedDialogTitle": "Genaue Benachrichtigungen",
+  "remindersDeniedDialogSubtitle": "Um genaue Benachrichtigungen zu erhalten, erlaube geplante Alarme für Via Mallorca.",
+  "useInexact": "Ungenau verwenden",
+  "allowExact": "Genau erlauben",
+  "switchToExact": "Zu genauen Benachrichtigungen wechseln",
+  "switchToInexact": "Zu ungenauen Benachrichtigungen wechseln"
 }

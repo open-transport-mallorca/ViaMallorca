@@ -31,7 +31,7 @@
   "locationDeniedForever": "Location denied forever",
   "locationDeniedText": "You have denied location permissions forever",
   "locationDeniedAction": "Please enable location services in app settings to use this feature",
-  "goToSettings": "Go to settings",
+  "openSettings": "Open settings",
   "cancel": "Cancel",
   "info": "Info",
   "noDepartures": "There are no departures for the next couple of hours. Please check back later.",
@@ -62,5 +62,87 @@
         "type": "int"
       }
     }
-  }
+  },
+  "notificationDialogTitle": "Departure notification for {lineCode}",
+  "@notificationDialogTitle": {
+    "placeholders": {
+      "lineCode": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationDialogSubtitle": "Schedule a notification for this departure",
+  "notifyMe": "Notify me",
+  "minutesBefore": "minutes before",
+  "alreadyScheduled": "You already have a notification scheduled for this departure",
+  "notificationChannelName": "Bus Departures",
+  "notificationTitle": "Depareture reminder for {lineCode}",
+  "@notificationTitle": {
+    "placeholders": {
+      "lineCode": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationBody": "Your bus {lineCode} is departing in {minutes} minutes",
+  "@notificationBody": {
+    "placeholders": {
+      "lineCode": {
+        "type": "String"
+      },
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "notificationBodyApprox": "Your bus {lineCode} is departing soon",
+  "@notificationBodyApprox": {
+    "placeholders": {
+      "lineCode": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationScheduled": "Notification scheduled for {lineCode} at {time}",
+  "@notificationScheduled": {
+    "placeholders": {
+      "lineCode": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationScheduledApprox": "Notification scheduled for {lineCode} at approximately {time}",
+  "@notificationScheduledApprox": {
+    "placeholders": {
+      "lineCode": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "scheduleNotification": "Schedule notification",
+  "pendingNotifications": "Pending notifications",
+  "noPendingNotifications": "You have no pending notifications",
+  "scheduledFor": "Scheduled for: {time}",
+  "@scheduledFor": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "cancelAllNotifications": "Cancel all notifications",
+  "notificationDeniedDialogTitle": "Notification permission",
+  "notificationDeniedDialogSubtitle": "You have denied the notification permission. \nPlease enable it in the app settings to receive notifications.",
+  "remindersDeniedDialogTitle": "Precise Notifications",
+  "remindersDeniedDialogSubtitle": "To receive precise notifications, please allow scheduled alarms for Via Mallorca.",
+  "useInexact": "Use inexact",
+  "allowExact": "Allow exact",
+  "switchToExact": "Switch to exact notifications",
+  "switchToInexact": "Switch to inexact notifications"
 }

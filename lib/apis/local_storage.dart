@@ -87,25 +87,6 @@ class LocalStorageApi {
     await _preferences!.setBool('openedFirstTime', openedFirstTime);
   }
 
-  /// Returns the value of the 'notifications' preference from local storage.
-  /// If the preference is not set, it returns `true` by default.
-  ///
-  /// Doesn't check the permission, only the user preference.
-  static bool getNotifications() {
-    return _preferences!.getBool('notifications') ?? true;
-  }
-
-  /// Sets the value of notifications in the local storage.
-  ///
-  /// The [notifications] parameter specifies whether notifications should be enabled or disabled.
-  /// This method saves the value of [notifications] in the local storage using the key 'notifications'.
-  /// Returns a [Future] that completes when the value is successfully saved.
-  ///
-  /// Doesn't check the permission, only the user preference.
-  static Future setNotifications(bool notifications) async {
-    await _preferences!.setBool('notifications', notifications);
-  }
-
   /// Retrieves the list of shown warnings from the local storage preferences.
   ///
   /// The [warningList] parameter is the list of warnings to filter.
@@ -149,5 +130,33 @@ class LocalStorageApi {
   /// [favouriteStations] - A list of strings representing the favourite stations.
   static Future setFavouriteStations(List<String> favouriteStations) async {
     await _preferences!.setStringList("favouriteStations", favouriteStations);
+  }
+
+  /// Whether to use inexact notifications.
+  /// This is used only on Android
+  static bool useInexactNotifications() {
+    return _preferences!.getBool("useInexactNotifications") ?? false;
+  }
+
+  /// Sets whether to use inexact notifications.
+  ///  This is used only on Android.
+  static Future setUseInexactNotifications(bool useInexactNotifications) async {
+    await _preferences!
+        .setBool("useInexactNotifications", useInexactNotifications);
+  }
+
+  /// Retrieves the notification channel from the local storage.
+  ///
+  ///  Returns the notification channel as a string if it exists,
+  /// otherwise returns null.
+  static String? getNotificationChannel() {
+    return _preferences!.getString("notificationChannel");
+  }
+
+  /// Sets the notification channel in the local storage.
+  ///
+  ///  The [channel] parameter specifies the notification channel to be set.
+  static Future setNotificationChannel(String channel) async {
+    await _preferences!.setString("notificationChannel", channel);
   }
 }

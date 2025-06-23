@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:via_mallorca/apis/local_storage.dart';
 import 'package:via_mallorca/settings/locale_picker.dart';
 import 'package:via_mallorca/settings/theme_picker.dart';
 import 'package:via_mallorca/localization/generated/app_localizations.dart';
@@ -33,13 +35,30 @@ class _SettingsPopupState extends State<SettingsPopup> {
             leading: const Icon(Icons.translate),
           ),
         ),
+        if (LocalStorageApi.useInexactNotifications())
+          PopupMenuItem(
+              value: 'precise_notifications',
+              child: ListTile(
+                title: Text(AppLocalizations.of(context)!.switchToExact),
+                leading: Icon(Icons.notification_important),
+              )),
+        if (!LocalStorageApi.useInexactNotifications())
+          PopupMenuItem(
+              value: 'inprecise_notifications',
+              child: ListTile(
+                title: Text(AppLocalizations.of(context)!.switchToInexact),
+                leading: Icon(Icons.notifications),
+              )),
         PopupMenuItem(
-          value: 'github',
-          child: ListTile(
-            title: const Text("GitHub"),
-            leading: Icon(MdiIcons.github),
-          ),
-        ),
+            value: 'github',
+            child: ListTile(
+              title: const Text("GitHub"),
+              leading: Icon(MdiIcons.github),
+              trailing: Icon(
+                Icons.open_in_new,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            )),
       ],
       offset: const Offset(0, 60),
       onSelected: (value) async {
@@ -48,6 +67,7 @@ class _SettingsPopupState extends State<SettingsPopup> {
             showModalBottomSheet(
                 context: context, builder: (context) => const ThemePicker());
             break;
+
           case 'language':
             showModalBottomSheet(
                 context: context,
@@ -56,6 +76,16 @@ class _SettingsPopupState extends State<SettingsPopup> {
                     expand: false,
                     builder: (context, index) => const LocalePicker()));
             break;
+
+          case 'precise_notifications':
+            await Permission.scheduleExactAlarm.request();
+            await LocalStorageApi.setUseInexactNotifications(false);
+            break;
+
+          case 'inprecise_notifications':
+            await LocalStorageApi.setUseInexactNotifications(true);
+            break;
+
           case 'github':
             launchUrl(
                 Uri.https('github.com', 'open-transport-mallorca/ViaMallorca'));
