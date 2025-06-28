@@ -19,19 +19,11 @@
   "nearby": "Proper",
   "nearbyStations": "Estacions properes",
   "distance": "Distància {distance} m",
-  "@distance": {
-    "placeholders": {
-      "distance": {
-        "type": "int"
-      }
-    }
-  },
   "locationDisabled": "Els serveis de localització estan desactivats",
   "enableLocation": "Activa els serveis de localització",
   "locationDeniedForever": "Localització denegada permanentment",
   "locationDeniedText": "Has denegat els permisos de localització permanentment",
   "locationDeniedAction": "Si us plau, activa els serveis de localització a la configuració de l'aplicació per utilitzar aquesta funció",
-  "goToSettings": "Vés a configuracions",
   "cancel": "Cancel·la",
   "info": "Informació",
   "noDepartures": "No hi ha sortides en les properes hores. Si us plau revisa més tard.",
@@ -55,13 +47,32 @@
   "stationsOnRoute": "Estacions en la ruta",
   "arrivingLate": "Arribant tard",
   "arrivingIn": "{count, plural, =0{ara} one{1 minut} other{{count} minuts}}",
-  "@arrivingIn": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "estimated": "Estimat",
-  "scheduled": "Programat"
+  "scheduled": "Programat",
+  "openSettings": "Obre la configuració",
+  "notificationDialogTitle": "Notificació de sortida per a {lineCode}",
+  "notificationDialogSubtitle": "Programa una notificació per a aquesta sortida",
+  "notifyMe": "Notifica'm",
+  "minutesBefore": "minuts abans",
+  "alreadyScheduled": "Ja tens una notificació programada per a aquesta sortida",
+  "viewPending": "Veure pendents",
+  "notificationChannelName": "Sortides d'autobús",
+  "notificationTitle": "Recordatori de sortida per a {lineCode}",
+  "notificationBody": "El teu autobús {lineCode} surt d'aquí a {minutes} minuts",
+  "notificationBodyApprox": "El teu autobús {lineCode} sortirà aviat",
+  "notificationScheduled": "Notificació programada per a {lineCode} a les {time}",
+  "notificationScheduledApprox": "Notificació programada per a {lineCode} aproximadament a les {time}",
+  "scheduleNotification": "Programar notificació",
+  "pendingNotifications": "Notificacions pendents",
+  "noPendingNotifications": "No tens notificacions pendents",
+  "scheduledFor": "Programat per a: {time}",
+  "cancelAllNotifications": "Cancel·la totes les notificacions",
+  "notificationDeniedDialogTitle": "Permís de notificació",
+  "notificationDeniedDialogSubtitle": "Has denegat el permís de notificació. \nActiva'l a la configuració de l'aplicació per rebre notificacions.",
+  "remindersDeniedDialogTitle": "Notificacions precises",
+  "remindersDeniedDialogSubtitle": "Per rebre notificacions precises, permet les alarmes programades per a Via Mallorca.",
+  "useInexact": "Utilitza inexacte",
+  "allowExact": "Permet exacte",
+  "switchToExact": "Canvia a notificacions exactes",
+  "switchToInexact": "Canvia a notificacions inexactes"
 }

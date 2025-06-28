@@ -23,7 +23,7 @@ class LocationDeniedPopup extends StatelessWidget {
             child: Text(AppLocalizations.of(context)!.cancel)),
         TextButton(
             onPressed: () => {openAppSettings(), Navigator.pop(context)},
-            child: Text(AppLocalizations.of(context)!.goToSettings))
+            child: Text(AppLocalizations.of(context)!.openSettings))
       ],
     );
   }

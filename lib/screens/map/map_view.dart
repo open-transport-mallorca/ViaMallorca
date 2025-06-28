@@ -9,9 +9,13 @@ import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
+import 'package:via_mallorca/apis/notification.dart';
+import 'package:via_mallorca/cache/cache_manager.dart';
 import 'package:via_mallorca/components/bottom_sheets/station/station_view.dart';
 import 'package:via_mallorca/components/bottom_sheets/timeline/timeline_view.dart';
 import 'package:via_mallorca/providers/map_provider.dart';
+import 'package:via_mallorca/providers/navigation_provider.dart';
+import 'package:via_mallorca/providers/notifications_provider.dart';
 import 'package:via_mallorca/providers/tracking_provider.dart';
 import 'package:via_mallorca/utils/adapt_color.dart';
 import 'package:mallorca_transit_services/mallorca_transit_services.dart';
@@ -24,7 +28,6 @@ enum PolylineType { way, back }
 
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
-
   @override
   State<MapScreen> createState() => _MapScreenState();
 }
@@ -46,13 +49,60 @@ class _MapScreenState extends State<MapScreen>
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addObserver(this);
+
+    NotificationApi.onNotificationTap = (String? payload) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        resolvePayload(context, payload);
+      });
+    };
+
+    // Handle payload if it came before `onNotificationTap` was set
+    NotificationApi.maybeHandlePendingPayload();
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
+  }
+
+  Future<void> resolvePayload(BuildContext context, String? payload) async {
+    if (payload != null && payload.contains(',')) {
+      try {
+        Provider.of<NotificationsProvider>(context, listen: false)
+            .reloadNotifications(); // Refreshes the UI
+        final viaPayload = ViaNotificationPayload.fromString(payload);
+
+        // We can assume that at this stage the stations are cached
+        // as the user had to open the app at least once to plan a reminder
+        final cachedStations = await CacheManager.getAllStations();
+
+        final station = cachedStations.firstWhere(
+          (s) => s.id == viaPayload.stationId,
+          orElse: () => throw Exception("Station not found"),
+        );
+
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          Provider.of<NavigationProvider>(context, listen: false).setIndex(1);
+          Provider.of<MapProvider>(context, listen: false).updateLocation(
+            LatLng(station.lat, station.long),
+            18,
+          );
+          showBottomSheet(
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.vertical(top: Radius.circular(10.0)),
+            ),
+            context: context,
+            builder: (_) => StationSheet(
+              station: station,
+              highlightedDepartureId: viaPayload.tripId,
+            ),
+          );
+        });
+      } catch (e) {
+        debugPrint("Error parsing notification payload: $e");
+      }
+    }
   }
 
   @override

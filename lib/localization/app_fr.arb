@@ -19,19 +19,11 @@
   "nearby": "À proximité",
   "nearbyStations": "Stations à proximité",
   "distance": "Distance {distance} m",
-  "@distance": {
-    "placeholders": {
-      "distance": {
-        "type": "int"
-      }
-    }
-  },
   "locationDisabled": "Les services de localisation sont désactivés",
   "enableLocation": "Activer les services de localisation",
   "locationDeniedForever": "Localisation refusée définitivement",
   "locationDeniedText": "Vous avez refusé définitivement les autorisations de localisation",
   "locationDeniedAction": "Veuillez activer les services de localisation dans les paramètres de l'application pour utiliser cette fonctionnalité",
-  "goToSettings": "Aller aux paramètres",
   "cancel": "Annuler",
   "info": "Info",
   "noDepartures": "Il n'y a pas de départs pour les prochaines heures. Veuillez revenir plus tard.",
@@ -55,13 +47,32 @@
   "stationsOnRoute": "Stations sur la route",
   "arrivingLate": "Arrivée tardive",
   "arrivingIn": "{count, plural, =0{maintenant} one{1 minute} other{{count} minutes}}",
-  "@arrivingIn": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "estimated": "Estimé",
-  "scheduled": "Prévu"
+  "scheduled": "Prévu",
+  "openSettings": "Ouvrir les paramètres",
+  "notificationDialogTitle": "Notification de départ pour {lineCode}",
+  "notificationDialogSubtitle": "Planifiez une notification pour ce départ",
+  "notifyMe": "Me notifier",
+  "minutesBefore": "minutes avant",
+  "alreadyScheduled": "Vous avez déjà une notification programmée pour ce départ",
+  "viewPending": "Voir en attente",
+  "notificationChannelName": "Départs de bus",
+  "notificationTitle": "Rappel de départ pour {lineCode}",
+  "notificationBody": "Votre bus {lineCode} part dans {minutes} minutes",
+  "notificationBodyApprox": "Votre bus {lineCode} part bientôt",
+  "notificationScheduled": "Notification programmée pour {lineCode} à {time}",
+  "notificationScheduledApprox": "Notification programmée pour {lineCode} vers {time}",
+  "scheduleNotification": "Programmer une notification",
+  "pendingNotifications": "Notifications en attente",
+  "noPendingNotifications": "Aucune notification en attente",
+  "scheduledFor": "Prévu pour : {time}",
+  "cancelAllNotifications": "Annuler toutes les notifications",
+  "notificationDeniedDialogTitle": "Autorisation de notification",
+  "notificationDeniedDialogSubtitle": "Vous avez refusé l'autorisation de notification. \nVeuillez l'activer dans les paramètres de l'application pour recevoir des notifications.",
+  "remindersDeniedDialogTitle": "Notifications précises",
+  "remindersDeniedDialogSubtitle": "Pour recevoir des notifications précises, autorisez les alarmes programmées pour Via Mallorca.",
+  "useInexact": "Utiliser approximatif",
+  "allowExact": "Autoriser précis",
+  "switchToExact": "Passer aux notifications précises",
+  "switchToInexact": "Passer aux notifications approximatives"
 }

@@ -1,22 +1,20 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:latlong2/latlong.dart';
 import 'package:mallorca_transit_services/mallorca_transit_services.dart';
 import 'package:provider/provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:via_mallorca/components/bottom_sheets/station/departure_card.dart';
 import 'package:via_mallorca/components/station_line_labels/station_line_labels_view.dart';
 import 'package:via_mallorca/localization/generated/app_localizations.dart';
-import 'package:via_mallorca/providers/map_provider.dart';
 import 'package:via_mallorca/providers/tracking_provider.dart';
-import 'package:via_mallorca/utils/distance_formatter.dart';
-import 'package:via_mallorca/utils/station_sort.dart';
 import 'station_viewmodel.dart';
 
 class StationSheet extends StatelessWidget {
   final Station station;
+  final int? highlightedDepartureId;
 
-  const StationSheet({super.key, required this.station});
+  const StationSheet(
+      {super.key, required this.station, this.highlightedDepartureId});
 
   @override
   Widget build(BuildContext context) {
@@ -174,215 +172,16 @@ class StationSheet extends StatelessWidget {
                                       .withValues(alpha: 1),
                                   width: 3)
                               : null),
-                      child: departureCard(context, departure));
+                      child: DepartureCard(
+                        station: station,
+                        departure: departure,
+                        isHighlighted:
+                            highlightedDepartureId == departure.tripId,
+                      ));
                 });
               }),
         ),
       ),
     );
-  }
-
-  Widget departureCard(BuildContext context, Departure departure) {
-    return Card(
-      color: Theme.of(context).colorScheme.surfaceContainerHigh,
-      child: Padding(
-          padding: const EdgeInsets.all(12.0),
-          child: Row(
-            spacing: 12,
-            children: [
-              // Leading icon (left side)
-              _getIconForLine(departure.lineCode),
-
-              // Main content (middle)
-              Expanded(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Title line
-                    Text(
-                      "${departure.lineCode}${departure.destination != null ? " - ${departure.destination}" : ""}",
-                      style: const TextStyle(fontSize: 20),
-                    ),
-
-                    // Subtitle content
-                    Text(
-                      departure.name,
-                      style: const TextStyle(fontSize: 16),
-                    ),
-
-                    // Arrival time
-                    Builder(
-                      builder: (context) {
-                        final l10n = AppLocalizations.of(context)!;
-                        final now = DateTime.now();
-
-                        final scheduledArrival = departure.estimatedArrival;
-                        final scheduledArrivalStr =
-                            DateFormat.Hm().format(scheduledArrival);
-                        final minutesToScheduled =
-                            scheduledArrival.difference(now).inMinutes;
-
-                        final estimatedArrival =
-                            departure.realTrip?.estimatedArrival;
-                        final minutesToEstimated =
-                            estimatedArrival?.difference(now).inMinutes ?? 0;
-                        final estimatedArrivalStr = estimatedArrival != null
-                            ? DateFormat.Hm().format(estimatedArrival)
-                            : null;
-
-                        // Define scheduledText and its color
-                        String scheduledText;
-                        Color scheduledColor;
-
-                        if (minutesToScheduled < 0) {
-                          scheduledText =
-                              "$scheduledArrivalStr - ${l10n.arrivingLate}";
-                          scheduledColor = Theme.of(context).colorScheme.error;
-                        } else if (minutesToScheduled > 59) {
-                          scheduledText = scheduledArrivalStr;
-                          scheduledColor =
-                              Theme.of(context).colorScheme.onSurface;
-                        } else {
-                          scheduledText =
-                              "${l10n.arrivingIn(minutesToScheduled)} ($scheduledArrivalStr)";
-                          scheduledColor =
-                              Theme.of(context).colorScheme.onSurface;
-                        }
-
-                        // Show estimated only if it differs from scheduled and is valid
-                        final showEstimated = estimatedArrival != null &&
-                            estimatedArrival != scheduledArrival &&
-                            minutesToEstimated >= 0 &&
-                            minutesToEstimated != minutesToScheduled;
-
-                        return Column(
-                          mainAxisSize: MainAxisSize.min,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "${l10n.scheduled}: $scheduledText",
-                              style: TextStyle(
-                                  fontSize: 14, color: scheduledColor),
-                            ),
-                            if (showEstimated && estimatedArrivalStr != null)
-                              Text(
-                                "${l10n.estimated}: ${l10n.arrivingIn(minutesToEstimated).toLowerCase()} ($estimatedArrivalStr)",
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Theme.of(context).colorScheme.primary,
-                                ),
-                              ),
-                          ],
-                        );
-                      },
-                    )
-                  ],
-                ),
-              ),
-
-              // Trailing widgets (right side)
-              Row(mainAxisSize: MainAxisSize.min, spacing: 12, children: [
-                if (departure.realTrip != null) ...[
-                  // Passenger count
-                  if (departure.realTrip?.stats != null)
-                    Builder(builder: (context) {
-                      final color = departure.realTrip!.stats!.passengers >
-                              departure.realTrip!.stats!.placesToSit +
-                                  departure.realTrip!.stats!.placesToStand
-                          ? Theme.of(context).colorScheme.error
-                          : Theme.of(context).colorScheme.onSurface;
-                      return Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            Icons.people,
-                            size: 20,
-                            color: color,
-                          ),
-                          Text(
-                            "${departure.realTrip!.stats!.passengers}",
-                            style: TextStyle(fontSize: 16, color: color),
-                          ),
-                        ],
-                      );
-                    }),
-
-                  // Track button
-                  Column(
-                    spacing: 2,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Material(
-                        color: Theme.of(context).colorScheme.secondaryContainer,
-                        borderRadius: BorderRadius.circular(12),
-                        child: InkWell(
-                          borderRadius: BorderRadius.circular(12),
-                          onTap: () async {
-                            final line =
-                                await RouteLine.getLine(departure.lineCode);
-                            if (context.mounted) {
-                              Provider.of<MapProvider>(context, listen: false)
-                                  .viewRoute(line, context, true);
-                              Provider.of<TrackingProvider>(context,
-                                      listen: false)
-                                  .startTracking(
-                                      departure.realTrip!.id,
-                                      departure.lineCode,
-                                      LatLng(departure.realTrip!.lat,
-                                          departure.realTrip!.long),
-                                      station.id);
-                              Provider.of<MapProvider>(context, listen: false)
-                                  .updateLocation(
-                                      LatLng(departure.realTrip!.lat,
-                                          departure.realTrip!.long),
-                                      15);
-                            }
-                          },
-                          child: Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              spacing: 4,
-                              children: [
-                                const Icon(Icons.location_pin, size: 20),
-                                Text(
-                                  AppLocalizations.of(context)!.track,
-                                  style: const TextStyle(fontSize: 12),
-                                )
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
-                      Text(
-                        MetricDistanceFormatter.formatDistance(
-                            calculateDistance(
-                                lon1: station.long,
-                                lat1: station.lat,
-                                lon2: departure.realTrip!.long,
-                                lat2: departure.realTrip!.lat),
-                            context),
-                        style: TextStyle(fontSize: 11),
-                      )
-                    ],
-                  ),
-                ],
-              ])
-            ],
-          )),
-    );
-  }
-
-  Icon _getIconForLine(String line) {
-    if (line.startsWith("M")) {
-      return const Icon(Icons.subway_outlined);
-    } else if (line.startsWith("T")) {
-      return const Icon(Icons.train);
-    } else if (line.startsWith("A")) {
-      return const Icon(Icons.airplanemode_active_outlined);
-    } else {
-      return const Icon(Icons.directions_bus);
-    }
   }
 }

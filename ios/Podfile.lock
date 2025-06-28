@@ -76,7 +76,7 @@ SPEC CHECKSUMS:
   device_info_plus: bf2e3232933866d73fe290f2942f2156cdd10342
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
   flutter_compass: cbbd285cea1584c7ac9c4e0c3e1f17cbea55e855
-  flutter_local_notifications: df98d66e515e1ca797af436137b4459b160ad8c9
+  flutter_local_notifications: ff50f8405aaa0ccdc7dcfb9022ca192e8ad9688f
   geolocator_apple: 9bcea1918ff7f0062d98345d238ae12718acfbc1
   ObjectBox: bf3d4b51075d52868422d5d1f2f2141b1d630d30
   objectbox_flutter_libs: 2f30755c12b0fe104d75445c3ba879e3072eda54
@@ -86,6 +86,6 @@ SPEC CHECKSUMS:
   syncfusion_flutter_pdfviewer: bb9998884b864cfedf72628df3503bdf57e397c0
   url_launcher_ios: 5334b05cef931de560670eeae103fd3e431ac3fe
 
-PODFILE CHECKSUM: 9c764a87c6b0bf50131d5c140757ef6ec681ed9d
+PODFILE CHECKSUM: b5961ca827111133c6f57bb4fedc37bddd5d4fb5
 
 COCOAPODS: 1.16.2
