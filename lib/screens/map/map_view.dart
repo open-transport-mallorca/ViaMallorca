@@ -13,6 +13,7 @@ import 'package:via_mallorca/apis/notification.dart';
 import 'package:via_mallorca/cache/cache_manager.dart';
 import 'package:via_mallorca/components/bottom_sheets/station/station_view.dart';
 import 'package:via_mallorca/components/bottom_sheets/timeline/timeline_view.dart';
+import 'package:via_mallorca/extensions/grayscale_filter.dart';
 import 'package:via_mallorca/providers/map_provider.dart';
 import 'package:via_mallorca/providers/navigation_provider.dart';
 import 'package:via_mallorca/providers/notifications_provider.dart';
@@ -32,20 +33,7 @@ class MapScreen extends StatefulWidget {
   State<MapScreen> createState() => _MapScreenState();
 }
 
-class _MapScreenState extends State<MapScreen>
-    with TickerProviderStateMixin, WidgetsBindingObserver {
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    final trackingProvider =
-        Provider.of<TrackingProvider>(context, listen: false);
-
-    if (state == AppLifecycleState.resumed) {
-      trackingProvider.resume();
-    } else if (state == AppLifecycleState.paused) {
-      trackingProvider.pause();
-    }
-  }
-
+class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
@@ -58,12 +46,6 @@ class _MapScreenState extends State<MapScreen>
 
     // Handle payload if it came before `onNotificationTap` was set
     NotificationApi.maybeHandlePendingPayload();
-  }
-
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
   }
 
   Future<void> resolvePayload(BuildContext context, String? payload) async {
@@ -418,13 +400,39 @@ class _MapScreenState extends State<MapScreen>
                           .withValues(alpha: 0.9)),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: Image.asset(
-                        trackingProvider.lineType == LineType.bus ||
-                                trackingProvider.lineType == LineType.unknown ||
-                                trackingProvider.lineType == null
-                            ? "assets/bus.png"
-                            : "assets/train.png",
-                        height: 50 * animation.value),
+                    child: Stack(
+                      alignment: Alignment.center,
+                      children: [
+                        ColorFiltered(
+                          colorFilter: trackingProvider.connectionStatus !=
+                                  ConnectionStatus.connected
+                              ? ColorFilterX.grayscale()
+                              : const ColorFilter.mode(
+                                  Colors.transparent,
+                                  BlendMode.dst,
+                                ),
+                          child: Image.asset(
+                            trackingProvider.lineType == LineType.bus ||
+                                    trackingProvider.lineType ==
+                                        LineType.unknown ||
+                                    trackingProvider.lineType == null
+                                ? "assets/bus.png"
+                                : "assets/train.png",
+                            height: 50 * animation.value,
+                          ),
+                        ),
+                        if (trackingProvider.connectionStatus ==
+                            ConnectionStatus.connecting)
+                          SizedBox(
+                            width: 40 * animation.value,
+                            height: 40 * animation.value,
+                            child: CircularProgressIndicator(
+                              color: Theme.of(context).colorScheme.primary,
+                              strokeWidth: 3,
+                            ),
+                          ),
+                      ],
+                    ),
                   ));
             })
     ]);

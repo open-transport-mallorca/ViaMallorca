@@ -1,117 +1,147 @@
 import 'dart:async';
 import 'dart:convert';
-import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:mallorca_transit_services/mallorca_transit_services.dart';
+import 'package:web_socket_channel/web_socket_channel.dart';
 
-/// A provider class for tracking bus locations and information.
-class TrackingProvider extends ChangeNotifier {
+enum ConnectionStatus {
+  disconnected,
+  connecting,
+  connected,
+}
+
+class TrackingProvider extends ChangeNotifier with WidgetsBindingObserver {
   LatLng? currentLocation;
   RouteStationInfo? routeStationInfo;
-  StreamSubscription? _locationStream;
   int? currentSpeed;
   int? trackingTripId;
   LineType? lineType;
   String? routeCode;
   List<StationOnRoute>? stationsOnRoute;
-
   int? trackingFromStation;
 
-  StreamSubscription? _connectivitySubscription;
+  WebSocketChannel? _channel;
+  StreamSubscription? _locationStream;
 
-  /// Starts tracking the bus with the given [tripId] and [lineCode].
-  /// Optionally, an [initialCoords] can be provided to set the initial location.
-  Future<void> startTracking(int tripId, String lineCode, LatLng initialCoords,
-      int trackingFrom) async {
-    // Properly clean up existing connections first
+  bool _isTracking = false;
+
+  ConnectionStatus _connectionStatus = ConnectionStatus.disconnected;
+  ConnectionStatus get connectionStatus => _connectionStatus;
+
+  AppLifecycleState? _appLifecycleState = AppLifecycleState.resumed;
+
+  void _setConnectionStatus(ConnectionStatus status) {
+    if (_connectionStatus != status) {
+      _connectionStatus = status;
+      notifyListeners();
+    }
+  }
+
+  Future<void> startTracking(
+    int tripId,
+    String lineCode,
+    LatLng initialCoords,
+    int trackingFrom,
+  ) async {
     await stopTracking();
-
-    trackingFromStation = trackingFrom;
-    trackingTripId = tripId;
-    currentLocation = initialCoords;
-
-    if (_locationStream != null) {
-      _locationStream!.cancel();
-    }
-
-    if (_connectivitySubscription != null) {
-      _connectivitySubscription!.cancel();
-    }
-
-    _connectivitySubscription =
-        Connectivity().onConnectivityChanged.listen((state) async {
-      if (state.contains(ConnectivityResult.none)) {
-        _locationStream?.pause();
-      } else {
-        _locationStream?.resume();
-        // Consider re-establishing the WebSocket connection if paused for too long
-        if (_locationStream?.isPaused ?? false) {
-          stopTracking();
-          await startTracking(
-              tripId, lineCode, currentLocation!, trackingFromStation!);
-        }
-      }
-    });
-
-    trackingFromStation = trackingFrom;
+    WidgetsBinding.instance.addObserver(this);
+    _isTracking = true;
+    _setConnectionStatus(ConnectionStatus.connecting);
 
     trackingTripId = tripId;
+    trackingFromStation = trackingFrom;
     currentLocation = initialCoords;
 
-    RouteLine routeLine = await RouteLine.getLine(lineCode);
+    final routeLine = await RouteLine.getLine(lineCode);
     lineType = routeLine.type;
     routeCode = routeLine.code;
 
-    Stream locationStream = await LocationWebSocket.locationStream(tripId);
-    _locationStream = locationStream.listen((location) {
-      var action = LocationWebSocket.locationParser(jsonDecode(location));
-      if (action is BusPosition) {
-        currentLocation = LatLng(action.lat, action.long);
-        currentSpeed = action.speed.round();
+    _channel = LocationWebSocket.locationChannel(tripId);
+
+    _locationStream = _channel!.stream.listen(
+      (location) {
+        final action = LocationWebSocket.locationParser(jsonDecode(location));
+
+        if (_connectionStatus != ConnectionStatus.connected) {
+          _setConnectionStatus(ConnectionStatus.connected);
+        }
+
+        if (action is BusPosition) {
+          currentLocation = LatLng(action.lat, action.long);
+          currentSpeed = action.speed.round();
+        } else if (action is RouteStationInfo) {
+          routeStationInfo = action;
+          stationsOnRoute = action.stops;
+        }
+
         notifyListeners();
-      }
-      if (action is RouteStationInfo) {
-        routeStationInfo = action;
-        stationsOnRoute = action.stops;
-        notifyListeners();
-      }
-      if (action is ConnectionClose) {
-        stopTracking();
-        notifyListeners();
-      }
-    });
+      },
+      onDone: () {
+        _setConnectionStatus(ConnectionStatus.disconnected);
+        debugPrint("WebSocket connection closed");
+
+        if (_appLifecycleState == AppLifecycleState.resumed &&
+            _isTracking &&
+            _connectionStatus == ConnectionStatus.disconnected) {
+          debugPrint("App resumed and was tracking. Reconnecting...");
+          startTracking(
+            trackingTripId!,
+            routeCode!,
+            currentLocation!,
+            trackingFromStation!,
+          );
+        }
+      },
+      onError: (e) {
+        _setConnectionStatus(ConnectionStatus.disconnected);
+        debugPrint("WebSocket error: $e");
+      },
+    );
   }
 
-  void pause() {
-    _locationStream?.pause();
-  }
-
-  void resume() {
-    if (_locationStream != null) {
-      // Always restart the tracking when resuming the app
-      if (trackingTripId != null &&
-          routeCode != null &&
-          currentLocation != null &&
-          trackingFromStation != null) {
-        startTracking(trackingTripId!, routeCode!, currentLocation!,
-            trackingFromStation!);
-      }
-    }
-  }
-
-  /// Stops tracking the bus.
   Future<void> stopTracking() async {
+    WidgetsBinding.instance.removeObserver(this);
+    _isTracking = false;
+
     await _locationStream?.cancel();
     _locationStream = null;
-    await _connectivitySubscription?.cancel();
-    _connectivitySubscription = null;
+
+    await _channel?.sink.close();
+    _channel = null;
+
     trackingTripId = null;
     trackingFromStation = null;
     currentLocation = null;
     stationsOnRoute = null;
     routeStationInfo = null;
     currentSpeed = null;
+
+    _setConnectionStatus(ConnectionStatus.disconnected);
     notifyListeners();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    _appLifecycleState = state;
+    final isNowForeground = state == AppLifecycleState.resumed;
+
+    if (isNowForeground &&
+        _isTracking &&
+        _connectionStatus == ConnectionStatus.disconnected) {
+      debugPrint("App resumed and was tracking. Reconnecting...");
+      startTracking(
+        trackingTripId!,
+        routeCode!,
+        currentLocation!,
+        trackingFromStation!,
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    stopTracking();
+    super.dispose();
   }
 }
