@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
-import 'package:skeletonizer/skeletonizer.dart';
 import 'package:via_mallorca/components/bottom_sheets/station/station_view.dart';
 import 'package:via_mallorca/components/popups/location_denied_popup.dart';
+import 'package:via_mallorca/components/skeletons/nearby_card_skeleton.dart';
 import 'package:via_mallorca/components/station_line_labels/station_line_labels_view.dart';
 import 'package:via_mallorca/providers/map_provider.dart';
 import 'package:via_mallorca/providers/navigation_provider.dart';
@@ -52,8 +52,13 @@ class NearbyStops extends StatelessWidget {
                           LocationPermission.whileInUse)
                     Expanded(
                       child: ListView.builder(
-                        itemCount: viewModel.nearbyStations.length,
+                        itemCount: viewModel.isLoading
+                            ? 5
+                            : viewModel.nearbyStations.length,
                         itemBuilder: (context, index) {
+                          if (viewModel.isLoading) {
+                            return const NearbyCardSkeleton();
+                          }
                           return nearbyCard(viewModel, index, context);
                         },
                       ),
@@ -93,25 +98,19 @@ class NearbyStops extends StatelessWidget {
               : BorderSide.none,
           borderRadius: BorderRadius.circular(10),
         ),
-        title: Skeletonizer(
-          enabled: viewModel.isLoading,
-          child: Text(
-            station.name,
-          ),
+        title: Text(
+          station.name,
         ),
-        subtitle: Skeletonizer(
-          enabled: viewModel.isLoading,
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (station.ref != null) ...[
-                Text(station.ref!),
-                const SizedBox(height: 5),
-              ],
-              StationLineLabels(station: station),
+        subtitle: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (station.ref != null) ...[
+              Text(station.ref!),
+              const SizedBox(height: 5),
             ],
-          ),
+            StationLineLabels(station: station),
+          ],
         ),
         isThreeLine: false,
         trailing: Row(
