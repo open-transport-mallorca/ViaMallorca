@@ -43,6 +43,7 @@ dependencies:
   flutter_map_cancellable_tile_provider: ^3.0.2
   numberpicker: ^2.1.2
   web_socket_channel: ^3.0.3
+  quick_actions: ^1.1.0
 
 dependency_overrides:
   intl: ^0.20.2
