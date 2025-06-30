@@ -1,14 +1,17 @@
 import 'package:flutter/material.dart';
-import 'package:via_mallorca/apis/local_storage.dart';
 import 'package:via_mallorca/cache/cache_manager.dart';
 import 'package:via_mallorca/extensions/remove_punctuation.dart';
 import 'package:mallorca_transit_services/mallorca_transit_services.dart';
+import 'package:via_mallorca/providers/favorites_provider.dart';
 
 class StationsViewModel extends ChangeNotifier {
+  final FavoritesProvider favoritesProvider;
+
+  StationsViewModel(this.favoritesProvider);
+
   final TextEditingController searchController = TextEditingController();
   List<Station> cachedStations = [];
   List<Station> searchResults = [];
-  List<Station>? favourites = [];
   bool onlyFavourites = false;
 
   Future<void> loadStations() async {
@@ -17,15 +20,8 @@ class StationsViewModel extends ChangeNotifier {
       cachedStations = await Station.getAllStations();
       CacheManager.setAllStations(cachedStations);
     }
-    favourites = await _getFavouriteStations();
-    notifyListeners();
-  }
 
-  Future<List<Station>> _getFavouriteStations() async {
-    final favouriteCodes = await LocalStorageApi.getFavouriteStations();
-    return cachedStations.where((station) {
-      return favouriteCodes.contains(station.code.toString());
-    }).toList();
+    notifyListeners();
   }
 
   void toggleFavouritesFilter(bool value) {
@@ -54,27 +50,12 @@ class StationsViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void addFavourite(Station station) async {
-    favourites?.insert(0, station);
-    await _saveFavourites();
-    notifyListeners();
-  }
-
-  void removeFavourite(Station station) async {
-    favourites?.remove(station);
-    await _saveFavourites();
-    notifyListeners();
-  }
-
-  Future<void> _saveFavourites() async {
-    final favouriteCodes =
-        favourites?.map((station) => station.code.toString()).toList() ?? [];
-    await LocalStorageApi.setFavouriteStations(favouriteCodes);
-  }
-
   List<Station> get filteredStations {
     if (onlyFavourites) {
-      return favourites ?? [];
+      return cachedStations
+          .where((station) => favoritesProvider.favoriteStations
+              .contains(station.code.toString()))
+          .toList();
     }
     return searchResults.isEmpty && searchController.text.isEmpty
         ? cachedStations

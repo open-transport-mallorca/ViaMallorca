@@ -6,6 +6,7 @@ import 'package:via_mallorca/components/bottom_sheets/station/station_view.dart'
 import 'package:via_mallorca/components/popups/location_denied_popup.dart';
 import 'package:via_mallorca/components/skeletons/nearby_card_skeleton.dart';
 import 'package:via_mallorca/components/station_line_labels/station_line_labels_view.dart';
+import 'package:via_mallorca/providers/favorites_provider.dart';
 import 'package:via_mallorca/providers/map_provider.dart';
 import 'package:via_mallorca/providers/navigation_provider.dart';
 import 'package:via_mallorca/screens/nearby/nearby_viewmodel.dart';
@@ -89,74 +90,77 @@ class NearbyStops extends StatelessWidget {
       formattedDistance = MetricDistanceFormatter.formatDistance(
           distanceInMeters.toDouble(), context);
     }
-    return Card(
-      color: cardColor,
-      child: ListTile(
-        shape: RoundedRectangleBorder(
-          side: viewModel.favouriteStations.contains(station)
-              ? BorderSide(color: favoriteBorder, width: 3.0)
-              : BorderSide.none,
-          borderRadius: BorderRadius.circular(10),
-        ),
-        title: Text(
-          station.name,
-        ),
-        subtitle: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (station.ref != null) ...[
-              Text(station.ref!),
-              const SizedBox(height: 5),
+    return Consumer<FavoritesProvider>(
+        builder: (context, favoritesProvider, child) {
+      return Card(
+        color: cardColor,
+        child: ListTile(
+          shape: RoundedRectangleBorder(
+            side: favoritesProvider.isFavoriteStation(station.code.toString())
+                ? BorderSide(color: favoriteBorder, width: 3.0)
+                : BorderSide.none,
+            borderRadius: BorderRadius.circular(10),
+          ),
+          title: Text(
+            station.name,
+          ),
+          subtitle: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (station.ref != null) ...[
+                Text(station.ref!),
+                const SizedBox(height: 5),
+              ],
+              StationLineLabels(station: station),
             ],
-            StationLineLabels(station: station),
-          ],
-        ),
-        isThreeLine: false,
-        trailing: Row(
-          mainAxisAlignment: MainAxisAlignment.end,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Card(
-              color: Theme.of(context).colorScheme.secondaryContainer,
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: SizedBox(
-                  width: 80,
-                  height: 25,
-                  child: Center(
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(Icons.location_pin),
-                        const SizedBox(width: 5),
-                        Text(
-                          formattedDistance,
-                          style: const TextStyle(fontSize: 16),
-                        ),
-                      ],
+          ),
+          isThreeLine: false,
+          trailing: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Card(
+                color: Theme.of(context).colorScheme.secondaryContainer,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: SizedBox(
+                    width: 80,
+                    height: 25,
+                    child: Center(
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.location_pin),
+                          const SizedBox(width: 5),
+                          Text(
+                            formattedDistance,
+                            style: const TextStyle(fontSize: 16),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-            const SizedBox(width: 12),
-            const Icon(Icons.arrow_forward_ios_rounded),
-          ],
+              const SizedBox(width: 12),
+              const Icon(Icons.arrow_forward_ios_rounded),
+            ],
+          ),
+          onTap: () {
+            Provider.of<NavigationProvider>(context, listen: false).setIndex(1);
+            Provider.of<MapProvider>(context, listen: false)
+                .updateLocation(LatLng(station.lat, station.long), 18);
+            showBottomSheet(
+                shape: const RoundedRectangleBorder(
+                    borderRadius:
+                        BorderRadius.vertical(top: Radius.circular(10.0))),
+                context: context,
+                builder: (context) => StationSheet(station: station));
+          },
         ),
-        onTap: () {
-          Provider.of<NavigationProvider>(context, listen: false).setIndex(1);
-          Provider.of<MapProvider>(context, listen: false)
-              .updateLocation(LatLng(station.lat, station.long), 18);
-          showBottomSheet(
-              shape: const RoundedRectangleBorder(
-                  borderRadius:
-                      BorderRadius.vertical(top: Radius.circular(10.0))),
-              context: context,
-              builder: (context) => StationSheet(station: station));
-        },
-      ),
-    );
+      );
+    });
   }
 
   Widget locationNotLoaded(

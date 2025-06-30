@@ -7,6 +7,7 @@ import 'package:via_mallorca/apis/local_storage.dart';
 import 'package:via_mallorca/apis/notification.dart';
 import 'package:via_mallorca/app_wrapper.dart';
 import 'package:via_mallorca/cache/cache_manager.dart';
+import 'package:via_mallorca/providers/favorites_provider.dart';
 import 'package:via_mallorca/providers/locale_provider.dart';
 import 'package:via_mallorca/providers/map_provider.dart';
 import 'package:via_mallorca/providers/navigation_provider.dart';
@@ -52,6 +53,7 @@ class ViaMallorca extends StatelessWidget {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => NavigationProvider()),
+        ChangeNotifierProvider(create: (context) => FavoritesProvider()),
         ChangeNotifierProvider(create: (context) => MapProvider()),
         ChangeNotifierProvider(create: (context) => TrackingProvider()),
         ChangeNotifierProvider(create: (context) => ThemeProvider()),

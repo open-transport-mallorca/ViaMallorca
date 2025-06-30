@@ -121,14 +121,14 @@ class LocalStorageApi {
   /// Retrieves the list of favourite stations from the local storage.
   ///
   /// Returns a future that completes with a list of strings representing the favourite stations.
-  static Future<List<String>> getFavouriteStations() async {
+  static Future<List<String>> getFavoriteStations() async {
     return _preferences!.getStringList("favouriteStations") ?? [];
   }
 
   /// Sets the list of favourite stations in the local storage.
   ///
   /// [favouriteStations] - A list of strings representing the favourite stations.
-  static Future setFavouriteStations(List<String> favouriteStations) async {
+  static Future setFavoriteStations(List<String> favouriteStations) async {
     await _preferences!.setStringList("favouriteStations", favouriteStations);
   }
 

@@ -6,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:via_mallorca/components/bottom_sheets/station/departure_card.dart';
 import 'package:via_mallorca/components/station_line_labels/station_line_labels_view.dart';
 import 'package:via_mallorca/localization/generated/app_localizations.dart';
+import 'package:via_mallorca/providers/favorites_provider.dart';
 import 'package:via_mallorca/providers/tracking_provider.dart';
 import 'station_viewmodel.dart';
 
@@ -18,90 +19,107 @@ class StationSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => StationSheetViewModel(station)..initialize(),
-      child: Consumer<StationSheetViewModel>(
-        builder: (context, viewModel, child) {
-          return Stack(
-            children: [
-              SizedBox(
-                width: double.infinity,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const SizedBox(height: 24),
-                      Column(
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: [
-                              Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  IconButton(
-                                    icon: const Icon(Icons.directions),
-                                    onPressed: () => launchUrl(Uri(
-                                      scheme: "geo",
-                                      path: "${station.lat},${station.long}",
-                                      query: "q=${station.lat},${station.long}",
-                                    )),
-                                  ),
-                                  IconButton(
-                                    icon: Icon(viewModel.isFavourite
-                                        ? Icons.star
-                                        : Icons.star_outline),
-                                    onPressed: viewModel.toggleFavourite,
-                                  ),
-                                ],
-                              ),
-                              Expanded(
-                                // This helps to center the text in the available space
-                                child: Column(
+    return Consumer<FavoritesProvider>(
+        builder: (context, favoritesProvider, child) {
+      return ChangeNotifierProvider(
+        create: (_) => StationSheetViewModel(station)..initialize(),
+        child: Consumer<StationSheetViewModel>(
+          builder: (context, viewModel, child) {
+            return Stack(
+              children: [
+                SizedBox(
+                  width: double.infinity,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const SizedBox(height: 24),
+                        Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                                Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
                                   children: [
-                                    Text(
-                                      "${station.name} (${station.code})",
-                                      style: const TextStyle(fontSize: 24),
-                                      textAlign: TextAlign.center,
+                                    IconButton(
+                                      icon: const Icon(Icons.directions),
+                                      onPressed: () => launchUrl(Uri(
+                                        scheme: "geo",
+                                        path: "${station.lat},${station.long}",
+                                        query:
+                                            "q=${station.lat},${station.long}",
+                                      )),
                                     ),
-                                    if (station.ref != null)
-                                      Text(
-                                        station.ref!,
-                                        textAlign: TextAlign.center,
-                                      ),
+                                    IconButton(
+                                      icon: Icon(
+                                          favoritesProvider.isFavoriteStation(
+                                                  station.code.toString())
+                                              ? Icons.star
+                                              : Icons.star_outline),
+                                      onPressed: () {
+                                        if (favoritesProvider.isFavoriteStation(
+                                            station.code.toString())) {
+                                          favoritesProvider
+                                              .removeFavoriteStation(
+                                                  station.code.toString());
+                                        } else {
+                                          favoritesProvider.addFavoriteStation(
+                                              station.code.toString());
+                                        }
+                                      },
+                                    ),
                                   ],
                                 ),
-                              ),
-                              const SizedBox(width: 48),
-                            ],
-                          ),
-                          const SizedBox(height: 8),
-                          StationLineLabels(station: station),
-                          const SizedBox(height: 16),
-                          _buildDeparturesList(context, viewModel),
-                        ],
-                      ),
-                    ],
+                                Expanded(
+                                  // This helps to center the text in the available space
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        "${station.name} (${station.code})",
+                                        style: const TextStyle(fontSize: 24),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                      if (station.ref != null)
+                                        Text(
+                                          station.ref!,
+                                          textAlign: TextAlign.center,
+                                        ),
+                                    ],
+                                  ),
+                                ),
+                                const SizedBox(width: 48),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            StationLineLabels(station: station),
+                            const SizedBox(height: 16),
+                            _buildDeparturesList(context, viewModel),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-              Positioned(
-                top: 0,
-                right: 0,
-                child: IconButton(
-                  icon: const Icon(Icons.close),
-                  onPressed: () => Navigator.of(context).pop(),
+                Positioned(
+                  top: 0,
+                  right: 0,
+                  child: IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () => Navigator.of(context).pop(),
+                  ),
                 ),
-              ),
-            ],
-          );
-        },
-      ),
-    );
+              ],
+            );
+          },
+        ),
+      );
+    });
   }
 
   Widget _buildDeparturesList(
