@@ -8,6 +8,7 @@ import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
+import 'package:quick_actions/quick_actions.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:via_mallorca/apis/notification.dart';
 import 'package:via_mallorca/cache/cache_manager.dart';
@@ -34,21 +35,48 @@ class MapScreen extends StatefulWidget {
 }
 
 class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
+  final QuickActions quickActions = QuickActions();
+
   @override
   void initState() {
     super.initState();
 
     NotificationApi.onNotificationTap = (String? payload) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        resolvePayload(context, payload);
+        resolveNotificationPayload(context, payload);
       });
     };
+
+    quickActions
+        .initialize((String shortcut) => resolveTilePayload(context, shortcut));
 
     // Handle payload if it came before `onNotificationTap` was set
     NotificationApi.maybeHandlePendingPayload();
   }
 
-  Future<void> resolvePayload(BuildContext context, String? payload) async {
+  Future<void> resolveTilePayload(BuildContext context, String? payload) async {
+    if (payload == null) return;
+    if (payload.startsWith('station_')) {
+      try {
+        final cachedStations = await CacheManager.getAllStations();
+
+        final stationCode = payload.substring('station_'.length);
+        final station = cachedStations.firstWhere(
+          (s) => s.code == int.parse(stationCode),
+          orElse: () => throw Exception("Station not found"),
+        );
+
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          jumpToStation(station, null);
+        });
+      } catch (e) {
+        debugPrint("Error resolving tile payload: $e");
+      }
+    }
+  }
+
+  Future<void> resolveNotificationPayload(
+      BuildContext context, String? payload) async {
     if (payload != null && payload.contains(',')) {
       try {
         Provider.of<NotificationsProvider>(context, listen: false)
@@ -65,26 +93,30 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
         );
 
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          Provider.of<NavigationProvider>(context, listen: false).setIndex(1);
-          Provider.of<MapProvider>(context, listen: false).updateLocation(
-            LatLng(station.lat, station.long),
-            18,
-          );
-          showBottomSheet(
-            shape: const RoundedRectangleBorder(
-              borderRadius: BorderRadius.vertical(top: Radius.circular(10.0)),
-            ),
-            context: context,
-            builder: (_) => StationSheet(
-              station: station,
-              highlightedDepartureId: viaPayload.tripId,
-            ),
-          );
+          jumpToStation(station, viaPayload.tripId);
         });
       } catch (e) {
         debugPrint("Error parsing notification payload: $e");
       }
     }
+  }
+
+  void jumpToStation(Station station, int? tripId) {
+    Provider.of<NavigationProvider>(context, listen: false).setIndex(1);
+    Provider.of<MapProvider>(context, listen: false).updateLocation(
+      LatLng(station.lat, station.long),
+      18,
+    );
+    showBottomSheet(
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(10.0)),
+      ),
+      context: context,
+      builder: (_) => StationSheet(
+        station: station,
+        highlightedDepartureId: tripId,
+      ),
+    );
   }
 
   @override
