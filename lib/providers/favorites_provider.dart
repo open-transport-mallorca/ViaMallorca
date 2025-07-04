@@ -17,6 +17,8 @@ class FavoritesProvider extends ChangeNotifier {
     final cachedStations = await CacheManager.getAllStations();
     final recentStations = _favoriteStations.reversed.take(4).toList();
 
+    if (cachedStations.isEmpty || recentStations.isEmpty) return;
+
     final shortcuts = recentStations.map((stationId) {
       final station =
           cachedStations.firstWhere((s) => s.code.toString() == stationId);
