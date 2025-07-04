@@ -36,7 +36,6 @@ class FavoritesProvider extends ChangeNotifier {
     final stations = await LocalStorageApi.getFavoriteStations();
     _favoriteStations.clear();
     _favoriteStations.addAll(stations);
-    await setQuickTiles(); // Update quick tiles on load
     notifyListeners();
   }
 
