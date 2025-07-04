@@ -7,10 +7,14 @@ class FavoritesProvider extends ChangeNotifier {
   final List<String> _favoriteStations = [];
   List<String> get favoriteStations => _favoriteStations;
 
+  final List<String> _favoriteRoutes = [];
+  List<String> get favoriteRoutes => _favoriteRoutes;
+
   final QuickActions _quickActions = QuickActions();
 
   FavoritesProvider() {
     _loadFavoriteStations();
+    _loadFavoriteRoutes();
   }
 
   Future<void> setQuickTiles() async {
@@ -32,11 +36,38 @@ class FavoritesProvider extends ChangeNotifier {
     _quickActions.setShortcutItems(shortcuts);
   }
 
-  Future<void> _loadFavoriteStations() async {
-    final stations = await LocalStorageApi.getFavoriteStations();
+  void _loadFavoriteStations() {
+    final stations = LocalStorageApi.getFavoriteStations();
     _favoriteStations.clear();
     _favoriteStations.addAll(stations);
     notifyListeners();
+  }
+
+  void _loadFavoriteRoutes() {
+    final routes = LocalStorageApi.getFavoriteRoutes();
+    _favoriteRoutes.clear();
+    _favoriteRoutes.addAll(routes);
+    notifyListeners();
+  }
+
+  void addFavoriteRoute(String routeId) {
+    if (!_favoriteRoutes.contains(routeId)) {
+      _favoriteRoutes.add(routeId);
+      LocalStorageApi.setFavoriteRoutes(_favoriteRoutes);
+      notifyListeners();
+    }
+  }
+
+  void removeFavoriteRoute(String routeId) {
+    if (_favoriteRoutes.contains(routeId)) {
+      _favoriteRoutes.remove(routeId);
+      LocalStorageApi.setFavoriteRoutes(_favoriteRoutes);
+      notifyListeners();
+    }
+  }
+
+  bool isFavoriteRoute(String routeId) {
+    return _favoriteRoutes.contains(routeId);
   }
 
   void addFavoriteStation(String stationId) {

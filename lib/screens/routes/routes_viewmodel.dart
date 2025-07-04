@@ -2,20 +2,21 @@ import 'package:flutter/material.dart';
 import 'package:mallorca_transit_services/mallorca_transit_services.dart';
 import 'package:via_mallorca/cache/cache_manager.dart';
 import 'package:via_mallorca/extensions/remove_punctuation.dart';
+import 'package:via_mallorca/providers/favorites_provider.dart';
 
 class RoutesViewModel extends ChangeNotifier {
+  final FavoritesProvider favoritesProvider;
   final TextEditingController searchController = TextEditingController();
 
   List<RouteLine> _cachedLines = [];
-  List<RouteLine> _filteredLines = [];
   bool _isLoading = true;
+  List<RouteLine> searchResults = [];
+  bool onlyFavourites = false;
 
-  RoutesViewModel() {
+  RoutesViewModel(this.favoritesProvider) {
     _initialize();
     searchController.addListener(_onSearchTextChanged);
   }
-
-  List<RouteLine> get filteredLines => _filteredLines;
 
   bool get isLoading => _isLoading;
 
@@ -27,26 +28,44 @@ class RoutesViewModel extends ChangeNotifier {
       _cachedLines = await RouteLine.getAllLines();
       CacheManager.setAllLines(_cachedLines);
     }
-    _filteredLines = List.from(_cachedLines);
+
     _isLoading = false;
     notifyListeners();
   }
 
-  void _onSearchTextChanged() {
-    final query = searchQuery.toLowerCase().removePunctuation();
-    if (query.isEmpty) {
-      _filteredLines = List.from(_cachedLines);
-    } else {
-      _filteredLines = _cachedLines.where((line) {
-        final name = line.name.toLowerCase().removePunctuation();
-        final code = line.code.toLowerCase().removePunctuation();
-        final type = line.type.toString().removePunctuation();
-        return name.contains(query) ||
-            code.contains(query) ||
-            type.contains(query);
-      }).toList();
-    }
+  void toggleFavouritesFilter(bool value) {
+    onlyFavourites = value;
     notifyListeners();
+  }
+
+  void _onSearchTextChanged() {
+    if (onlyFavourites) onlyFavourites = false;
+    searchResults = _cachedLines.where((route) {
+      final normalizedQuery =
+          searchController.text.toLowerCase().removePunctuation();
+      return route.name
+              .toLowerCase()
+              .removePunctuation()
+              .contains(normalizedQuery) ||
+          route.code
+              .toString()
+              .toLowerCase()
+              .removePunctuation()
+              .contains(normalizedQuery);
+    }).toList();
+    notifyListeners();
+  }
+
+  List<RouteLine> get filteredRoutes {
+    if (onlyFavourites) {
+      return _cachedLines
+          .where((route) =>
+              favoritesProvider.favoriteRoutes.contains(route.code.toString()))
+          .toList();
+    }
+    return searchResults.isEmpty && searchController.text.isEmpty
+        ? _cachedLines
+        : searchResults;
   }
 
   @override

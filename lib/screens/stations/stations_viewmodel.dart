@@ -7,12 +7,16 @@ import 'package:via_mallorca/providers/favorites_provider.dart';
 class StationsViewModel extends ChangeNotifier {
   final FavoritesProvider favoritesProvider;
 
-  StationsViewModel(this.favoritesProvider);
-
   final TextEditingController searchController = TextEditingController();
   List<Station> cachedStations = [];
   List<Station> searchResults = [];
   bool onlyFavourites = false;
+  bool _isLoading = true;
+  bool get isLoading => _isLoading;
+
+  StationsViewModel(this.favoritesProvider) {
+    searchController.addListener(_onSearchTextChanged);
+  }
 
   Future<void> loadStations() async {
     cachedStations = await CacheManager.getAllStations();
@@ -20,7 +24,7 @@ class StationsViewModel extends ChangeNotifier {
       cachedStations = await Station.getAllStations();
       CacheManager.setAllStations(cachedStations);
     }
-
+    _isLoading = false;
     notifyListeners();
   }
 
@@ -29,9 +33,11 @@ class StationsViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  void searchStations(String query) {
+  void _onSearchTextChanged() {
+    if (onlyFavourites) onlyFavourites = false;
     searchResults = cachedStations.where((station) {
-      final normalizedQuery = query.toLowerCase().removePunctuation();
+      final normalizedQuery =
+          searchController.text.toLowerCase().removePunctuation();
       return station.name
               .toLowerCase()
               .removePunctuation()
@@ -60,5 +66,12 @@ class StationsViewModel extends ChangeNotifier {
     return searchResults.isEmpty && searchController.text.isEmpty
         ? cachedStations
         : searchResults;
+  }
+
+  @override
+  void dispose() {
+    searchController.removeListener(_onSearchTextChanged);
+    searchController.dispose();
+    super.dispose();
   }
 }

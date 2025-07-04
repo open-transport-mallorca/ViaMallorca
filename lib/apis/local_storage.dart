@@ -121,7 +121,7 @@ class LocalStorageApi {
   /// Retrieves the list of favourite stations from the local storage.
   ///
   /// Returns a future that completes with a list of strings representing the favourite stations.
-  static Future<List<String>> getFavoriteStations() async {
+  static List<String> getFavoriteStations() {
     return _preferences!.getStringList("favouriteStations") ?? [];
   }
 
@@ -130,6 +130,21 @@ class LocalStorageApi {
   /// [favouriteStations] - A list of strings representing the favourite stations.
   static Future setFavoriteStations(List<String> favouriteStations) async {
     await _preferences!.setStringList("favouriteStations", favouriteStations);
+  }
+
+  /// Retrieves the list of favourite routes from the local storage.
+  ///
+  /// Returns a future that completes with a list of strings representing the favourite routes.
+  /// If no favourite routes are stored, it returns an empty list.
+  static List<String> getFavoriteRoutes() {
+    return _preferences!.getStringList("favouriteRoutes") ?? [];
+  }
+
+  /// Sets the list of favourite routes in the local storage.
+  ///
+  /// The [favouriteRoutes] parameter is a list of strings representing the favourite routes.
+  static Future setFavoriteRoutes(List<String> favouriteRoutes) async {
+    await _preferences!.setStringList("favouriteRoutes", favouriteRoutes);
   }
 
   /// Whether to use inexact notifications.
