@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:mallorca_transit_services/mallorca_transit_services.dart';
 import 'package:provider/provider.dart';
@@ -10,7 +12,7 @@ import 'package:via_mallorca/providers/favorites_provider.dart';
 import 'package:via_mallorca/providers/tracking_provider.dart';
 import 'station_viewmodel.dart';
 
-class StationSheet extends StatelessWidget {
+class StationSheet extends StatefulWidget {
   final Station station;
   final int? highlightedDepartureId;
 
@@ -18,13 +20,52 @@ class StationSheet extends StatelessWidget {
       {super.key, required this.station, this.highlightedDepartureId});
 
   @override
+  State<StationSheet> createState() => _StationSheetState();
+}
+
+class _StationSheetState extends State<StationSheet> {
+  Timer? _timer;
+  StationSheetViewModel? _viewModel; // For the timer to access the view model
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _scheduleNextUpdate();
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  void _scheduleNextUpdate() {
+    _timer?.cancel();
+
+    final now = DateTime.now();
+    final nextMinute =
+        DateTime(now.year, now.month, now.day, now.hour, now.minute + 1);
+    final duration = nextMinute.difference(now);
+
+    _timer = Timer(duration, () async {
+      if (mounted) {
+        await _viewModel?.fetchDepartures(); // Fetch data
+        _scheduleNextUpdate(); // Schedule next update
+      }
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Consumer<FavoritesProvider>(
         builder: (context, favoritesProvider, child) {
       return ChangeNotifierProvider(
-        create: (_) => StationSheetViewModel(station)..initialize(),
+        create: (_) => StationSheetViewModel(widget.station)..initialize(),
         child: Consumer<StationSheetViewModel>(
           builder: (context, viewModel, child) {
+            _viewModel = viewModel;
             return Stack(
               children: [
                 SizedBox(
@@ -48,46 +89,48 @@ class StationSheet extends StatelessWidget {
                                       icon: const Icon(Icons.directions),
                                       onPressed: () => launchUrl(Uri(
                                         scheme: "geo",
-                                        path: "${station.lat},${station.long}",
+                                        path:
+                                            "${widget.station.lat},${widget.station.long}",
                                         query:
-                                            "q=${station.lat},${station.long}",
+                                            "q=${widget.station.lat},${widget.station.long}",
                                       )),
                                     ),
                                     IconButton(
                                       icon: Icon(
                                           favoritesProvider.isFavoriteStation(
-                                                  station.code.toString())
+                                                  widget.station.code
+                                                      .toString())
                                               ? Icons.star
                                               : Icons.star_outline),
                                       onPressed: () {
                                         if (favoritesProvider.isFavoriteStation(
-                                            station.code.toString())) {
+                                            widget.station.code.toString())) {
                                           favoritesProvider
-                                              .removeFavoriteStation(
-                                                  station.code.toString());
+                                              .removeFavoriteStation(widget
+                                                  .station.code
+                                                  .toString());
                                         } else {
                                           favoritesProvider.addFavoriteStation(
-                                              station.code.toString());
+                                              widget.station.code.toString());
                                         }
                                       },
                                     ),
                                   ],
                                 ),
                                 Expanded(
-                                  // This helps to center the text in the available space
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     crossAxisAlignment:
                                         CrossAxisAlignment.center,
                                     children: [
                                       Text(
-                                        "${station.name} (${station.code})",
+                                        "${widget.station.name} (${widget.station.code})",
                                         style: const TextStyle(fontSize: 24),
                                         textAlign: TextAlign.center,
                                       ),
-                                      if (station.ref != null)
+                                      if (widget.station.ref != null)
                                         Text(
-                                          station.ref!,
+                                          widget.station.ref!,
                                           textAlign: TextAlign.center,
                                         ),
                                     ],
@@ -97,9 +140,9 @@ class StationSheet extends StatelessWidget {
                               ],
                             ),
                             const SizedBox(height: 8),
-                            StationLineLabels(station: station),
+                            StationLineLabels(station: widget.station),
                             const SizedBox(height: 16),
-                            _buildDeparturesList(context, viewModel),
+                            departuresList(context, viewModel),
                           ],
                         ),
                       ],
@@ -122,8 +165,7 @@ class StationSheet extends StatelessWidget {
     });
   }
 
-  Widget _buildDeparturesList(
-      BuildContext context, StationSheetViewModel viewModel) {
+  Widget departuresList(BuildContext context, StationSheetViewModel viewModel) {
     if (viewModel.hasError) {
       return Padding(
         padding: const EdgeInsets.only(bottom: 32.0),
@@ -191,10 +233,10 @@ class StationSheet extends StatelessWidget {
                                   width: 3)
                               : null),
                       child: DepartureCard(
-                        station: station,
+                        station: widget.station,
                         departure: departure,
                         isHighlighted:
-                            highlightedDepartureId == departure.tripId,
+                            widget.highlightedDepartureId == departure.tripId,
                       ));
                 });
               }),

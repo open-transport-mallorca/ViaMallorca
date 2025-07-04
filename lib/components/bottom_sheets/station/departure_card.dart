@@ -14,9 +14,10 @@ import 'package:via_mallorca/providers/map_provider.dart';
 import 'package:via_mallorca/providers/notifications_provider.dart';
 import 'package:via_mallorca/providers/tracking_provider.dart';
 import 'package:via_mallorca/utils/distance_formatter.dart';
+import 'package:via_mallorca/utils/line_icon.dart';
 import 'package:via_mallorca/utils/station_sort.dart';
 
-class DepartureCard extends StatefulWidget {
+class DepartureCard extends StatelessWidget {
   const DepartureCard(
       {super.key,
       required this.departure,
@@ -27,45 +28,7 @@ class DepartureCard extends StatefulWidget {
   final Station station;
   final bool isHighlighted;
 
-  @override
-  State<DepartureCard> createState() => _DepartureCardState();
-}
-
-class _DepartureCardState extends State<DepartureCard> {
-  Timer? _timer;
-
-  @override
-  void initState() {
-    super.initState();
-    _scheduleNextUpdate();
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
-  }
-
-  void _scheduleNextUpdate() {
-    // Cancel any existing timer
-    _timer?.cancel();
-
-    // Calculate time until next full minute (00 seconds)
-    final now = DateTime.now();
-    final nextMinute =
-        DateTime(now.year, now.month, now.day, now.hour, now.minute + 1);
-    final duration = nextMinute.difference(now);
-
-    // Schedule the timer
-    _timer = Timer(duration, () {
-      if (mounted) {
-        setState(() {});
-        _scheduleNextUpdate();
-      }
-    });
-  }
-
-  Future<void> handleAddNotification() async {
+  Future<void> handleAddNotification(BuildContext context) async {
     final notificationStatus = await Permission.notification.status;
     final alarmStatus = await Permission.scheduleExactAlarm.status;
 
@@ -74,10 +37,10 @@ class _DepartureCardState extends State<DepartureCard> {
       await Permission.notification.request(); // This only works on Android
     } else if ((notificationStatus.isPermanentlyDenied ||
             (Platform.isIOS && notificationStatus.isDenied)) &&
-        mounted) {
+        context.mounted) {
       showDialog(
         context: context,
-        builder: (context) => notificationsDeniedDialog(),
+        builder: (context) => notificationsDeniedDialog(context),
       );
       return;
     }
@@ -85,8 +48,8 @@ class _DepartureCardState extends State<DepartureCard> {
     // On Android also hceck if the user has granted alarm permissions
     if (Platform.isAndroid &&
         (alarmStatus.isDenied || alarmStatus.isRestricted)) {
-      if (!LocalStorageApi.useInexactNotifications() && mounted) {
-        bool? result = await offerPreciseNotifications();
+      if (!LocalStorageApi.useInexactNotifications() && context.mounted) {
+        bool? result = await offerPreciseNotifications(context);
         if (result == true) {
           // User accepted precise notifications, request permission
           await Permission.scheduleExactAlarm.request();
@@ -100,29 +63,26 @@ class _DepartureCardState extends State<DepartureCard> {
     }
 
     // If the user has granted notification permissions, show the notification dialog
-    if (mounted) {
+    if (context.mounted) {
       showDialog(
           context: context,
           builder: (context) => DepartureNotification(
-                station: widget.station,
-                departure: widget.departure,
+                station: station,
+                departure: departure,
               ));
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final departure = widget.departure;
-    final station = widget.station;
-
     return Card(
-      color: widget.isHighlighted
+      color: isHighlighted
           ? Theme.of(context).colorScheme.primaryContainer
           : Theme.of(context).colorScheme.surfaceContainerHigh,
       child: Stack(
         children: [
           if (departure.estimatedArrival.difference(DateTime.now()).inMinutes >=
-              4)
+              6)
             Consumer<NotificationsProvider>(
                 builder: (context, notifications, _) {
               return Positioned(
@@ -130,7 +90,7 @@ class _DepartureCardState extends State<DepartureCard> {
                   top: 0,
                   child: IconButton(
                     iconSize: 20,
-                    onPressed: () async => await handleAddNotification(),
+                    onPressed: () async => await handleAddNotification(context),
                     icon: Icon(Icons.notification_add,
                         color: notifications.pendingNotifications.any((n) =>
                                 n.payload != null && n.payload!.isNotEmpty
@@ -149,7 +109,7 @@ class _DepartureCardState extends State<DepartureCard> {
               spacing: 12,
               children: [
                 // Leading icon (left side)
-                _getIconForLine(departure.lineCode),
+                getIconFromLineCode(departure.lineCode),
 
                 // Main content (middle)
                 Expanded(
@@ -162,7 +122,7 @@ class _DepartureCardState extends State<DepartureCard> {
                         "${departure.lineCode}${departure.destination != null ? " - ${departure.destination}" : ""}",
                         style: TextStyle(
                             fontSize: 20,
-                            color: widget.isHighlighted
+                            color: isHighlighted
                                 ? Theme.of(context)
                                     .colorScheme
                                     .onPrimaryContainer
@@ -174,7 +134,7 @@ class _DepartureCardState extends State<DepartureCard> {
                         departure.name,
                         style: TextStyle(
                             fontSize: 16,
-                            color: widget.isHighlighted
+                            color: isHighlighted
                                 ? Theme.of(context)
                                     .colorScheme
                                     .onPrimaryContainer
@@ -212,7 +172,7 @@ class _DepartureCardState extends State<DepartureCard> {
                                 Theme.of(context).colorScheme.error;
                           } else if (minutesToScheduled > 59) {
                             scheduledText = scheduledArrivalStr;
-                            scheduledColor = widget.isHighlighted
+                            scheduledColor = isHighlighted
                                 ? Theme.of(context)
                                     .colorScheme
                                     .onPrimaryContainer
@@ -220,7 +180,7 @@ class _DepartureCardState extends State<DepartureCard> {
                           } else {
                             scheduledText =
                                 "${l10n.arrivingIn(minutesToScheduled)} ($scheduledArrivalStr)";
-                            scheduledColor = widget.isHighlighted
+                            scheduledColor = isHighlighted
                                 ? Theme.of(context)
                                     .colorScheme
                                     .onPrimaryContainer
@@ -269,7 +229,7 @@ class _DepartureCardState extends State<DepartureCard> {
                                 departure.realTrip!.stats!.placesToSit +
                                     departure.realTrip!.stats!.placesToStand
                             ? Theme.of(context).colorScheme.error
-                            : widget.isHighlighted
+                            : isHighlighted
                                 ? Theme.of(context)
                                     .colorScheme
                                     .onPrimaryContainer
@@ -360,7 +320,7 @@ class _DepartureCardState extends State<DepartureCard> {
     );
   }
 
-  Future<bool?> offerPreciseNotifications() {
+  Future<bool?> offerPreciseNotifications(BuildContext context) {
     return showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -385,7 +345,7 @@ class _DepartureCardState extends State<DepartureCard> {
     );
   }
 
-  Widget notificationsDeniedDialog() {
+  Widget notificationsDeniedDialog(BuildContext context) {
     return AlertDialog(
       title: Text(AppLocalizations.of(context)!.notificationDeniedDialogTitle),
       content:
@@ -406,17 +366,5 @@ class _DepartureCardState extends State<DepartureCard> {
         ),
       ],
     );
-  }
-
-  Icon _getIconForLine(String line) {
-    if (line.startsWith("M")) {
-      return const Icon(Icons.subway_outlined);
-    } else if (line.startsWith("T")) {
-      return const Icon(Icons.train);
-    } else if (line.startsWith("A")) {
-      return const Icon(Icons.airplanemode_active_outlined);
-    } else {
-      return const Icon(Icons.directions_bus);
-    }
   }
 }
