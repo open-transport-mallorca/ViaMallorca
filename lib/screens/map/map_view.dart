@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_map_cancellable_tile_provider/flutter_map_cancellable_tile_provider.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
@@ -36,14 +39,23 @@ class MapScreen extends StatefulWidget {
 
 class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
   final QuickActions quickActions = QuickActions();
+  List<ConnectivityResult> connectivityResults = [];
+  late StreamSubscription<List<ConnectivityResult>> connectivitySubscription;
 
   @override
   void initState() {
     super.initState();
 
+    connectivitySubscription = Connectivity()
+        .onConnectivityChanged
+        .listen((List<ConnectivityResult> result) {
+      connectivityResults = result;
+    });
+
     NotificationApi.onNotificationTap = (String? payload) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         resolveNotificationPayload(context, payload);
+        setState(() {});
       });
     };
 
@@ -52,6 +64,12 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
 
     // Handle payload if it came before `onNotificationTap` was set
     NotificationApi.maybeHandlePendingPayload();
+  }
+
+  @override
+  void dispose() {
+    connectivitySubscription.cancel();
+    super.dispose();
   }
 
   Future<void> resolveTilePayload(BuildContext context, String? payload) async {
@@ -145,7 +163,8 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                     initialCenter: const LatLng(39.607331, 2.983704)),
                 children: [
                   TileLayer(
-                      retinaMode: !kDebugMode,
+                      retinaMode: RetinaMode.isHighDensity(context) &&
+                          connectivityResults.contains(ConnectivityResult.wifi),
                       tileProvider: CancellableNetworkTileProvider(),
                       tileBuilder:
                           Theme.of(context).brightness == Brightness.dark
