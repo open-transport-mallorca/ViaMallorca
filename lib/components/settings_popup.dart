@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -35,20 +36,22 @@ class _SettingsPopupState extends State<SettingsPopup> {
             leading: const Icon(Icons.translate),
           ),
         ),
-        if (LocalStorageApi.useInexactNotifications())
-          PopupMenuItem(
-              value: 'precise_notifications',
-              child: ListTile(
-                title: Text(AppLocalizations.of(context)!.switchToExact),
-                leading: Icon(Icons.notification_important),
-              )),
-        if (!LocalStorageApi.useInexactNotifications())
-          PopupMenuItem(
-              value: 'inprecise_notifications',
-              child: ListTile(
-                title: Text(AppLocalizations.of(context)!.switchToInexact),
-                leading: Icon(Icons.notifications),
-              )),
+        if (Platform.isAndroid) ...[
+          if (LocalStorageApi.useInexactNotifications())
+            PopupMenuItem(
+                value: 'precise_notifications',
+                child: ListTile(
+                  title: Text(AppLocalizations.of(context)!.switchToExact),
+                  leading: Icon(Icons.notification_important),
+                ))
+          else
+            PopupMenuItem(
+                value: 'inprecise_notifications',
+                child: ListTile(
+                  title: Text(AppLocalizations.of(context)!.switchToInexact),
+                  leading: Icon(Icons.notifications),
+                )),
+        ],
         PopupMenuItem(
             value: 'github',
             child: ListTile(
