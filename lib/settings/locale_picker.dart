@@ -16,62 +16,65 @@ class LocalePicker extends StatefulWidget {
 class _LocalePickerState extends State<LocalePicker> {
   @override
   Widget build(BuildContext context) {
-    return Consumer<LocaleProvider>(builder: (context, localeProvider, _) {
-      return Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text(AppLocalizations.of(context)!.language,
-              style:
-                  const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 16),
-          SizedBox(
-            height: 300,
-            child: SingleChildScrollView(
-              child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: List.generate(
-                      AppLocalizations.supportedLocales.length + 1, (index) {
-                    if (index == 0) {
-                      return ListTile(
+    return Consumer<LocaleProvider>(
+      builder: (context, localeProvider, _) {
+        return Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              AppLocalizations.of(context)!.language,
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              height: 300,
+              child: RadioGroup<Locale?>(
+                groupValue: localeProvider.locale,
+                onChanged: (value) => localeProvider.locale = value,
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // System locale
+                      ListTile(
                         title: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Radio(
-                                value: null,
-                                groupValue: localeProvider.locale,
-                                onChanged: (value) =>
-                                    localeProvider.locale = value),
+                            const Radio<Locale?>(value: null),
                             const SizedBox(width: 8),
                             Text(AppLocalizations.of(context)!.system),
                           ],
                         ),
                         onTap: () => localeProvider.locale = null,
-                      );
-                    }
-                    final locale = AppLocalizations.supportedLocales[index - 1];
-                    return ListTile(
-                        title: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Radio(
-                                value: locale,
-                                groupValue: localeProvider.locale,
-                                onChanged: (value) =>
-                                    localeProvider.locale = value),
-                            const SizedBox(width: 8),
-                            Text(Locale.fromSubtags(
-                                    languageCode: locale.languageCode)
-                                .nativeDisplayLanguage
-                                .capitalize()),
-                          ],
-                        ),
-                        onTap: () => localeProvider.locale = locale);
-                  })),
+                      ),
+
+                      // Supported locales
+                      ...AppLocalizations.supportedLocales.map((locale) {
+                        return ListTile(
+                          title: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Radio<Locale?>(value: locale),
+                              const SizedBox(width: 8),
+                              Text(
+                                Locale.fromSubtags(
+                                  languageCode: locale.languageCode,
+                                ).nativeDisplayLanguage.capitalize(),
+                              ),
+                            ],
+                          ),
+                          onTap: () => localeProvider.locale = locale,
+                        );
+                      }),
+                    ],
+                  ),
+                ),
+              ),
             ),
-          )
-        ],
-      );
-    });
+          ],
+        );
+      },
+    );
   }
 }
