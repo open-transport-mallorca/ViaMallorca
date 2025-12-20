@@ -30,7 +30,7 @@ if (flutterVersionName == null) {
 
 android {
     namespace = "es.opentransportmallorca.via"
-    compileSdk = 35
+    compileSdk = 36
     ndkVersion = "27.0.12077973"
 
     kotlin {
@@ -45,8 +45,8 @@ android {
 
     defaultConfig {
         applicationId = "es.opentransportmallorca.via"
-        minSdk = 23
-        targetSdk = 35
+        minSdkVersion = flutter.minSdkVersion
+        targetSdk = 36
         versionCode = flutterVersionCode.toInteger()
         versionName = flutterVersionName
     }
