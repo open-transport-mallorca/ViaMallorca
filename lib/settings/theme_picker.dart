@@ -1,60 +1,66 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:via_mallorca/providers/theme_provider.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:via_mallorca/localization/generated/app_localizations.dart';
+import 'package:via_mallorca/providers/theme_provider.dart';
 
-/// A widget that allows the user to pick a theme.
-class ThemePicker extends StatefulWidget {
+class ThemePicker extends ConsumerWidget {
   const ThemePicker({super.key});
 
   @override
-  State<ThemePicker> createState() => _ThemePickerState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final theme = ref.watch(themeProvider);
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(AppLocalizations.of(context)!.theme,
+              style:
+                  const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              // Light
+              _buildThemeButton(context,
+                  label: AppLocalizations.of(context)!.light,
+                  icon: Icons.light_mode,
+                  isSelected: theme == ThemeMode.light,
+                  onPressed: () => ref
+                      .read(themeProvider.notifier)
+                      .setThemeMode(ThemeMode.light)),
 
-class _ThemePickerState extends State<ThemePicker> {
-  @override
-  Widget build(BuildContext context) {
-    return Consumer<ThemeProvider>(builder: (context, themeProvider, _) {
-      return Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(AppLocalizations.of(context)!.theme,
-                style:
-                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _buildThemeButton(
-                    AppLocalizations.of(context)!.light,
-                    Icons.light_mode,
-                    themeProvider.themeMode == ThemeMode.light,
-                    () => themeProvider.themeMode = ThemeMode.light),
-                _buildThemeButton(
-                    AppLocalizations.of(context)!.dark,
-                    Icons.dark_mode,
-                    themeProvider.themeMode == ThemeMode.dark,
-                    () => themeProvider.themeMode = ThemeMode.dark),
-                _buildThemeButton(
-                    AppLocalizations.of(context)!.system,
-                    Icons.brightness_4,
-                    themeProvider.themeMode == ThemeMode.system,
-                    () => themeProvider.themeMode = ThemeMode.system),
-              ],
-            ),
-            const SizedBox(height: 16)
-          ],
-        ),
-      );
-    });
+              // Dark
+              _buildThemeButton(context,
+                  label: AppLocalizations.of(context)!.dark,
+                  icon: Icons.dark_mode,
+                  isSelected: theme == ThemeMode.dark,
+                  onPressed: () => ref
+                      .read(themeProvider.notifier)
+                      .setThemeMode(ThemeMode.dark)),
+
+              // System
+              _buildThemeButton(context,
+                  label: AppLocalizations.of(context)!.system,
+                  icon: Icons.brightness_4,
+                  isSelected: theme == ThemeMode.system,
+                  onPressed: () => ref
+                      .read(themeProvider.notifier)
+                      .setThemeMode(ThemeMode.system)),
+            ],
+          ),
+          const SizedBox(height: 16)
+        ],
+      ),
+    );
   }
 
-  /// Builds a theme button with the given label, icon, and onPressed callback.
-  Widget _buildThemeButton(
-      String label, IconData icon, bool isSelected, VoidCallback onPressed) {
+  Widget _buildThemeButton(BuildContext context,
+      {required String label,
+      required IconData icon,
+      required bool isSelected,
+      required VoidCallback onPressed}) {
     return Material(
       color: Theme.of(context).colorScheme.secondaryContainer,
       borderRadius: BorderRadius.circular(8),

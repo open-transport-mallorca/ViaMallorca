@@ -2,6 +2,7 @@ import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_map_tile_caching/flutter_map_tile_caching.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 import 'package:provider/provider.dart';
 import 'package:via_mallorca/apis/local_storage.dart';
 import 'package:via_mallorca/apis/notification.dart';
@@ -42,52 +43,50 @@ void main() async {
     debugPrint("Error deleting old cache: $e");
   }
 
-  runApp(ViaMallorca());
+  runApp(ProviderScope(child: ViaMallorca()));
 }
 
-class ViaMallorca extends StatelessWidget {
+class ViaMallorca extends ConsumerWidget {
   const ViaMallorca({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return MultiProvider(
       providers: [
         ChangeNotifierProvider(create: (context) => NavigationProvider()),
         ChangeNotifierProvider(create: (context) => FavoritesProvider()),
         ChangeNotifierProvider(create: (context) => MapProvider()),
         ChangeNotifierProvider(create: (context) => TrackingProvider()),
-        ChangeNotifierProvider(create: (context) => ThemeProvider()),
-        ChangeNotifierProvider(create: (context) => LocaleProvider()),
         ChangeNotifierProvider(create: (context) => NotificationsProvider()),
       ],
       child: DynamicColorBuilder(builder: (lightDynamic, darkDynamic) {
-        return Consumer2<ThemeProvider, LocaleProvider>(
-          builder: (context, themeProvider, localeProvider, _) => MaterialApp(
-              navigatorKey: navigatorKey,
-              debugShowCheckedModeBanner: false,
+        final themeMode = ref.watch(themeProvider);
+        final locale = ref.watch(localeProvider);
+        return MaterialApp(
+            navigatorKey: navigatorKey,
+            debugShowCheckedModeBanner: false,
 
-              /// Not using dynamic schemes directly because of an issue with the
-              /// dynamicColor package.
-              /// https://github.com/material-foundation/flutter-packages/issues/649
-              theme: ThemeData(
-                  colorScheme: ColorScheme.fromSeed(
-                      seedColor: lightDynamic?.primary ?? Colors.cyan)),
-              darkTheme: ThemeData(
-                  colorScheme: ColorScheme.fromSeed(
-                      seedColor: darkDynamic?.primary ?? Colors.cyan,
-                      brightness: Brightness.dark),
-                  brightness: Brightness.dark),
-              themeMode: themeProvider.themeMode,
-              localizationsDelegates: const [
-                AppLocalizations.delegate,
-                GlobalMaterialLocalizations.delegate,
-                GlobalWidgetsLocalizations.delegate,
-                GlobalCupertinoLocalizations.delegate,
-              ],
-              supportedLocales: AppLocalizations.supportedLocales,
-              locale: localeProvider.locale,
-              home: AppWrapper()),
-        );
+            /// Not using dynamic schemes directly because of an issue with the
+            /// dynamicColor package.
+            /// https://github.com/material-foundation/flutter-packages/issues/649
+            theme: ThemeData(
+                colorScheme: ColorScheme.fromSeed(
+                    seedColor: lightDynamic?.primary ?? Colors.cyan)),
+            darkTheme: ThemeData(
+                colorScheme: ColorScheme.fromSeed(
+                    seedColor: darkDynamic?.primary ?? Colors.cyan,
+                    brightness: Brightness.dark),
+                brightness: Brightness.dark),
+            themeMode: themeMode,
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            supportedLocales: AppLocalizations.supportedLocales,
+            locale: locale,
+            home: AppWrapper());
       }),
     );
   }
