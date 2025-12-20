@@ -1,5 +1,4 @@
 import 'dart:async';
-
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:flutter_map_cancellable_tile_provider/flutter_map_cancellable_tile_provider.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
@@ -7,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart' hide Provider, Consumer;
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 import 'package:quick_actions/quick_actions.dart';
@@ -31,13 +31,14 @@ import 'map_viewmodel.dart';
 
 enum PolylineType { way, back }
 
-class MapScreen extends StatefulWidget {
+class MapScreen extends ConsumerStatefulWidget {
   const MapScreen({super.key});
   @override
-  State<MapScreen> createState() => _MapScreenState();
+  ConsumerState<MapScreen> createState() => _MapScreenState();
 }
 
-class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
+class _MapScreenState extends ConsumerState<MapScreen>
+    with TickerProviderStateMixin {
   final QuickActions quickActions = QuickActions();
   List<ConnectivityResult> connectivityResults = [];
   late StreamSubscription<List<ConnectivityResult>> connectivitySubscription;
@@ -120,7 +121,7 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
   }
 
   void jumpToStation(Station station, int? tripId) {
-    Provider.of<NavigationProvider>(context, listen: false).setIndex(1);
+    ref.read(navigationProvider.notifier).setIndex(1);
     Provider.of<MapProvider>(context, listen: false).updateLocation(
       LatLng(station.lat, station.long),
       18,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart' hide Consumer, Provider;
 import 'package:provider/provider.dart';
 import 'package:via_mallorca/components/search_bar.dart';
 import 'package:via_mallorca/providers/favorites_provider.dart';
@@ -85,7 +86,7 @@ class RoutesScreen extends StatelessWidget {
   }
 }
 
-class RouteTile extends StatelessWidget {
+class RouteTile extends ConsumerWidget {
   const RouteTile({
     super.key,
     required this.route,
@@ -94,7 +95,7 @@ class RouteTile extends StatelessWidget {
   final RouteLine route;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final cardColor = Theme.of(context).colorScheme.surfaceContainerHigh;
     final tileIcon = getIconForRouteLine(route);
     return Consumer<FavoritesProvider>(
@@ -140,9 +141,9 @@ class RouteTile extends StatelessWidget {
           ),
           onTap: () {
             FocusManager.instance.primaryFocus?.unfocus();
-            Provider.of<NavigationProvider>(context, listen: false).setIndex(1);
+            ref.read(navigationProvider.notifier).setIndex(1);
             Provider.of<MapProvider>(context, listen: false)
-                .viewRoute(route, context);
+                .viewRoute(context, ref, line: route);
           },
         ),
       );

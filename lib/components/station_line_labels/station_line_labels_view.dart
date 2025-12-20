@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart' hide Consumer, Provider;
 import 'package:mallorca_transit_services/mallorca_transit_services.dart';
 import 'package:provider/provider.dart';
 import 'package:via_mallorca/localization/generated/app_localizations.dart';
@@ -7,13 +8,13 @@ import 'package:via_mallorca/providers/map_provider.dart';
 import 'package:via_mallorca/providers/navigation_provider.dart';
 import 'station_line_labels_viewmodel.dart';
 
-class StationLineLabels extends StatelessWidget {
+class StationLineLabels extends ConsumerWidget {
   const StationLineLabels({super.key, required this.station});
 
   final Station station;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return ChangeNotifierProvider(
       create: (_) => StationViewModel(station)..loadLines(),
       child: Consumer<StationViewModel>(
@@ -55,12 +56,11 @@ class StationLineLabels extends StatelessWidget {
                     child: InkWell(
                       borderRadius: BorderRadius.circular(10),
                       onTap: () async {
-                        Provider.of<NavigationProvider>(context, listen: false)
-                            .setIndex(1);
+                        ref.read(navigationProvider.notifier).setIndex(1);
                         final routeLine = await RouteLine.getLine(line.code);
                         if (context.mounted) {
                           Provider.of<MapProvider>(context, listen: false)
-                              .viewRoute(routeLine, context);
+                              .viewRoute(context, ref, line: routeLine);
                         }
                       },
                       child: Padding(

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart' hide Consumer, Provider;
 import 'package:latlong2/latlong.dart';
 import 'package:mallorca_transit_services/mallorca_transit_services.dart';
 import 'package:provider/provider.dart';
@@ -6,8 +7,8 @@ import 'package:via_mallorca/components/bottom_sheets/station/station_view.dart'
 import 'package:via_mallorca/components/search_bar.dart';
 import 'package:via_mallorca/providers/favorites_provider.dart';
 import 'package:via_mallorca/providers/map_provider.dart';
-import 'package:via_mallorca/providers/navigation_provider.dart';
 import 'package:via_mallorca/localization/generated/app_localizations.dart';
+import 'package:via_mallorca/providers/navigation_provider.dart';
 import 'stations_viewmodel.dart';
 
 class StationsScreen extends StatelessWidget {
@@ -83,13 +84,13 @@ class StationsScreen extends StatelessWidget {
   }
 }
 
-class StationTile extends StatelessWidget {
+class StationTile extends ConsumerWidget {
   const StationTile({super.key, required this.station});
 
   final Station station;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final cardColor = Theme.of(context).colorScheme.surfaceContainerHigh;
 
     return Consumer<FavoritesProvider>(
@@ -116,7 +117,7 @@ class StationTile extends StatelessWidget {
             },
           ),
           onTap: () {
-            Provider.of<NavigationProvider>(context, listen: false).setIndex(1);
+            ref.read(navigationProvider.notifier).setIndex(1);
             showBottomSheet(
               shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.vertical(top: Radius.circular(10.0)),

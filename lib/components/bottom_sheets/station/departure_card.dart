@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart' hide Consumer, Provider;
 import 'package:intl/intl.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:mallorca_transit_services/mallorca_transit_services.dart';
@@ -18,7 +19,7 @@ import 'package:via_mallorca/utils/distance_formatter.dart';
 import 'package:via_mallorca/utils/line_icon.dart';
 import 'package:via_mallorca/utils/station_sort.dart';
 
-class DepartureCard extends StatelessWidget {
+class DepartureCard extends ConsumerWidget {
   const DepartureCard(
       {super.key,
       required this.departure,
@@ -74,8 +75,9 @@ class DepartureCard extends StatelessWidget {
     }
   }
 
+  // TODO: Refactor this into smaller widgets
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Consumer<FavoritesProvider>(
         builder: (context, favoritesProvider, child) {
       return Card(
@@ -284,7 +286,8 @@ class DepartureCard extends StatelessWidget {
                                 if (context.mounted) {
                                   Provider.of<MapProvider>(context,
                                           listen: false)
-                                      .viewRoute(line, context, true);
+                                      .viewRoute(context, ref,
+                                          line: line, isTracking: true);
                                   Provider.of<TrackingProvider>(context,
                                           listen: false)
                                       .startTracking(

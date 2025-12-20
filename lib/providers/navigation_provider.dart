@@ -1,15 +1,15 @@
-import 'package:flutter/material.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart';
 
-/// A provider class for managing the navigation state.
-///
-/// This class extends the [ChangeNotifier] class and provides a way to keep track of the current index
-/// for navigation purposes. It notifies its listeners whenever the index is updated.
-class NavigationProvider extends ChangeNotifier {
-  int currentIndex = 0;
+final navigationProvider =
+    NotifierProvider<NavigationNotifier, int>(NavigationNotifier.new);
 
-  /// Sets the current index to the given [index] and notifies the listeners.
+class NavigationNotifier extends Notifier<int> {
+  @override
+  int build() {
+    return 0;
+  }
+
   void setIndex(int index) {
-    currentIndex = index;
-    notifyListeners();
+    state = index;
   }
 }

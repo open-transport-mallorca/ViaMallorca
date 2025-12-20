@@ -11,7 +11,6 @@ import 'package:via_mallorca/cache/cache_manager.dart';
 import 'package:via_mallorca/providers/favorites_provider.dart';
 import 'package:via_mallorca/providers/locale_provider.dart';
 import 'package:via_mallorca/providers/map_provider.dart';
-import 'package:via_mallorca/providers/navigation_provider.dart';
 import 'package:via_mallorca/providers/notifications_provider.dart';
 import 'package:via_mallorca/providers/theme_provider.dart';
 import 'package:via_mallorca/providers/tracking_provider.dart';
@@ -53,7 +52,6 @@ class ViaMallorca extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (context) => NavigationProvider()),
         ChangeNotifierProvider(create: (context) => FavoritesProvider()),
         ChangeNotifierProvider(create: (context) => MapProvider()),
         ChangeNotifierProvider(create: (context) => TrackingProvider()),

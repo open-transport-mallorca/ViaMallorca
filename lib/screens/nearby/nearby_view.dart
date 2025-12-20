@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart' hide Consumer, Provider;
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 import 'package:via_mallorca/components/bottom_sheets/station/station_view.dart';
@@ -14,11 +15,11 @@ import 'package:via_mallorca/localization/generated/app_localizations.dart';
 import 'package:via_mallorca/utils/distance_formatter.dart';
 import 'package:via_mallorca/utils/station_sort.dart';
 
-class NearbyStops extends StatelessWidget {
+class NearbyStops extends ConsumerWidget {
   const NearbyStops({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return ChangeNotifierProvider(
       create: (_) => NearbyStopsViewModel()..initialize(),
       child: Consumer<NearbyStopsViewModel>(
@@ -60,7 +61,8 @@ class NearbyStops extends StatelessWidget {
                           if (viewModel.isLoading) {
                             return const NearbyCardSkeleton();
                           }
-                          return nearbyCard(viewModel, index, context);
+                          return nearbyCard(context, ref,
+                              viewModel: viewModel, index: index);
                         },
                       ),
                     )
@@ -73,8 +75,8 @@ class NearbyStops extends StatelessWidget {
     );
   }
 
-  Widget nearbyCard(
-      NearbyStopsViewModel viewModel, int index, BuildContext context) {
+  Widget nearbyCard(BuildContext context, WidgetRef ref,
+      {required NearbyStopsViewModel viewModel, required int index}) {
     final cardColor = Theme.of(context).colorScheme.surfaceContainerHigh;
     final favoriteBorder = Theme.of(context).colorScheme.primaryContainer;
 
@@ -148,7 +150,7 @@ class NearbyStops extends StatelessWidget {
             ],
           ),
           onTap: () {
-            Provider.of<NavigationProvider>(context, listen: false).setIndex(1);
+            ref.read(navigationProvider.notifier).setIndex(1);
             Provider.of<MapProvider>(context, listen: false)
                 .updateLocation(LatLng(station.lat, station.long), 18);
             showBottomSheet(

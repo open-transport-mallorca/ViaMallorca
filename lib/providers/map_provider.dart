@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_animations/flutter_map_animations.dart';
+import 'package:hooks_riverpod/hooks_riverpod.dart' hide Provider;
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 import 'package:via_mallorca/providers/navigation_provider.dart';
@@ -84,12 +85,11 @@ class MapProvider extends ChangeNotifier {
   /// The [line] parameter is a [RouteLine] object representing the route line to be viewed.
   /// The [context] parameter is the build context.
   /// The [isTracking] parameter is an optional boolean value indicating whether tracking is enabled.
-  Future<void> viewRoute(RouteLine line, BuildContext context,
-      [bool? isTracking]) async {
+  Future<void> viewRoute(BuildContext context, WidgetRef ref,
+      {required RouteLine line, bool? isTracking}) async {
     final trackingProvider =
         Provider.of<TrackingProvider>(context, listen: false);
-    final navigationProvider =
-        Provider.of<NavigationProvider>(context, listen: false);
+    final currentIndex = ref.read(navigationProvider);
 
     customRouteDestinations = [];
     customRoutes = [[], []];
@@ -104,8 +104,8 @@ class MapProvider extends ChangeNotifier {
 
     setMapLoadingProgress(0);
 
-    if (navigationProvider.currentIndex != 3) {
-      navigationProvider.setIndex(1);
+    if (currentIndex != 3) {
+      ref.read(navigationProvider.notifier).setIndex(3);
     }
     FocusScope.of(context).unfocus();
     final sublines = await Subline.getSublines(line);
