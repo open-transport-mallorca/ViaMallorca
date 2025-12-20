@@ -5,25 +5,26 @@ import 'package:flutter_map_cancellable_tile_provider/flutter_map_cancellable_ti
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:flutter_map_animations/flutter_map_animations.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 import 'package:quick_actions/quick_actions.dart';
-import 'package:skeletonizer/skeletonizer.dart';
 import 'package:via_mallorca/apis/notification.dart';
 import 'package:via_mallorca/cache/cache_manager.dart';
 import 'package:via_mallorca/components/bottom_sheets/station/station_view.dart';
-import 'package:via_mallorca/components/bottom_sheets/timeline/timeline_view.dart';
-import 'package:via_mallorca/extensions/grayscale_filter.dart';
+import 'package:via_mallorca/components/map/bus_info.dart';
+import 'package:via_mallorca/components/map/bus_tracker.dart';
+import 'package:via_mallorca/components/map/loading_overlay.dart';
+import 'package:via_mallorca/components/map/route_way_switcher.dart';
+import 'package:via_mallorca/components/map/untrack_buttons.dart';
+import 'package:via_mallorca/components/map/update_location_buttons.dart';
 import 'package:via_mallorca/providers/map_provider.dart';
 import 'package:via_mallorca/providers/navigation_provider.dart';
 import 'package:via_mallorca/providers/notifications_provider.dart';
 import 'package:via_mallorca/providers/tracking_provider.dart';
 import 'package:via_mallorca/utils/adapt_color.dart';
 import 'package:mallorca_transit_services/mallorca_transit_services.dart';
-import 'package:via_mallorca/localization/generated/app_localizations.dart';
 import 'package:via_mallorca/utils/dark_tile_builder.dart';
 
 import 'map_viewmodel.dart';
@@ -202,70 +203,33 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                     ),
 
                   // Bus Tracker Marker
-                  _busTracker(context)
+                  BusTracker()
                 ],
               ),
               // Bus Info Container
-              _busInfo(context),
+              IgnorePointer(child: BusInfo()),
 
               // Bottom Buttons
-              _untrackButtons(context),
+              Align(alignment: Alignment.bottomLeft, child: UntrackButtons()),
 
               // Custom Route Way Switcher
               if ((mapProvider.customRouteDestinations != null &&
                       mapProvider.customRouteDestinations!.isNotEmpty) &&
                   trackingProvider.currentLocation == null)
-                _routeWaySwitcher(context),
+                Align(
+                    alignment: Alignment.bottomLeft, child: RouteWaySwitcher()),
 
               // Update location button
-              _updateLocationButtons(context, viewModel),
+              Align(
+                  alignment: Alignment.bottomRight,
+                  child: UpdateLocationButtons()),
 
-              if (mapProvider.loadingProgress < 1)
-                _loadingOverlay(context, mapProvider)
+              if (mapProvider.loadingProgress < 1) LoadingOverlay()
             ]);
           },
         );
       }),
     );
-  }
-
-  Widget _updateLocationButtons(BuildContext context, MapViewModel viewModel) {
-    final trackingProvider =
-        Provider.of<TrackingProvider>(context, listen: false);
-
-    return Align(
-        alignment: Alignment.bottomRight,
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
-            spacing: 10,
-            children: [
-              if (trackingProvider.currentLocation != null)
-                // Move to Bus
-                FloatingActionButton(
-                    mini: true,
-                    onPressed: () {
-                      viewModel.moveToLocation(
-                          context: context,
-                          position: trackingProvider.currentLocation!,
-                          zoom: 15);
-                    },
-                    child: const Icon(Icons.directions_bus)),
-
-              // Move to Current Location
-              FloatingActionButton(
-                  onPressed: () async =>
-                      viewModel.moveToCurrentLocation(context),
-                  child: Icon((viewModel.locationPermission ==
-                              LocationPermission.whileInUse ||
-                          viewModel.locationPermission ==
-                              LocationPermission.always)
-                      ? Icons.my_location
-                      : Icons.location_searching)),
-            ],
-          ),
-        ));
   }
 
   Widget _stationsMarkers(BuildContext context, MapViewModel viewModel) {
@@ -366,314 +330,5 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                   ? 0
                   : 1]
     ]);
-  }
-
-  Widget _routeWaySwitcher(BuildContext context) {
-    final mapProvider = Provider.of<MapProvider>(context, listen: false);
-    final trackingProvider =
-        Provider.of<TrackingProvider>(context, listen: false);
-    return Align(
-      alignment: Alignment.bottomLeft,
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Container(
-          decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(10),
-              color:
-                  Theme.of(context).colorScheme.surface.withValues(alpha: 0.7)),
-          child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    trackingProvider.routeCode ?? "",
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  if (trackingProvider.currentLocation != null)
-                    const SizedBox(width: 10),
-                  ConstrainedBox(
-                      constraints: const BoxConstraints(maxWidth: 200),
-                      child: FittedBox(
-                        child: Text(mapProvider.customRouteDestinations != null
-                            ? mapProvider.customRouteDestinations![
-                                mapProvider.customWay == Way.way ? 0 : 1]
-                            : ""),
-                      )),
-                  const SizedBox(
-                    width: 10,
-                  ),
-                  if (trackingProvider.currentLocation == null &&
-                      (mapProvider.customRouteDestinations ?? []).length > 1)
-                    AnimatedRotation(
-                      duration: const Duration(milliseconds: 300),
-                      turns: (mapProvider.customWay ?? Way.way) == Way.way
-                          ? 0
-                          : 0.5,
-                      child: IconButton(
-                        onPressed: () {
-                          mapProvider.setCustomWay(
-                              mapProvider.customWay == Way.way
-                                  ? Way.back
-                                  : Way.way);
-                        },
-                        icon: const Icon(Icons.compare_arrows_rounded),
-                      ),
-                    ),
-                ],
-              )),
-        ),
-      ),
-    );
-  }
-
-  Widget _busTracker(BuildContext context) {
-    final trackingProvider =
-        Provider.of<TrackingProvider>(context, listen: false);
-
-    return AnimatedMarkerLayer(markers: [
-      if (trackingProvider.currentLocation != null)
-        AnimatedMarker(
-            width: 120,
-            height: 120,
-            point: LatLng(trackingProvider.currentLocation!.latitude,
-                trackingProvider.currentLocation!.longitude),
-            builder: (_, animation) {
-              return Container(
-                  width: 60 * animation.value,
-                  height: 60 * animation.value,
-                  decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12),
-                      color: Theme.of(context)
-                          .colorScheme
-                          .tertiaryContainer
-                          .withValues(alpha: 0.9)),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        ColorFiltered(
-                          colorFilter: trackingProvider.connectionStatus !=
-                                  ConnectionStatus.connected
-                              ? ColorFilterX.grayscale()
-                              : const ColorFilter.mode(
-                                  Colors.transparent,
-                                  BlendMode.dst,
-                                ),
-                          child: Image.asset(
-                            trackingProvider.lineType == LineType.bus ||
-                                    trackingProvider.lineType ==
-                                        LineType.unknown ||
-                                    trackingProvider.lineType == null
-                                ? "assets/bus.png"
-                                : "assets/train.png",
-                            height: 50 * animation.value,
-                          ),
-                        ),
-                        if (trackingProvider.connectionStatus ==
-                            ConnectionStatus.connecting)
-                          SizedBox(
-                            width: 40 * animation.value,
-                            height: 40 * animation.value,
-                            child: CircularProgressIndicator(
-                              color: Theme.of(context).colorScheme.primary,
-                              strokeWidth: 3,
-                            ),
-                          ),
-                      ],
-                    ),
-                  ));
-            })
-    ]);
-  }
-
-  Widget _busInfo(BuildContext context) {
-    final mapProvider = Provider.of<MapProvider>(context, listen: false);
-    final trackingProvider =
-        Provider.of<TrackingProvider>(context, listen: false);
-
-    return IgnorePointer(
-      child: AnimatedOpacity(
-        duration: const Duration(milliseconds: 300),
-        opacity: trackingProvider.currentLocation == null ? 0 : 1,
-        child: Align(
-            alignment: Alignment.topRight,
-            child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Container(
-                  width: 250,
-                  height: 150,
-                  decoration: BoxDecoration(
-                      color: Theme.of(context)
-                          .colorScheme
-                          .surface
-                          .withValues(alpha: 0.7),
-                      borderRadius: BorderRadius.circular(12)),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Builder(builder: (context) {
-                      final routeCode = trackingProvider.routeCode;
-                      final destinations = mapProvider.customRouteDestinations;
-                      final way = mapProvider.customWay;
-                      final stationInfo = trackingProvider.routeStationInfo;
-                      final speed = trackingProvider.currentSpeed;
-
-                      return Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Skeletonizer(
-                            enabled: routeCode == null || destinations == null,
-                            child: Text(
-                              "${routeCode ?? ''} - ${destinations != null ? destinations[way == Way.way ? 0 : 1] : ''}",
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                          Skeletonizer(
-                            enabled: stationInfo == null,
-                            child: Text(
-                              "${AppLocalizations.of(context)!.passengers}: ${stationInfo?.passangers.inBus ?? '-'} / ${stationInfo?.passangers.totalCapacity ?? '-'}",
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: (stationInfo != null &&
-                                        stationInfo.passangers.inBus <
-                                            stationInfo
-                                                .passangers.totalCapacity)
-                                    ? Theme.of(context).colorScheme.onSurface
-                                    : Theme.of(context).colorScheme.error,
-                              ),
-                            ),
-                          ),
-                          Skeletonizer(
-                            enabled: speed == null,
-                            child: Text(
-                                "${AppLocalizations.of(context)!.speed}: ${speed ?? '-'} km/h"),
-                          ),
-                          Skeletonizer(
-                            enabled: stationInfo == null,
-                            child: FittedBox(
-                              child: Text(
-                                "${AppLocalizations.of(context)!.nextStop}: ${stationInfo?.stops.first.stopName ?? ''}",
-                              ),
-                            ),
-                          ),
-                          Skeletonizer(
-                            enabled: stationInfo == null,
-                            child: FittedBox(
-                              child: Text(
-                                "${AppLocalizations.of(context)!.finalStop}: ${stationInfo?.stops.last.stopName ?? ''}",
-                              ),
-                            ),
-                          ),
-                        ],
-                      );
-                    }),
-                  ),
-                ))),
-      ),
-    );
-  }
-
-  Widget _untrackButtons(BuildContext context) {
-    final mapProvider = Provider.of<MapProvider>(context, listen: false);
-    final trackingProvider =
-        Provider.of<TrackingProvider>(context, listen: false);
-    return Align(
-        alignment: Alignment.bottomLeft,
-        child: Padding(
-            padding: EdgeInsets.symmetric(
-                vertical: Provider.of<TrackingProvider>(context, listen: false)
-                            .currentLocation !=
-                        null
-                    ? 24.0
-                    : 82.0,
-                horizontal: 24.0),
-            child: Column(mainAxisAlignment: MainAxisAlignment.end, children: [
-              // Untrack Route Button
-              if (mapProvider.customRoutes != null &&
-                  trackingProvider.currentLocation == null)
-                ElevatedButton.icon(
-                    onPressed: () {
-                      mapProvider.setCustomPolylines(null);
-                      mapProvider.setCustomStations([]);
-                      mapProvider.setCustomWay(null);
-                      mapProvider.setCustomRouteDestinations(null);
-                    },
-                    style: ButtonStyle(
-                      backgroundColor: WidgetStateProperty.all(
-                          Theme.of(context).colorScheme.tertiaryContainer),
-                    ),
-                    icon: Icon(
-                      Icons.stop,
-                      color: Theme.of(context).colorScheme.onTertiaryContainer,
-                    ),
-                    label: Text(
-                      AppLocalizations.of(context)!.untrackRoute,
-                      style: TextStyle(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onTertiaryContainer),
-                    )),
-
-              // Stop Tracking Bus Button
-              if (trackingProvider.currentLocation != null)
-                ElevatedButton.icon(
-                    onPressed: () async {
-                      await context.read<TrackingProvider>().stopTracking();
-                      mapProvider.setCustomPolylines(null);
-                      mapProvider.setCustomStations([]);
-                      mapProvider.setCustomWay(null);
-                      mapProvider.setCustomRouteDestinations(null);
-                    },
-                    style: ButtonStyle(
-                      backgroundColor: WidgetStateProperty.all(
-                          Theme.of(context).colorScheme.errorContainer),
-                    ),
-                    icon: Icon(Icons.stop,
-                        color: Theme.of(context).colorScheme.error),
-                    label: Text(
-                      AppLocalizations.of(context)!.stopTracking,
-                      style:
-                          TextStyle(color: Theme.of(context).colorScheme.error),
-                    )),
-
-              // Stop Timeline
-              if (trackingProvider.stationsOnRoute != null)
-                ElevatedButton.icon(
-                  label: Text(AppLocalizations.of(context)!.stationsOnRoute),
-                  icon: const Icon(Icons.timeline),
-                  onPressed: () {
-                    showBottomSheet(
-                        context: context,
-                        builder: (context) => const TimelineSheet());
-                  },
-                )
-            ])));
-  }
-
-  Widget _loadingOverlay(BuildContext context, MapProvider mapProvider) {
-    return Container(
-      width: double.infinity,
-      height: double.infinity,
-      decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.5)),
-      child: Center(
-          child: SizedBox(
-              width: 100,
-              height: 100,
-              child: Column(
-                children: [
-                  CircularProgressIndicator(
-                    value: mapProvider.loadingProgress,
-                    strokeWidth: 5,
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                        Theme.of(context).colorScheme.primary),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(AppLocalizations.of(context)!.loading),
-                ],
-              ))),
-    );
   }
 }
