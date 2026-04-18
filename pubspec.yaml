@@ -1,13 +1,13 @@
 name: via_mallorca
 description: An open source app for tracking Mallorca Transit.
 publish_to: "none"
-version: 1.6.0+11
+version: 1.6.1+12
 
 environment:
   sdk: ">=3.4.0 <4.0.0"
 
 dependencies:
-  mallorca_transit_services: ^1.2.1
+  mallorca_transit_services: ^1.3.0
   dynamic_color: ^1.7.0
   flutter:
     sdk: flutter

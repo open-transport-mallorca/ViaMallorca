@@ -1,10 +1,14 @@
 [
   {
     "language": "en-US",
-    "text": "Added notifications for bus departures and improved user experience."
+    "text": "Fixed tracking for certain bus routes"
   },
   {
     "language": "es-ES",
-    "text": "Añadido notificaciones para las salidas de buses y mejorada la experiencia del usuario."
+    "text": "Corregido el seguimiento para ciertas rutas de autobuses"
+  },
+  {
+    "language": "de-DE",
+    "text": "Verfolgung für bestimmte Buslinien behoben"
   }
 ]
