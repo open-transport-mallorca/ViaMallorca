@@ -20,6 +20,8 @@ class TrackingProvider extends ChangeNotifier with WidgetsBindingObserver {
   String? routeCode;
   List<StationOnRoute>? stationsOnRoute;
   int? trackingFromStation;
+  bool hasBusPosition = false;
+  bool hasStationInfo = false;
 
   WebSocketChannel? _channel;
   StreamSubscription? _locationStream;
@@ -61,11 +63,20 @@ class TrackingProvider extends ChangeNotifier with WidgetsBindingObserver {
 
     _locationStream = _channel!.stream.listen(
       (location) {
-        final action = LocationWebSocket.locationParser(jsonDecode(location));
+        final json = jsonDecode(location) as Map;
+        final type = json['type'];
+
+        if (type == 'position') {
+          hasBusPosition = true;
+        } else if (type == 'esta-info') {
+          hasStationInfo = true;
+        }
 
         if (_connectionStatus != ConnectionStatus.connected) {
           _setConnectionStatus(ConnectionStatus.connected);
         }
+
+        final action = LocationWebSocket.locationParser(json);
 
         if (action is BusPosition) {
           currentLocation = LatLng(action.lat, action.long);
@@ -116,6 +127,8 @@ class TrackingProvider extends ChangeNotifier with WidgetsBindingObserver {
     stationsOnRoute = null;
     routeStationInfo = null;
     currentSpeed = null;
+    hasBusPosition = false;
+    hasStationInfo = false;
 
     _setConnectionStatus(ConnectionStatus.disconnected);
     notifyListeners();
