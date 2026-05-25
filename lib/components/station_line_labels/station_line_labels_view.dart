@@ -57,7 +57,8 @@ class StationLineLabels extends StatelessWidget {
                       onTap: () async {
                         Provider.of<NavigationProvider>(context, listen: false)
                             .setIndex(1);
-                        final routeLine = await RouteLine.getLine(line.code);
+                        final routeLine =
+                            await RouteLinesApi.getLine(line.code);
                         if (context.mounted) {
                           Provider.of<MapProvider>(context, listen: false)
                               .viewRoute(routeLine, context);

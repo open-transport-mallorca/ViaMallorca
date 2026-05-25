@@ -23,7 +23,7 @@ class StationSheetViewModel extends ChangeNotifier {
         notifyListeners();
       }
 
-      departures = await Departures.getDepartures(
+      departures = await DeparturesApi.getDepartures(
         stationCode: station.code,
         numberOfDepartures: numberOfDepartures,
       );

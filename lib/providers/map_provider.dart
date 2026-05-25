@@ -108,7 +108,7 @@ class MapProvider extends ChangeNotifier {
       navigationProvider.setIndex(1);
     }
     FocusScope.of(context).unfocus();
-    final sublines = await Subline.getSublines(line);
+    final sublines = await RouteLinesApi.getSublines(line);
 
     setMapLoadingProgress(0.3);
 
@@ -116,7 +116,7 @@ class MapProvider extends ChangeNotifier {
 
     for (Subline subline in sublines) {
       List<LatLng> points = [];
-      final route = await RoutePath.getPath(subline);
+      final route = await RouteLinesApi.getPath(subline);
       for (List<LatLng> routePath in route.paths) {
         for (LatLng point in routePath) {
           points.add(point);

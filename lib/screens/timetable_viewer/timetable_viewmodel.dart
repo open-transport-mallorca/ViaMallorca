@@ -18,7 +18,7 @@ class TimetableViewModel extends ChangeNotifier {
 
   Future<void> _fetchTimetable() async {
     try {
-      _timetableUri = await RouteLine.getPdfTimetable(lineCode);
+      _timetableUri = await RouteLinesApi.getPdfTimetable(lineCode);
     } catch (e) {
       _errorMessage = e.toString();
     } finally {

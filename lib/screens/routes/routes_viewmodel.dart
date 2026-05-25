@@ -25,7 +25,7 @@ class RoutesViewModel extends ChangeNotifier {
   Future<void> _initialize() async {
     _cachedLines = await CacheManager.getAllLines();
     if (_cachedLines.isEmpty) {
-      _cachedLines = await RouteLine.getAllLines();
+      _cachedLines = await RouteLinesApi.getAllLines();
       CacheManager.setAllLines(_cachedLines);
     }
 

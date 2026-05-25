@@ -80,7 +80,7 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
 
         final stationCode = payload.substring('station_'.length);
         final station = cachedStations.firstWhere(
-          (s) => s.code == int.parse(stationCode),
+          (s) => s.code == stationCode,
           orElse: () => throw Exception("Station not found"),
         );
 

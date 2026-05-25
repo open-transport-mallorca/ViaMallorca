@@ -58,8 +58,16 @@ class CacheManager {
     }
     final List<String>? data = _prefs?.getStringList(resourceName);
     if (data != null) {
-      for (var station in data) {
-        stations.add(Station.fromJson(jsonDecode(station)));
+      try {
+        for (var station in data) {
+          stations.add(Station.fromJson(jsonDecode(station)));
+        }
+      } catch (_) {
+        // Cached data is incompatible (e.g. station.code migrated from int to
+        // String). Clear and force a fresh fetch.
+        await _prefs?.remove(resourceName);
+        await _prefs?.remove('expiry_$resourceName');
+        return [];
       }
     }
     return stations;
@@ -80,10 +88,9 @@ class CacheManager {
 
   /// Get the lines that pass through a station from the cache.
   ///
-  /// The [stationCode] is the code of the station.
-  /// The stationCode is the `code`, not `id` of the station.
+  /// The [stationCode] is the `code` (not `id`) of the station.
   /// The lines are returned as a list of [RouteLine] objects.
-  static Future<List<RouteLine>> getLines(int stationCode) async {
+  static Future<List<RouteLine>> getLines(String stationCode) async {
     final String resourceName = 'lines_$stationCode';
     bool shouldRefresh =
         (await getExpiry(resourceName)).isBefore(DateTime.now());
@@ -100,11 +107,9 @@ class CacheManager {
 
   /// Set the lines that pass through a station in the cache.
   ///
-  /// The [stationCode] is the code of the station.
-  /// The stationCode is the `code`, not `id` of the station.
+  /// The [stationCode] is the `code` (not `id`) of the station.
   /// The [lines] are the lines that pass through the station.
-  /// The lines are a list of [RouteLine] objects.
-  static Future<void> setLines(int stationCode, List<RouteLine> lines) async {
+  static Future<void> setLines(String stationCode, List<RouteLine> lines) async {
     final String resourceName = 'lines_$stationCode';
     List<String> data = [];
     for (var line in lines) {

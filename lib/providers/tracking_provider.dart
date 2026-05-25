@@ -53,7 +53,7 @@ class TrackingProvider extends ChangeNotifier with WidgetsBindingObserver {
     trackingFromStation = trackingFrom;
     currentLocation = initialCoords;
 
-    final routeLine = await RouteLine.getLine(lineCode);
+    final routeLine = await RouteLinesApi.getLine(lineCode);
     lineType = routeLine.type;
     routeCode = routeLine.code;
 
@@ -69,7 +69,7 @@ class TrackingProvider extends ChangeNotifier with WidgetsBindingObserver {
 
         if (action is BusPosition) {
           currentLocation = LatLng(action.lat, action.long);
-          currentSpeed = action.speed.round();
+          currentSpeed = action.speed?.round();
         } else if (action is RouteStationInfo) {
           routeStationInfo = action;
           stationsOnRoute = action.stops;
