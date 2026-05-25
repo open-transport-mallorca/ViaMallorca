@@ -12,7 +12,7 @@ class LocalStorageApi {
   ///
   /// This method should be called before any other method in this class.
   /// Usually called in the main method.
-  static init() async {
+  static Future<void> init() async {
     _preferences = await SharedPreferences.getInstance();
   }
 
@@ -62,7 +62,7 @@ class LocalStorageApi {
   /// The [locale] parameter specifies the desired locale to be set.
   /// If [locale] is null, the locale will be set to 'auto'.
   /// The locale is stored in the shared preferences as a string.
-  static setLocale(Locale? locale) async {
+  static Future<void> setLocale(Locale? locale) async {
     await _preferences!.setString('locale', locale?.languageCode ?? 'auto');
   }
 

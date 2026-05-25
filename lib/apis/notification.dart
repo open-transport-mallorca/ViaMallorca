@@ -25,7 +25,7 @@ class NotificationApi {
     );
 
     await notificationsPlugin.initialize(
-      initializationSettings,
+      settings: initializationSettings,
       onDidReceiveNotificationResponse: (NotificationResponse response) {
         final payload = response.payload;
         if (payload != null) {
@@ -91,9 +91,15 @@ class NotificationApi {
         android: androidPlatformChannelSpecifics,
         iOS: darwinPlatformChannelSpecifics);
 
-    await notificationsPlugin.zonedSchedule(id, notificationTitle,
-        notificationBody, scheduledDateTime, platformChannelSpecifics,
-        payload: payload, androidScheduleMode: androidScheduleMode);
+    await notificationsPlugin.zonedSchedule(
+      id: id,
+      title: notificationTitle,
+      body: notificationBody,
+      scheduledDate: scheduledDateTime,
+      notificationDetails: platformChannelSpecifics,
+      payload: payload,
+      androidScheduleMode: androidScheduleMode,
+    );
   }
 
   /// Retrieves a list of pending notifications.
@@ -103,7 +109,7 @@ class NotificationApi {
 
   /// Cancels a scheduled notification with the specified ID.
   static Future<void> cancelNotification(int id) async {
-    await notificationsPlugin.cancel(id);
+    await notificationsPlugin.cancel(id: id);
   }
 
   /// Cancels all scheduled notifications.

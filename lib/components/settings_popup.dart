@@ -56,6 +56,7 @@ class _SettingsPopupState extends State<SettingsPopup> {
             value: 'github',
             child: ListTile(
               title: const Text("GitHub"),
+              // ignore: deprecated_member_use
               leading: Icon(MdiIcons.github),
               trailing: Icon(
                 Icons.open_in_new,
