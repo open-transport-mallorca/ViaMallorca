@@ -1,14 +1,14 @@
 [
   {
     "language": "en-US",
-    "text": "Fixed tracking for certain bus routes"
+    "text": "Fixed PDF timetables & bus details while tracking certain bus routes"
   },
   {
     "language": "es-ES",
-    "text": "Corregido el seguimiento para ciertas rutas de autobuses"
+    "text": "Corregido horarios en PDF y detalles de autobús al rastrear ciertas rutas"
   },
   {
     "language": "de-DE",
-    "text": "Verfolgung für bestimmte Buslinien behoben"
+    "text": "PDF-Fahrpläne und Busdetails beim Verfolgen bestimmter Buslinien behoben"
   }
 ]
