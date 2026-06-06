@@ -37,6 +37,11 @@ class BusInfo extends StatelessWidget {
                       final way = mapProvider.customWay;
                       final stationInfo = trackingProvider.routeStationInfo;
                       final speed = trackingProvider.currentSpeed;
+                      final hasBusPosition = trackingProvider.hasBusPosition;
+                      final hasStationInfo = trackingProvider.hasStationInfo;
+                      final hasStops = stationInfo != null &&
+                          stationInfo.stops.isNotEmpty;
+                      final l10n = AppLocalizations.of(context)!;
 
                       return Column(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -49,42 +54,46 @@ class BusInfo extends StatelessWidget {
                                   const TextStyle(fontWeight: FontWeight.bold),
                             ),
                           ),
-                          Skeletonizer(
-                            enabled: stationInfo == null,
-                            child: Text(
-                              "${AppLocalizations.of(context)!.passengers}: ${stationInfo?.passangers.inBus ?? '-'} / ${stationInfo?.passangers.totalCapacity ?? '-'}",
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: (stationInfo != null &&
-                                        stationInfo.passangers.inBus <
-                                            stationInfo
-                                                .passangers.totalCapacity)
-                                    ? Theme.of(context).colorScheme.onSurface
-                                    : Theme.of(context).colorScheme.error,
-                              ),
-                            ),
-                          ),
-                          Skeletonizer(
-                            enabled: speed == null,
-                            child: Text(
-                                "${AppLocalizations.of(context)!.speed}: ${speed ?? '-'} km/h"),
-                          ),
-                          Skeletonizer(
-                            enabled: stationInfo == null,
-                            child: FittedBox(
+                          if (!hasStationInfo || stationInfo != null)
+                            Skeletonizer(
+                              enabled: !hasStationInfo,
                               child: Text(
-                                "${AppLocalizations.of(context)!.nextStop}: ${stationInfo?.stops.first.stopName ?? ''}",
+                                "${l10n.passengers}: ${stationInfo?.passangers.inBus ?? '-'} / ${stationInfo?.passangers.totalCapacity ?? '-'}",
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  color: (stationInfo != null &&
+                                          stationInfo.passangers.inBus <
+                                              stationInfo
+                                                  .passangers.totalCapacity)
+                                      ? Theme.of(context).colorScheme.onSurface
+                                      : Theme.of(context).colorScheme.error,
+                                ),
                               ),
                             ),
-                          ),
-                          Skeletonizer(
-                            enabled: stationInfo == null,
-                            child: FittedBox(
+                          if (!hasBusPosition || speed != null)
+                            Skeletonizer(
+                              enabled: !hasBusPosition,
                               child: Text(
-                                "${AppLocalizations.of(context)!.finalStop}: ${stationInfo?.stops.last.stopName ?? ''}",
+                                  "${l10n.speed}: ${speed ?? '-'} km/h"),
+                            ),
+                          if (!hasStationInfo || hasStops)
+                            Skeletonizer(
+                              enabled: !hasStationInfo,
+                              child: FittedBox(
+                                child: Text(
+                                  "${l10n.nextStop}: ${hasStops ? stationInfo.stops.first.stopName : ''}",
+                                ),
                               ),
                             ),
-                          ),
+                          if (!hasStationInfo || hasStops)
+                            Skeletonizer(
+                              enabled: !hasStationInfo,
+                              child: FittedBox(
+                                child: Text(
+                                  "${l10n.finalStop}: ${hasStops ? stationInfo.stops.last.stopName : ''}",
+                                ),
+                              ),
+                            ),
                         ],
                       );
                     }),

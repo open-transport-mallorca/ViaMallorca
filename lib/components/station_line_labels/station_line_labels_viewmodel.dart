@@ -23,7 +23,7 @@ class StationViewModel extends ChangeNotifier {
     try {
       final cached = await CacheManager.getLines(station.code);
       _cachedLines =
-          cached.isNotEmpty ? cached : await Station.getLines(station.code);
+          cached.isNotEmpty ? cached : await StationsApi.getLines(station.code);
       CacheManager.setLines(station.code, _cachedLines!);
     } finally {
       // notifyListeners() is only called if the object is still valid

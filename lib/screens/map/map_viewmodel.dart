@@ -30,7 +30,7 @@ class MapViewModel extends ChangeNotifier with WidgetsBindingObserver {
         .setMapController(AnimatedMapController(vsync: vsync));
     _cachedStations = await CacheManager.getAllStations();
     if (_cachedStations.isEmpty) {
-      _cachedStations = await Station.getAllStations();
+      _cachedStations = await StationsApi.getAllStations();
       await CacheManager.setAllStations(_cachedStations);
     }
 

@@ -279,8 +279,8 @@ class DepartureCard extends StatelessWidget {
                             child: InkWell(
                               borderRadius: BorderRadius.circular(12),
                               onTap: () async {
-                                final line =
-                                    await RouteLine.getLine(departure.lineCode);
+                                final line = await RouteLinesApi.getLine(
+                                    departure.lineCode);
                                 if (context.mounted) {
                                   Provider.of<MapProvider>(context,
                                           listen: false)

@@ -1,6 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:flutter_material_design_icons/flutter_material_design_icons.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:via_mallorca/apis/local_storage.dart';
@@ -56,6 +56,7 @@ class _SettingsPopupState extends State<SettingsPopup> {
             value: 'github',
             child: ListTile(
               title: const Text("GitHub"),
+              // ignore: deprecated_member_use
               leading: Icon(MdiIcons.github),
               trailing: Icon(
                 Icons.open_in_new,
