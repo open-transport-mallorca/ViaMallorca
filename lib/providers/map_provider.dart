@@ -117,9 +117,11 @@ class MapProvider extends ChangeNotifier {
     customRouteDestinations = [];
     customRoutes = [[], []];
 
-    if (Navigator.canPop(context)) {
-      Navigator.pop(context);
-    }
+    // Close any open station bottom sheet (it lives as a local-history entry on
+    // the root route, which popUntil won't dismiss), then return to the root
+    // scaffold regardless of depth so the map below becomes visible.
+    closeStationSheet();
+    Navigator.of(context).popUntil((route) => route.isFirst);
 
     if (trackingProvider.currentLocation != null) {
       trackingProvider.stopTracking();

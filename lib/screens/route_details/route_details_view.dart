@@ -50,20 +50,15 @@ class RouteDetailsScreen extends StatelessWidget {
                         Expanded(
                           child: FilledButton.icon(
                             onPressed: () {
-                              final mapProvider = Provider.of<MapProvider>(
-                                  context,
-                                  listen: false);
-                              // Close the station sheet this screen may have been
-                              // opened from, so we don't land on the map with it
-                              // still covering the route.
-                              mapProvider.closeStationSheet();
                               // Switch to the map tab first: viewRoute only
                               // auto-switches when not already on the routes tab
-                              // (index 3), which is where we are here.
+                              // (index 3), which is where we are here. viewRoute
+                              // closes any open station sheet itself.
                               Provider.of<NavigationProvider>(context,
                                       listen: false)
                                   .setIndex(1);
-                              mapProvider.viewRoute(line, context);
+                              Provider.of<MapProvider>(context, listen: false)
+                                  .viewRoute(line, context);
                             },
                             icon: const Icon(Icons.map_outlined),
                             label:
@@ -356,15 +351,12 @@ class _SublineTile extends StatelessWidget {
         subtitle: Text(details),
         trailing: trailing,
         onTap: () {
-          final mapProvider = Provider.of<MapProvider>(context, listen: false);
-          // Close the station sheet this screen may have been opened from, so
-          // the chosen direction isn't hidden behind it on the map.
-          mapProvider.closeStationSheet();
           // Load the full line (keeping the way switcher) but pre-select the
           // tapped direction. Switch to the map tab first, since viewRoute only
-          // auto-switches when not already on the routes tab.
+          // auto-switches when not already on the routes tab. viewRoute closes
+          // any open station sheet itself.
           Provider.of<NavigationProvider>(context, listen: false).setIndex(1);
-          mapProvider.viewRoute(
+          Provider.of<MapProvider>(context, listen: false).viewRoute(
             subline.parentLine,
             context,
             initialWay: subline.way,

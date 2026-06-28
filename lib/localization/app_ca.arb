@@ -87,5 +87,8 @@
   "inbound": "Tornada",
   "timetable": "Horari",
   "allYear": "Tot l'any",
+  "linesServingStop": "Línies que paren aquí",
+  "departures": "Sortides",
+  "openInMaps": "Obrir a Mapes",
   "stopCount": "{count, plural, =0{sense parades} one{1 parada} other{{count} parades}}"
 }

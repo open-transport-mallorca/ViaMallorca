@@ -61,15 +61,25 @@ class StationLineLabels extends StatelessWidget {
                       ),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
-                        child: Text(
-                          line.code,
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onPrimaryContainer,
-                            fontWeight: FontWeight.bold,
-                          ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              line.code,
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onPrimaryContainer,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            if (line.summerOnly == true) ...[
+                              const SizedBox(width: 4),
+                              Icon(Icons.wb_sunny,
+                                  size: 16, color: Colors.orange.shade700),
+                            ],
+                          ],
                         ),
                       ),
                     ),

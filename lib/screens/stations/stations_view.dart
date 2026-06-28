@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:latlong2/latlong.dart';
 import 'package:mallorca_transit_services/mallorca_transit_services.dart';
 import 'package:provider/provider.dart';
-import 'package:via_mallorca/components/bottom_sheets/station/station_view.dart';
 import 'package:via_mallorca/components/search_bar.dart';
 import 'package:via_mallorca/providers/favorites_provider.dart';
-import 'package:via_mallorca/providers/map_provider.dart';
-import 'package:via_mallorca/providers/navigation_provider.dart';
+import 'package:via_mallorca/screens/station_details/station_details_view.dart';
 import 'package:via_mallorca/localization/generated/app_localizations.dart';
 import 'stations_viewmodel.dart';
 
@@ -115,22 +112,12 @@ class StationTile extends StatelessWidget {
               }
             },
           ),
-          onTap: () {
-            Provider.of<NavigationProvider>(context, listen: false).setIndex(1);
-            final sheet = showBottomSheet(
-              shape: const RoundedRectangleBorder(
-                borderRadius: BorderRadius.vertical(top: Radius.circular(10.0)),
-              ),
-              context: context,
-              builder: (_) => StationSheet(station: station),
-            );
-            Provider.of<MapProvider>(context, listen: false)
-                .registerStationSheet(sheet);
-            Provider.of<MapProvider>(context, listen: false).updateLocation(
-              LatLng(station.lat, station.long),
-              18,
-            );
-          },
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => StationDetailsScreen(station: station),
+            ),
+          ),
         ),
       );
     });

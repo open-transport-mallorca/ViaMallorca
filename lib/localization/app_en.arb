@@ -158,6 +158,9 @@
   "inbound": "Return",
   "timetable": "Timetable",
   "allYear": "All year",
+  "linesServingStop": "Lines serving this stop",
+  "departures": "Departures",
+  "openInMaps": "Open in Maps",
   "stopCount": "{count, plural, =0{no stops} one{1 stop} other{{count} stops}}",
   "@stopCount": {
     "placeholders": {

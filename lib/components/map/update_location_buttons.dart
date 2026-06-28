@@ -20,6 +20,7 @@ class UpdateLocationButtons extends StatelessWidget {
             if (trackingProvider.currentLocation != null)
               // Move to Bus
               FloatingActionButton(
+                  heroTag: 'moveToBus',
                   mini: true,
                   onPressed: () {
                     viewModel.moveToLocation(
@@ -31,6 +32,7 @@ class UpdateLocationButtons extends StatelessWidget {
 
             // Move to Current Location
             FloatingActionButton(
+                heroTag: 'moveToCurrentLocation',
                 onPressed: () async => viewModel.moveToCurrentLocation(context),
                 child: Icon((viewModel.locationPermission ==
                             LocationPermission.whileInUse ||
