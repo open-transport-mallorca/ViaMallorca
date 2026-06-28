@@ -72,9 +72,6 @@ class NearbyStops extends StatelessWidget {
 
   Widget nearbyCard(
       NearbyStopsViewModel viewModel, int index, BuildContext context) {
-    final cardColor = Theme.of(context).colorScheme.surfaceContainerHigh;
-    final favoriteBorder = Theme.of(context).colorScheme.primaryContainer;
-
     final station = viewModel.nearbyStations[index];
     String formattedDistance = '';
     if (viewModel.currentLocation != null) {
@@ -89,6 +86,11 @@ class NearbyStops extends StatelessWidget {
     }
     return Consumer<FavoritesProvider>(
         builder: (context, favoritesProvider, child) {
+      // Read theme colours inside the builder so they refresh when switching
+      // between light/dark mode. The outer itemBuilder context isn't rebuilt on
+      // a theme change, so capturing them there leaves the card colour stale.
+      final cardColor = Theme.of(context).colorScheme.surfaceContainerHigh;
+      final favoriteBorder = Theme.of(context).colorScheme.primaryContainer;
       return Card(
         color: cardColor,
         child: ListTile(
