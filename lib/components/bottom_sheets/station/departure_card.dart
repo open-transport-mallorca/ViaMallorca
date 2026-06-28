@@ -281,11 +281,26 @@ class DepartureCard extends StatelessWidget {
                               onTap: () async {
                                 final line = await RouteLinesApi.getLine(
                                     departure.lineCode);
+                                // Stops are direction-specific, so the subline
+                                // containing this boarding station tells us which
+                                // way the tracked trip is going. Without this the
+                                // map defaults to the outbound way and may show
+                                // the wrong direction's route/stops.
+                                Way? trackedWay;
+                                for (final subline
+                                    in line.sublines ?? <Subline>[]) {
+                                  if (subline.stations
+                                      .any((s) => s.id == station.id)) {
+                                    trackedWay = subline.way;
+                                    break;
+                                  }
+                                }
                                 if (context.mounted) {
                                   Provider.of<MapProvider>(context,
                                           listen: false)
                                       .viewRoute(line, context,
-                                          isTracking: true);
+                                          isTracking: true,
+                                          initialWay: trackedWay);
                                   Provider.of<TrackingProvider>(context,
                                           listen: false)
                                       .startTracking(
