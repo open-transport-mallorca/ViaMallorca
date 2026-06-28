@@ -74,5 +74,7 @@
   "useInexact": "Ungenau verwenden",
   "allowExact": "Genau erlauben",
   "switchToExact": "Zu genauen Benachrichtigungen wechseln",
-  "switchToInexact": "Zu ungenauen Benachrichtigungen wechseln"
+  "switchToInexact": "Zu ungenauen Benachrichtigungen wechseln",
+  "onDemand": "Auf Anfrage",
+  "summerOnly": "Nur im Sommer"
 }

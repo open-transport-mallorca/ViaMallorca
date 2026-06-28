@@ -74,5 +74,7 @@
   "useInexact": "Utilitza inexacte",
   "allowExact": "Permet exacte",
   "switchToExact": "Canvia a notificacions exactes",
-  "switchToInexact": "Canvia a notificacions inexactes"
+  "switchToInexact": "Canvia a notificacions inexactes",
+  "onDemand": "Sota demanda",
+  "summerOnly": "Només a l'estiu"
 }

@@ -74,5 +74,7 @@
   "useInexact": "Usar inexactas",
   "allowExact": "Permitir exactas",
   "switchToExact": "Cambiar a notificaciones exactas",
-  "switchToInexact": "Cambiar a notificaciones inexactas"
+  "switchToInexact": "Cambiar a notificaciones inexactas",
+  "onDemand": "Bajo demanda",
+  "summerOnly": "Solo en verano"
 }

@@ -106,7 +106,49 @@ class RouteTile extends StatelessWidget {
             borderRadius: BorderRadius.circular(10),
           ),
           title: Text(route.code, style: const TextStyle(fontSize: 20)),
-          subtitle: Text(route.name),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(route.name),
+              if (route.onDemand == true || route.summerOnly == true)
+                Padding(
+                  padding: const EdgeInsets.only(top: 4),
+                  child: Wrap(
+                    spacing: 4,
+                    children: [
+                      if (route.onDemand == true)
+                        Chip(
+                          avatar: Icon(Icons.touch_app,
+                              size: 14,
+                              color: Theme.of(context).colorScheme.tertiary),
+                          label: Text(
+                            AppLocalizations.of(context)!.onDemand,
+                            style: const TextStyle(fontSize: 11),
+                          ),
+                          visualDensity: VisualDensity.compact,
+                          padding: EdgeInsets.zero,
+                          materialTapTargetSize:
+                              MaterialTapTargetSize.shrinkWrap,
+                        ),
+                      if (route.summerOnly == true)
+                        Chip(
+                          avatar: Icon(Icons.wb_sunny,
+                              size: 14, color: Colors.orange.shade700),
+                          label: Text(
+                            AppLocalizations.of(context)!.summerOnly,
+                            style: const TextStyle(fontSize: 11),
+                          ),
+                          visualDensity: VisualDensity.compact,
+                          padding: EdgeInsets.zero,
+                          materialTapTargetSize:
+                              MaterialTapTargetSize.shrinkWrap,
+                        ),
+                    ],
+                  ),
+                ),
+            ],
+          ),
           leading: tileIcon,
           trailing: Row(
             mainAxisSize: MainAxisSize.min,

@@ -74,5 +74,7 @@
   "useInexact": "Utiliser approximatif",
   "allowExact": "Autoriser précis",
   "switchToExact": "Passer aux notifications précises",
-  "switchToInexact": "Passer aux notifications approximatives"
+  "switchToInexact": "Passer aux notifications approximatives",
+  "onDemand": "À la demande",
+  "summerOnly": "Été seulement"
 }

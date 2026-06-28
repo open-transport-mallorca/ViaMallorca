@@ -145,5 +145,7 @@
   "useInexact": "Use inexact",
   "allowExact": "Allow exact",
   "switchToExact": "Switch to exact notifications",
-  "switchToInexact": "Switch to inexact notifications"
+  "switchToInexact": "Switch to inexact notifications",
+  "onDemand": "On demand",
+  "summerOnly": "Summer only"
 }
