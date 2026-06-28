@@ -76,5 +76,16 @@
   "switchToExact": "Перемкнутися на точні сповіщення",
   "switchToInexact": "Перемкнутися на неточні сповіщення",
   "onDemand": "На замовлення",
-  "summerOnly": "Лише влітку"
+  "summerOnly": "Лише влітку",
+  "viewOnMap": "Показати на карті",
+  "townsServed": "Населені пункти",
+  "operatingPeriod": "Період роботи",
+  "currentlyOperating": "Зараз працює",
+  "serviceHolidays": "Свята, що впливають на рух",
+  "directions": "Напрямки",
+  "outbound": "Туди",
+  "inbound": "Назад",
+  "timetable": "Розклад",
+  "allYear": "Цілий рік",
+  "stopCount": "{count, plural, =0{немає зупинок} one{1 зупинка} other{{count} зупинок}}"
 }

@@ -76,5 +76,16 @@
   "switchToExact": "Canvia a notificacions exactes",
   "switchToInexact": "Canvia a notificacions inexactes",
   "onDemand": "Sota demanda",
-  "summerOnly": "Només a l'estiu"
+  "summerOnly": "Només a l'estiu",
+  "viewOnMap": "Veure al mapa",
+  "townsServed": "Municipis servits",
+  "operatingPeriod": "Període de servei",
+  "currentlyOperating": "En servei actualment",
+  "serviceHolidays": "Festius que afecten el servei",
+  "directions": "Direccions",
+  "outbound": "Anada",
+  "inbound": "Tornada",
+  "timetable": "Horari",
+  "allYear": "Tot l'any",
+  "stopCount": "{count, plural, =0{sense parades} one{1 parada} other{{count} parades}}"
 }

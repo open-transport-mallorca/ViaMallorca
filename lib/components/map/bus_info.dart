@@ -39,8 +39,8 @@ class BusInfo extends StatelessWidget {
                       final speed = trackingProvider.currentSpeed;
                       final hasBusPosition = trackingProvider.hasBusPosition;
                       final hasStationInfo = trackingProvider.hasStationInfo;
-                      final hasStops = stationInfo != null &&
-                          stationInfo.stops.isNotEmpty;
+                      final hasStops =
+                          stationInfo != null && stationInfo.stops.isNotEmpty;
                       final l10n = AppLocalizations.of(context)!;
 
                       return Column(
@@ -73,8 +73,8 @@ class BusInfo extends StatelessWidget {
                           if (!hasBusPosition || speed != null)
                             Skeletonizer(
                               enabled: !hasBusPosition,
-                              child: Text(
-                                  "${l10n.speed}: ${speed ?? '-'} km/h"),
+                              child:
+                                  Text("${l10n.speed}: ${speed ?? '-'} km/h"),
                             ),
                           if (!hasStationInfo || hasStops)
                             Skeletonizer(

@@ -284,7 +284,8 @@ class DepartureCard extends StatelessWidget {
                                 if (context.mounted) {
                                   Provider.of<MapProvider>(context,
                                           listen: false)
-                                      .viewRoute(line, context, true);
+                                      .viewRoute(line, context,
+                                          isTracking: true);
                                   Provider.of<TrackingProvider>(context,
                                           listen: false)
                                       .startTracking(

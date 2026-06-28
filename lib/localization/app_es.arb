@@ -76,5 +76,16 @@
   "switchToExact": "Cambiar a notificaciones exactas",
   "switchToInexact": "Cambiar a notificaciones inexactas",
   "onDemand": "Bajo demanda",
-  "summerOnly": "Solo en verano"
+  "summerOnly": "Solo en verano",
+  "viewOnMap": "Ver en el mapa",
+  "townsServed": "Municipios servidos",
+  "operatingPeriod": "Período de operación",
+  "currentlyOperating": "En operación actualmente",
+  "serviceHolidays": "Festivos que afectan al servicio",
+  "directions": "Direcciones",
+  "outbound": "Ida",
+  "inbound": "Vuelta",
+  "timetable": "Horario",
+  "allYear": "Todo el año",
+  "stopCount": "{count, plural, =0{sin paradas} one{1 parada} other{{count} paradas}}"
 }

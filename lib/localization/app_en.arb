@@ -147,5 +147,23 @@
   "switchToExact": "Switch to exact notifications",
   "switchToInexact": "Switch to inexact notifications",
   "onDemand": "On demand",
-  "summerOnly": "Summer only"
+  "summerOnly": "Summer only",
+  "viewOnMap": "View on map",
+  "townsServed": "Towns served",
+  "operatingPeriod": "Operating period",
+  "currentlyOperating": "Currently operating",
+  "serviceHolidays": "Holidays affecting service",
+  "directions": "Directions",
+  "outbound": "Outbound",
+  "inbound": "Return",
+  "timetable": "Timetable",
+  "allYear": "All year",
+  "stopCount": "{count, plural, =0{no stops} one{1 stop} other{{count} stops}}",
+  "@stopCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  }
 }

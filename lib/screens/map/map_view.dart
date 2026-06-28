@@ -125,7 +125,7 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
       LatLng(station.lat, station.long),
       18,
     );
-    showBottomSheet(
+    final sheet = showBottomSheet(
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(10.0)),
       ),
@@ -135,6 +135,8 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
         highlightedDepartureId: tripId,
       ),
     );
+    Provider.of<MapProvider>(context, listen: false)
+        .registerStationSheet(sheet);
   }
 
   @override
@@ -257,12 +259,14 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                   point: LatLng(station.lat, station.long),
                   child: GestureDetector(
                     onTap: () {
-                      showBottomSheet(
+                      final sheet = showBottomSheet(
                           shape: const RoundedRectangleBorder(
                               borderRadius: BorderRadius.vertical(
                                   top: Radius.circular(10.0))),
                           context: context,
                           builder: (context) => StationSheet(station: station));
+                      Provider.of<MapProvider>(context, listen: false)
+                          .registerStationSheet(sheet);
                     },
                     child: Image.asset(
                       "assets/stop_icon.png",
@@ -290,12 +294,14 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                   point: LatLng(station.lat, station.long),
                   child: GestureDetector(
                     onTap: () {
-                      showBottomSheet(
+                      final sheet = showBottomSheet(
                           shape: const RoundedRectangleBorder(
                               borderRadius: BorderRadius.vertical(
                                   top: Radius.circular(10.0))),
                           context: context,
                           builder: (context) => StationSheet(station: station));
+                      Provider.of<MapProvider>(context, listen: false)
+                          .registerStationSheet(sheet);
                     },
                     child: ColorFiltered(
                       colorFilter: ColorFilter.matrix(

@@ -117,13 +117,15 @@ class StationTile extends StatelessWidget {
           ),
           onTap: () {
             Provider.of<NavigationProvider>(context, listen: false).setIndex(1);
-            showBottomSheet(
+            final sheet = showBottomSheet(
               shape: const RoundedRectangleBorder(
                 borderRadius: BorderRadius.vertical(top: Radius.circular(10.0)),
               ),
               context: context,
               builder: (_) => StationSheet(station: station),
             );
+            Provider.of<MapProvider>(context, listen: false)
+                .registerStationSheet(sheet);
             Provider.of<MapProvider>(context, listen: false).updateLocation(
               LatLng(station.lat, station.long),
               18,

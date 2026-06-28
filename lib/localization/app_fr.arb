@@ -76,5 +76,16 @@
   "switchToExact": "Passer aux notifications précises",
   "switchToInexact": "Passer aux notifications approximatives",
   "onDemand": "À la demande",
-  "summerOnly": "Été seulement"
+  "summerOnly": "Été seulement",
+  "viewOnMap": "Voir sur la carte",
+  "townsServed": "Communes desservies",
+  "operatingPeriod": "Période d'exploitation",
+  "currentlyOperating": "En service actuellement",
+  "serviceHolidays": "Jours fériés affectant le service",
+  "directions": "Directions",
+  "outbound": "Aller",
+  "inbound": "Retour",
+  "timetable": "Horaire",
+  "allYear": "Toute l'année",
+  "stopCount": "{count, plural, =0{aucun arrêt} one{1 arrêt} other{{count} arrêts}}"
 }

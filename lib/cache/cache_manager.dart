@@ -109,7 +109,8 @@ class CacheManager {
   ///
   /// The [stationCode] is the `code` (not `id`) of the station.
   /// The [lines] are the lines that pass through the station.
-  static Future<void> setLines(String stationCode, List<RouteLine> lines) async {
+  static Future<void> setLines(
+      String stationCode, List<RouteLine> lines) async {
     final String resourceName = 'lines_$stationCode';
     List<String> data = [];
     for (var line in lines) {

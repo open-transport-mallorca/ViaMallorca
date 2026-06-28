@@ -3,8 +3,7 @@ import 'package:mallorca_transit_services/mallorca_transit_services.dart';
 import 'package:provider/provider.dart';
 import 'package:via_mallorca/localization/generated/app_localizations.dart';
 import 'package:skeletonizer/skeletonizer.dart';
-import 'package:via_mallorca/providers/map_provider.dart';
-import 'package:via_mallorca/providers/navigation_provider.dart';
+import 'package:via_mallorca/screens/route_details/route_details_view.dart';
 import 'station_line_labels_viewmodel.dart';
 
 class StationLineLabels extends StatelessWidget {
@@ -54,16 +53,12 @@ class StationLineLabels extends StatelessWidget {
                     borderRadius: BorderRadius.circular(10),
                     child: InkWell(
                       borderRadius: BorderRadius.circular(10),
-                      onTap: () async {
-                        Provider.of<NavigationProvider>(context, listen: false)
-                            .setIndex(1);
-                        final routeLine =
-                            await RouteLinesApi.getLine(line.code);
-                        if (context.mounted) {
-                          Provider.of<MapProvider>(context, listen: false)
-                              .viewRoute(routeLine, context);
-                        }
-                      },
+                      onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => RouteDetailsScreen(route: line),
+                        ),
+                      ),
                       child: Padding(
                         padding: const EdgeInsets.all(8.0),
                         child: Text(

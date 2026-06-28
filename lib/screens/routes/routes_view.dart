@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:via_mallorca/components/search_bar.dart';
 import 'package:via_mallorca/providers/favorites_provider.dart';
-import 'package:via_mallorca/providers/map_provider.dart';
-import 'package:via_mallorca/providers/navigation_provider.dart';
+import 'package:via_mallorca/screens/route_details/route_details_view.dart';
 import 'package:via_mallorca/screens/timetable_viewer/timetable_view.dart';
 import 'package:via_mallorca/localization/generated/app_localizations.dart';
 import 'package:mallorca_transit_services/mallorca_transit_services.dart';
@@ -182,9 +181,12 @@ class RouteTile extends StatelessWidget {
           ),
           onTap: () {
             FocusManager.instance.primaryFocus?.unfocus();
-            Provider.of<NavigationProvider>(context, listen: false).setIndex(1);
-            Provider.of<MapProvider>(context, listen: false)
-                .viewRoute(route, context);
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => RouteDetailsScreen(route: route),
+              ),
+            );
           },
         ),
       );

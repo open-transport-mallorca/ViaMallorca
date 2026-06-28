@@ -151,12 +151,14 @@ class NearbyStops extends StatelessWidget {
             Provider.of<NavigationProvider>(context, listen: false).setIndex(1);
             Provider.of<MapProvider>(context, listen: false)
                 .updateLocation(LatLng(station.lat, station.long), 18);
-            showBottomSheet(
+            final sheet = showBottomSheet(
                 shape: const RoundedRectangleBorder(
                     borderRadius:
                         BorderRadius.vertical(top: Radius.circular(10.0))),
                 context: context,
                 builder: (context) => StationSheet(station: station));
+            Provider.of<MapProvider>(context, listen: false)
+                .registerStationSheet(sheet);
           },
         ),
       );
