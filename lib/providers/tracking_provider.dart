@@ -23,6 +23,35 @@ class TrackingProvider extends ChangeNotifier with WidgetsBindingObserver {
   bool hasBusPosition = false;
   bool hasStationInfo = false;
 
+  /// When the last position fix arrived.
+  DateTime? lastFixAt;
+
+  /// Rolling estimate of the gap between position fixes.
+  ///
+  /// The tracking socket emits a position roughly every 15 seconds; the marker
+  /// animation spans this so the bus keeps moving between fixes instead of
+  /// jumping. Smoothed rather than taken raw so one late packet does not stall
+  /// the marker.
+  Duration fixInterval = const Duration(seconds: 15);
+
+  static const Duration _minFixInterval = Duration(seconds: 4);
+  static const Duration _maxFixInterval = Duration(seconds: 25);
+
+  void _recordFixTiming() {
+    final now = DateTime.now();
+    final previous = lastFixAt;
+    lastFixAt = now;
+    if (previous == null) return;
+
+    final observed = now.difference(previous);
+    if (observed < _minFixInterval || observed > _maxFixInterval) return;
+    fixInterval = Duration(
+      milliseconds:
+          (fixInterval.inMilliseconds * 0.7 + observed.inMilliseconds * 0.3)
+              .round(),
+    );
+  }
+
   WebSocketChannel? _channel;
   StreamSubscription? _locationStream;
 
@@ -81,6 +110,7 @@ class TrackingProvider extends ChangeNotifier with WidgetsBindingObserver {
         if (action is BusPosition) {
           currentLocation = LatLng(action.lat, action.long);
           currentSpeed = action.speed?.round();
+          _recordFixTiming();
         } else if (action is RouteStationInfo) {
           routeStationInfo = action;
           stationsOnRoute = action.stops;
@@ -129,6 +159,8 @@ class TrackingProvider extends ChangeNotifier with WidgetsBindingObserver {
     currentSpeed = null;
     hasBusPosition = false;
     hasStationInfo = false;
+    lastFixAt = null;
+    fixInterval = const Duration(seconds: 15);
 
     _setConnectionStatus(ConnectionStatus.disconnected);
     notifyListeners();

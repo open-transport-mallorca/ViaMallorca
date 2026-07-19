@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
+import 'package:via_mallorca/providers/map_provider.dart';
 import 'package:via_mallorca/providers/tracking_provider.dart';
 import 'package:via_mallorca/screens/map/map_viewmodel.dart';
 
@@ -23,10 +24,12 @@ class UpdateLocationButtons extends StatelessWidget {
                   heroTag: 'moveToBus',
                   mini: true,
                   onPressed: () {
+                    // Recentring on the bus also resumes following it.
+                    context.read<MapProvider>().setFollowTrackedBus(true);
                     viewModel.moveToLocation(
                         context: context,
                         position: trackingProvider.currentLocation!,
-                        zoom: 15);
+                        zoom: MapProvider.trackingZoom);
                   },
                   child: const Icon(Icons.directions_bus)),
 

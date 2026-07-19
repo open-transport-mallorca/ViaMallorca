@@ -161,6 +161,13 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                 options: MapOptions(
                     interactionOptions: const InteractionOptions(
                         flags: InteractiveFlag.all & ~InteractiveFlag.rotate),
+                    // Any hands-on move of the map hands control back to the
+                    // user. Camera moves we make ourselves report no gesture,
+                    // so following does not cancel itself.
+                    onPositionChanged: (_, hasGesture) {
+                      if (!hasGesture) return;
+                      mapProvider.setFollowTrackedBus(false);
+                    },
                     initialZoom: 9,
                     initialCenter: const LatLng(39.607331, 2.983704)),
                 children: [

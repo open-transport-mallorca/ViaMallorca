@@ -27,6 +27,22 @@ class MapProvider extends ChangeNotifier {
   /// The value ranges from 0 to 1.
   double loadingProgress = 1;
 
+  /// Zoom used when framing a tracked bus.
+  static const double trackingZoom = 15;
+
+  /// Whether the camera keeps the tracked bus centred as it moves.
+  ///
+  /// Enabled when tracking starts and switched off by the first map gesture,
+  /// so panning away is never fought by the follow. The bus button turns it
+  /// back on.
+  bool followTrackedBus = false;
+
+  void setFollowTrackedBus(bool value) {
+    if (followTrackedBus == value) return;
+    followTrackedBus = value;
+    notifyListeners();
+  }
+
   /// Registers the [controller] of a freshly shown station bottom sheet so it
   /// can later be closed via [closeStationSheet]. Self-clears when the sheet is
   /// dismissed by any other means (drag, back button, tab switch).

@@ -324,12 +324,17 @@ class DepartureCard extends StatelessWidget {
                                           LatLng(departure.realTrip!.lat,
                                               departure.realTrip!.long),
                                           station.id);
+                                  // A new trip always starts followed, even if
+                                  // the user had panned away from the last one.
+                                  Provider.of<MapProvider>(context,
+                                          listen: false)
+                                      .setFollowTrackedBus(true);
                                   Provider.of<MapProvider>(context,
                                           listen: false)
                                       .updateLocation(
                                           LatLng(departure.realTrip!.lat,
                                               departure.realTrip!.long),
-                                          15);
+                                          MapProvider.trackingZoom);
                                 }
                               },
                               child: Padding(
