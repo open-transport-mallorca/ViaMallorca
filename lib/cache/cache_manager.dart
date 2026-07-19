@@ -17,9 +17,23 @@ class CacheManager {
   ///
   /// v2: mallorca_transit_services 2.4.0 added `pickupType`/`dropoffType` to
   /// [Station], which the departures list uses to flag discharge-only stops.
-  static const int _schemaVersion = 2;
+  /// v3: line details are stored once under [_linePrefix] and referenced by
+  /// station, instead of a full copy per station.
+  static const int _schemaVersion = 3;
 
   static const String _schemaVersionKey = 'cache_schema_version';
+
+  /// A single line, with its sublines and their stops.
+  static const String _linePrefix = 'line_';
+
+  /// The line codes serving a station — a reference list, not the lines.
+  static const String _stationLinesPrefix = 'station_lines_';
+
+  /// Line composition at a stop changes far less often than the lines
+  /// themselves, so the reference list outlives the details it points at.
+  static const Duration _stationLinesTtl = Duration(days: 7);
+
+  static const Duration _lineTtl = Duration(days: 2);
 
   /// Initialize the cache manager.
   ///
@@ -28,6 +42,7 @@ class CacheManager {
   static Future<void> init() async {
     _prefs = await SharedPreferences.getInstance();
     await _migrate();
+    await _pruneExpired();
   }
 
   /// Drops the whole cache when it was written under an older schema.
@@ -37,6 +52,27 @@ class CacheManager {
     if ((prefs.getInt(_schemaVersionKey) ?? 1) == _schemaVersion) return;
     await clearCache();
     await prefs.setInt(_schemaVersionKey, _schemaVersion);
+  }
+
+  /// Deletes cached lines whose expiry has passed.
+  ///
+  /// Reads only ever skip expired entries, so without this they would sit in
+  /// the preferences file forever — the whole file is parsed into memory on
+  /// first access, so dead entries cost startup time on every launch.
+  static Future<void> _pruneExpired() async {
+    final prefs = _prefs;
+    if (prefs == null) return;
+    final now = DateTime.now();
+    for (final key in prefs.getKeys().toList()) {
+      if (!key.startsWith('expiry_$_linePrefix') &&
+          !key.startsWith('expiry_$_stationLinesPrefix')) {
+        continue;
+      }
+      final expiry = DateTime.tryParse(prefs.getString(key) ?? '');
+      if (expiry == null || expiry.isAfter(now)) continue;
+      await prefs.remove(key);
+      await prefs.remove(key.substring('expiry_'.length));
+    }
   }
 
   /// Get the expiry date for a specific resource.
@@ -106,39 +142,63 @@ class CacheManager {
     await setExpiry(resourceName, expiry);
   }
 
-  /// Get the lines that pass through a station from the cache.
+  /// The codes of the lines that pass through a station, or null when that
+  /// list is absent or stale.
   ///
-  /// The [stationCode] is the `code` (not `id`) of the station.
-  /// The lines are returned as a list of [RouteLine] objects.
-  static Future<List<RouteLine>> getLines(String stationCode) async {
-    final String resourceName = 'lines_$stationCode';
-    bool shouldRefresh =
-        (await getExpiry(resourceName)).isBefore(DateTime.now());
-    if (shouldRefresh) {
-      return [];
+  /// This is only the reference list — call [getLine] for each code to get the
+  /// lines themselves. The [stationCode] is the `code` (not `id`) of the
+  /// station.
+  static Future<List<String>?> getStationLineCodes(String stationCode) async {
+    final String resourceName = '$_stationLinesPrefix$stationCode';
+    if ((await getExpiry(resourceName)).isBefore(DateTime.now())) {
+      return null;
     }
-    List<RouteLine> lines = [];
-    final data = _prefs?.getStringList(resourceName) ?? [];
-    for (var line in data) {
-      lines.add(RouteLine.fromJson(jsonDecode(line)));
-    }
-    return lines;
+    return _prefs?.getStringList(resourceName);
   }
 
-  /// Set the lines that pass through a station in the cache.
+  /// A single cached line with its sublines, or null when absent or stale.
   ///
-  /// The [stationCode] is the `code` (not `id`) of the station.
-  /// The [lines] are the lines that pass through the station.
+  /// Lines are stored once and shared by every station they serve, so a line
+  /// cached while viewing one stop is a hit at all the others.
+  static Future<RouteLine?> getLine(String lineCode) async {
+    final String resourceName = '$_linePrefix$lineCode';
+    if ((await getExpiry(resourceName)).isBefore(DateTime.now())) {
+      return null;
+    }
+    final data = _prefs?.getString(resourceName);
+    if (data == null) return null;
+    try {
+      return RouteLine.fromJson(jsonDecode(data));
+    } catch (_) {
+      // Unreadable entry (e.g. written by an older model). Drop it so the
+      // caller refetches instead of failing.
+      await _prefs?.remove(resourceName);
+      await _prefs?.remove('expiry_$resourceName');
+      return null;
+    }
+  }
+
+  /// Store a single line, shared across every station it serves.
+  static Future<void> setLine(RouteLine line) async {
+    final String resourceName = '$_linePrefix${line.code}';
+    await _prefs?.setString(resourceName, jsonEncode(RouteLine.toJson(line)));
+    await setExpiry(resourceName, DateTime.now().add(_lineTtl));
+  }
+
+  /// Store the lines that pass through a station.
+  ///
+  /// Writes one shared copy of each line plus a short list of line codes for
+  /// the station, so a line serving many stops is held once rather than once
+  /// per stop. The [stationCode] is the `code` (not `id`) of the station.
   static Future<void> setLines(
       String stationCode, List<RouteLine> lines) async {
-    final String resourceName = 'lines_$stationCode';
-    List<String> data = [];
-    for (var line in lines) {
-      data.add(jsonEncode(RouteLine.toJson(line)));
+    for (final line in lines) {
+      await setLine(line);
     }
-    await _prefs?.setStringList(resourceName, data);
-    DateTime expiry = DateTime.now().add(const Duration(days: 2));
-    await setExpiry(resourceName, expiry);
+    final String resourceName = '$_stationLinesPrefix$stationCode';
+    await _prefs?.setStringList(
+        resourceName, lines.map((line) => line.code).toList());
+    await setExpiry(resourceName, DateTime.now().add(_stationLinesTtl));
   }
 
   /// Get all lines from the cache.
@@ -185,9 +245,11 @@ class CacheManager {
     // Remove all stations and lines data
     await prefs.remove('stations');
 
-    // Remove all line-specific data
+    // Remove all line-specific data, including the pre-v3 per-station copies.
     for (final key in keys) {
       if (key.startsWith('lines_') ||
+          key.startsWith(_linePrefix) ||
+          key.startsWith(_stationLinesPrefix) ||
           key == 'lines' ||
           key.startsWith('expiry_')) {
         await prefs.remove(key);

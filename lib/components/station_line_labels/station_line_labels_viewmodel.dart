@@ -48,10 +48,7 @@ class StationViewModel extends ChangeNotifier {
     if (_cachedLines != null) return;
 
     try {
-      final cached = await CacheManager.getLines(station.code);
-      _cachedLines =
-          cached.isNotEmpty ? cached : await StationsApi.getLines(station.code);
-      CacheManager.setLines(station.code, _cachedLines!);
+      _cachedLines = await _fetchLines();
       _dischargeOnlyByLine = _computeDischargeOnly(_cachedLines!);
     } finally {
       // notifyListeners() is only called if the object is still valid
@@ -59,6 +56,37 @@ class StationViewModel extends ChangeNotifier {
         notifyListeners();
       }
     }
+  }
+
+  /// Resolves the station's lines, hitting the network only for what the cache
+  /// is missing.
+  ///
+  /// Once the station's line codes are known, each line is fetched on its own,
+  /// so a line already cached from another stop costs nothing. Only a station
+  /// whose code list is unknown needs [StationsApi.getLines], which fetches the
+  /// stop and then every one of its lines.
+  /// Only freshly fetched data is written back, so that revisiting a stop does
+  /// not keep pushing the expiry of entries that were never refreshed.
+  Future<List<RouteLine>> _fetchLines() async {
+    final codes = await CacheManager.getStationLineCodes(station.code);
+    if (codes == null) {
+      final lines = await StationsApi.getLines(station.code);
+      await CacheManager.setLines(station.code, lines);
+      return lines;
+    }
+
+    final lines = <RouteLine>[];
+    for (final code in codes) {
+      final cached = await CacheManager.getLine(code);
+      if (cached != null) {
+        lines.add(cached);
+        continue;
+      }
+      final fetched = await RouteLinesApi.getLine(code);
+      await CacheManager.setLine(fetched);
+      lines.add(fetched);
+    }
+    return lines;
   }
 
   /// The pickup/dropoff flags live on the stops of a line's sublines, which are
