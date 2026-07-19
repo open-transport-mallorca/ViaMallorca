@@ -7,6 +7,7 @@ import 'package:skeletonizer/skeletonizer.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:via_mallorca/components/bottom_sheets/station/departure_card.dart';
 import 'package:via_mallorca/components/station_line_labels/station_line_labels_view.dart';
+import 'package:via_mallorca/components/station_line_labels/station_line_labels_viewmodel.dart';
 import 'package:via_mallorca/localization/generated/app_localizations.dart';
 import 'package:via_mallorca/providers/favorites_provider.dart';
 import 'package:via_mallorca/providers/tracking_provider.dart';
@@ -61,8 +62,17 @@ class _StationSheetState extends State<StationSheet> {
   Widget build(BuildContext context) {
     return Consumer<FavoritesProvider>(
         builder: (context, favoritesProvider, child) {
-      return ChangeNotifierProvider(
-        create: (_) => StationSheetViewModel(widget.station)..initialize(),
+      return MultiProvider(
+        providers: [
+          ChangeNotifierProvider(
+            create: (_) => StationSheetViewModel(widget.station)..initialize(),
+          ),
+          // Shared with the line labels below, so one fetch serves both them
+          // and the discharge-only flags on the departure cards.
+          ChangeNotifierProvider(
+            create: (_) => StationViewModel(widget.station)..loadLines(),
+          ),
+        ],
         child: Consumer<StationSheetViewModel>(
           builder: (context, viewModel, child) {
             _viewModel = viewModel;
@@ -187,6 +197,7 @@ class _StationSheetState extends State<StationSheet> {
     }
 
     final departures = viewModel.departures ?? [];
+    final dischargeOnly = context.watch<StationViewModel>().dischargeOnlyByLine;
     return RefreshIndicator(
       onRefresh: viewModel.fetchDepartures,
       child: ConstrainedBox(
@@ -237,6 +248,8 @@ class _StationSheetState extends State<StationSheet> {
                         departure: departure,
                         isHighlighted:
                             widget.highlightedDepartureId == departure.tripId,
+                        isDischargeOnly:
+                            dischargeOnly[departure.lineCode] == true,
                       ));
                 });
               }),

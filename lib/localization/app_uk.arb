@@ -88,6 +88,9 @@
   "timetable": "Розклад",
   "allYear": "Цілий рік",
   "linesServingStop": "Маршрути цієї зупинки",
+  "dropOffOnly": "Тільки висадка",
+  "dischargeOnlyDialogTitle": "Зупинка тільки для висадки",
+  "dischargeOnlyDialogSubtitle": "На цій зупинці цей автобус лише висаджує пасажирів, тож сісти тут не вдасться. Усе одно стежити за ним?",
   "departures": "Відправлення",
   "openInMaps": "Відкрити в Картах",
   "stopCount": "{count, plural, =0{немає зупинок} one{1 зупинка} other{{count} зупинок}}"

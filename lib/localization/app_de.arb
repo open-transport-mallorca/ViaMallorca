@@ -88,6 +88,9 @@
   "timetable": "Fahrplan",
   "allYear": "Ganzjährig",
   "linesServingStop": "Linien an dieser Haltestelle",
+  "dropOffOnly": "Nur Ausstieg",
+  "dischargeOnlyDialogTitle": "Haltestelle nur zum Ausstieg",
+  "dischargeOnlyDialogSubtitle": "An dieser Haltestelle lässt dieser Bus nur Fahrgäste aussteigen, du kannst hier also nicht einsteigen. Trotzdem verfolgen?",
   "departures": "Abfahrten",
   "openInMaps": "In Karten öffnen",
   "stopCount": "{count, plural, =0{keine Haltestellen} one{1 Haltestelle} other{{count} Haltestellen}}"

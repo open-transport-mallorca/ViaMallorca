@@ -11,12 +11,32 @@ import 'package:mallorca_transit_services/mallorca_transit_services.dart';
 class CacheManager {
   static SharedPreferences? _prefs;
 
+  /// Bumped whenever a cached model gains fields the app relies on, so that
+  /// entries written by an older version are dropped instead of silently
+  /// reading back as null until they expire.
+  ///
+  /// v2: mallorca_transit_services 2.4.0 added `pickupType`/`dropoffType` to
+  /// [Station], which the departures list uses to flag discharge-only stops.
+  static const int _schemaVersion = 2;
+
+  static const String _schemaVersionKey = 'cache_schema_version';
+
   /// Initialize the cache manager.
   ///
   /// This method should be called before any other method in this class.
   /// Usually called in the main method.
   static Future<void> init() async {
     _prefs = await SharedPreferences.getInstance();
+    await _migrate();
+  }
+
+  /// Drops the whole cache when it was written under an older schema.
+  static Future<void> _migrate() async {
+    final prefs = _prefs;
+    if (prefs == null) return;
+    if ((prefs.getInt(_schemaVersionKey) ?? 1) == _schemaVersion) return;
+    await clearCache();
+    await prefs.setInt(_schemaVersionKey, _schemaVersion);
   }
 
   /// Get the expiry date for a specific resource.

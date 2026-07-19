@@ -9,6 +9,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:via_mallorca/components/app_bar.dart';
 import 'package:via_mallorca/components/bottom_sheets/station/departure_card.dart';
 import 'package:via_mallorca/components/station_line_labels/station_line_labels_view.dart';
+import 'package:via_mallorca/components/station_line_labels/station_line_labels_viewmodel.dart';
 import 'package:via_mallorca/localization/generated/app_localizations.dart';
 import 'package:via_mallorca/providers/favorites_provider.dart';
 import 'package:via_mallorca/providers/map_provider.dart';
@@ -58,8 +59,17 @@ class _StationDetailsScreenState extends State<StationDetailsScreen> {
   @override
   Widget build(BuildContext context) {
     final station = widget.station;
-    return ChangeNotifierProvider(
-      create: (_) => StationDetailsViewModel(station)..initialize(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (_) => StationDetailsViewModel(station)..initialize(),
+        ),
+        // Provided above both sections so the lines are fetched once and shared
+        // by the labels and the departures list.
+        ChangeNotifierProvider(
+          create: (_) => StationViewModel(station)..loadLines(),
+        ),
+      ],
       child: Consumer2<StationDetailsViewModel, FavoritesProvider>(
         builder: (context, viewModel, favorites, _) {
           _viewModel = viewModel;
@@ -242,6 +252,7 @@ class _DeparturesSection extends StatelessWidget {
 
     final loaded = departures != null;
     final items = loaded ? departures : <Departure?>[null, null, null, null];
+    final dischargeOnly = context.watch<StationViewModel>().dischargeOnlyByLine;
 
     return _Section(
       title: l10n.departures,
@@ -263,7 +274,12 @@ class _DeparturesSection extends StatelessWidget {
                           subtitle: Text('Scheduled: in 0 minutes'),
                         ),
                       )
-                    : DepartureCard(station: station, departure: departure),
+                    : DepartureCard(
+                        station: station,
+                        departure: departure,
+                        isDischargeOnly:
+                            dischargeOnly[departure.lineCode] == true,
+                      ),
               ),
           ],
         ),

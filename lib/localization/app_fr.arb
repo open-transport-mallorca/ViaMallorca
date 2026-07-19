@@ -88,6 +88,9 @@
   "timetable": "Horaire",
   "allYear": "Toute l'année",
   "linesServingStop": "Lignes desservant cet arrêt",
+  "dropOffOnly": "Descente uniquement",
+  "dischargeOnlyDialogTitle": "Arrêt de descente uniquement",
+  "dischargeOnlyDialogSubtitle": "À cet arrêt, ce bus ne permet que de descendre, vous ne pourrez donc pas y monter. Le suivre quand même ?",
   "departures": "Départs",
   "openInMaps": "Ouvrir dans Maps",
   "stopCount": "{count, plural, =0{aucun arrêt} one{1 arrêt} other{{count} arrêts}}"

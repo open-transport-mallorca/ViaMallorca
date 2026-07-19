@@ -88,6 +88,9 @@
   "timetable": "Horario",
   "allYear": "Todo el año",
   "linesServingStop": "Líneas que paran aquí",
+  "dropOffOnly": "Solo bajada",
+  "dischargeOnlyDialogTitle": "Parada solo de bajada",
+  "dischargeOnlyDialogSubtitle": "En esta parada este autobús solo permite bajar, por lo que no podrás subir aquí. ¿Quieres seguirlo igualmente?",
   "departures": "Salidas",
   "openInMaps": "Abrir en Mapas",
   "stopCount": "{count, plural, =0{sin paradas} one{1 parada} other{{count} paradas}}"

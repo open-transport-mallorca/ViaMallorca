@@ -23,11 +23,16 @@ class DepartureCard extends StatelessWidget {
       {super.key,
       required this.departure,
       required this.station,
-      this.isHighlighted = false});
+      this.isHighlighted = false,
+      this.isDischargeOnly = false});
 
   final Departure departure;
   final Station station;
   final bool isHighlighted;
+
+  /// Whether this stop only lets passengers off this line - boarding here is
+  /// not possible, so the card says so.
+  final bool isDischargeOnly;
 
   Future<void> handleAddNotification(BuildContext context) async {
     final notificationStatus = await Permission.notification.status;
@@ -142,6 +147,8 @@ class DepartureCard extends StatelessWidget {
                             style: TextStyle(fontSize: 20, color: textColor),
                           );
                         }),
+
+                        if (isDischargeOnly) _DischargeOnlyBadge(),
 
                         // Subtitle content
                         Text(
@@ -279,6 +286,14 @@ class DepartureCard extends StatelessWidget {
                             child: InkWell(
                               borderRadius: BorderRadius.circular(12),
                               onTap: () async {
+                                // Boarding is not possible here, so make sure
+                                // the user knows before they follow this bus.
+                                if (isDischargeOnly) {
+                                  final confirmed =
+                                      await confirmTrackDischargeOnly(context);
+                                  if (confirmed != true) return;
+                                }
+                                if (!context.mounted) return;
                                 final line = await RouteLinesApi.getLine(
                                     departure.lineCode);
                                 // Stops are direction-specific, so the subline
@@ -356,6 +371,29 @@ class DepartureCard extends StatelessWidget {
     });
   }
 
+  /// Asks the user to confirm before tracking a bus they cannot board at this
+  /// stop. Resolves to true only if they choose to track it anyway.
+  Future<bool?> confirmTrackDischargeOnly(BuildContext context) {
+    return showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(AppLocalizations.of(context)!.dischargeOnlyDialogTitle),
+        content:
+            Text(AppLocalizations.of(context)!.dischargeOnlyDialogSubtitle),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text(AppLocalizations.of(context)!.cancel),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text(AppLocalizations.of(context)!.track),
+          ),
+        ],
+      ),
+    );
+  }
+
   Future<bool?> offerPreciseNotifications(BuildContext context) {
     return showDialog<bool>(
       context: context,
@@ -401,6 +439,36 @@ class DepartureCard extends StatelessWidget {
           child: Text(AppLocalizations.of(context)!.openSettings),
         ),
       ],
+    );
+  }
+}
+
+/// Marks a departure whose stop lets passengers off but not on.
+class _DischargeOnlyBadge extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final scheme = Theme.of(context).colorScheme;
+    return Padding(
+      padding: const EdgeInsets.only(top: 2, bottom: 2),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+        decoration: BoxDecoration(
+          color: scheme.tertiaryContainer,
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          spacing: 4,
+          children: [
+            Icon(Icons.exit_to_app,
+                size: 14, color: scheme.onTertiaryContainer),
+            Text(
+              AppLocalizations.of(context)!.dropOffOnly,
+              style: TextStyle(fontSize: 12, color: scheme.onTertiaryContainer),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
