@@ -89,6 +89,7 @@
   "allYear": "Цілий рік",
   "linesServingStop": "Маршрути цієї зупинки",
   "dropOffOnly": "Тільки висадка",
+  "noStationsOnRoute": "На цьому маршруті більше немає зупинок",
   "dischargeOnlyDialogTitle": "Зупинка тільки для висадки",
   "dischargeOnlyDialogSubtitle": "На цій зупинці цей автобус лише висаджує пасажирів, тож сісти тут не вдасться. Усе одно стежити за ним?",
   "departures": "Відправлення",

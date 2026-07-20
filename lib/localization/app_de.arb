@@ -89,6 +89,7 @@
   "allYear": "Ganzjährig",
   "linesServingStop": "Linien an dieser Haltestelle",
   "dropOffOnly": "Nur Ausstieg",
+  "noStationsOnRoute": "Keine Haltestellen mehr auf dieser Route",
   "dischargeOnlyDialogTitle": "Haltestelle nur zum Ausstieg",
   "dischargeOnlyDialogSubtitle": "An dieser Haltestelle lässt dieser Bus nur Fahrgäste aussteigen, du kannst hier also nicht einsteigen. Trotzdem verfolgen?",
   "departures": "Abfahrten",

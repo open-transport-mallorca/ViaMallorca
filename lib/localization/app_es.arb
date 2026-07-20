@@ -89,6 +89,7 @@
   "allYear": "Todo el año",
   "linesServingStop": "Líneas que paran aquí",
   "dropOffOnly": "Solo bajada",
+  "noStationsOnRoute": "No quedan paradas en esta ruta",
   "dischargeOnlyDialogTitle": "Parada solo de bajada",
   "dischargeOnlyDialogSubtitle": "En esta parada este autobús solo permite bajar, por lo que no podrás subir aquí. ¿Quieres seguirlo igualmente?",
   "departures": "Salidas",

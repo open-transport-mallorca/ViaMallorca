@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mallorca_transit_services/mallorca_transit_services.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:via_mallorca/components/station_line_labels/station_line_labels_view.dart';
@@ -60,53 +61,84 @@ class TimelineSheet extends StatelessWidget {
                       ),
                     ),
                     const Divider(thickness: 2),
-                    Expanded(
-                      child: Timeline.tileBuilder(
-                        theme: TimelineThemeData(
-                            color: Theme.of(context).colorScheme.primary),
-                        builder: TimelineTileBuilder.fromStyle(
-                          contentsAlign: ContentsAlign.basic,
-                          indicatorStyle: IndicatorStyle.outlined,
-                          oppositeContentsBuilder: (context, index) {
-                            final scheduledArrival = tracking
-                                .stationsOnRoute![index].scheduledArrival;
-                            return Padding(
-                              padding: const EdgeInsets.all(24.0),
-                              child: Text(
-                                DateFormat("HH:mm").format(scheduledArrival),
-                                style: const TextStyle(fontSize: 18),
+                    // The list can empty out while the sheet is open, once the
+                    // bus has passed its last stop.
+                    if (tracking.stationsOnRoute!.isEmpty)
+                      Expanded(
+                        child: Center(
+                          child: Padding(
+                            padding: const EdgeInsets.all(24.0),
+                            child: Text(
+                              AppLocalizations.of(context)!.noStationsOnRoute,
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurfaceVariant,
                               ),
-                            );
-                          },
-                          contentsBuilder: (context, index) {
-                            final stopId =
-                                tracking.stationsOnRoute![index].stopId;
-                            final station = stations
-                                .firstWhere((station) => station.id == stopId);
-
-                            return Padding(
-                              padding: const EdgeInsets.all(24.0),
-                              child: Center(
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Text(
-                                      tracking.stationsOnRoute![index].stopName,
-                                      textAlign: TextAlign.center,
-                                      style: const TextStyle(fontSize: 20),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    StationLineLabels(station: station),
-                                  ],
+                            ),
+                          ),
+                        ),
+                      )
+                    else
+                      Expanded(
+                        child: Timeline.tileBuilder(
+                          theme: TimelineThemeData(
+                              color: Theme.of(context).colorScheme.primary),
+                          builder: TimelineTileBuilder.fromStyle(
+                            contentsAlign: ContentsAlign.basic,
+                            indicatorStyle: IndicatorStyle.outlined,
+                            oppositeContentsBuilder: (context, index) {
+                              final scheduledArrival = tracking
+                                  .stationsOnRoute![index].scheduledArrival;
+                              return Padding(
+                                padding: const EdgeInsets.all(24.0),
+                                child: Text(
+                                  DateFormat("HH:mm").format(scheduledArrival),
+                                  style: const TextStyle(fontSize: 18),
                                 ),
-                              ),
-                            );
-                          },
-                          itemCount: tracking.stationsOnRoute!.length,
+                              );
+                            },
+                            contentsBuilder: (context, index) {
+                              final stopId =
+                                  tracking.stationsOnRoute![index].stopId;
+                              // A stop the cached station list does not know
+                              // about still gets its name and time from the
+                              // socket; only the line labels need the station.
+                              Station? station;
+                              for (final candidate in stations) {
+                                if (candidate.id != stopId) continue;
+                                station = candidate;
+                                break;
+                              }
+
+                              return Padding(
+                                padding: const EdgeInsets.all(24.0),
+                                child: Center(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        tracking
+                                            .stationsOnRoute![index].stopName,
+                                        textAlign: TextAlign.center,
+                                        style: const TextStyle(fontSize: 20),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      if (station != null)
+                                        StationLineLabels(station: station),
+                                    ],
+                                  ),
+                                ),
+                              );
+                            },
+                            itemCount: tracking.stationsOnRoute!.length,
+                          ),
                         ),
                       ),
-                    ),
                   ],
                 ),
               ],

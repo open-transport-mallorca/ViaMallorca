@@ -160,6 +160,7 @@
   "allYear": "All year",
   "linesServingStop": "Lines serving this stop",
   "dropOffOnly": "Drop-off only",
+  "noStationsOnRoute": "No stops left on this route",
   "dischargeOnlyDialogTitle": "Drop-off only stop",
   "dischargeOnlyDialogSubtitle": "This bus only lets passengers off at this stop, so you will not be able to board it here. Track it anyway?",
   "departures": "Departures",
