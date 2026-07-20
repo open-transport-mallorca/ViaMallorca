@@ -246,6 +246,14 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
     return MarkerClusterLayerWidget(
       options: MarkerClusterLayerOptions(
         showPolygon: false,
+        // Tapping a cluster zooms to fit its bounds, capped by maxZoom — which
+        // defaults to 17, where the 80px cluster radius still covers ~74m. Over
+        // half the island's stops have a neighbour closer than that, so those
+        // clusters could never be opened however many times you tapped. Allow
+        // the zoom to go deeper, and stop clustering before it gets there so
+        // the markers always come apart.
+        maxZoom: 19,
+        disableClusteringAtZoom: 18,
         builder: (context, markers) {
           return Container(
             decoration: BoxDecoration(
