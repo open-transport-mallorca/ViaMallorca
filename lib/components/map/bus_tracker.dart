@@ -35,10 +35,15 @@ class _BusTrackerState extends State<BusTracker>
   /// when a new one has arrived.
   LatLng? _lastFix;
 
+  /// Metres along the route at each end of the current animation, null when
+  /// that end is not on the drawn route.
+  double? _fromDistance;
+  double? _toDistance;
+
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(vsync: this)..addListener(_followBus);
+    _controller = AnimationController(vsync: this)..addListener(_onTick);
     _tracking = context.read<TrackingProvider>();
     _map = context.read<MapProvider>();
     _tracking.addListener(_onTrackingChanged);
@@ -59,6 +64,33 @@ class _BusTrackerState extends State<BusTracker>
     final path = _path;
     if (path == null) return _lastFix;
     return path.at(_controller.value);
+  }
+
+  void _onTick() {
+    _followBus();
+    _publishProgress();
+  }
+
+  /// Reports how far along the route the bus has reached, so the polylines can
+  /// paint what is behind it differently from what is ahead.
+  ///
+  /// Interpolated between the two fixes rather than re-projecting every frame:
+  /// projection is linear in the route's vertex count, and the marker already
+  /// moves linearly between the same two points.
+  void _publishProgress() {
+    final from = _fromDistance;
+    final to = _toDistance;
+
+    // The bus left the drawn route; keep the last split rather than flicking
+    // the whole route back to one colour.
+    if (to == null) return;
+
+    final value = from == null ? to : from + (to - from) * _controller.value;
+    final previous = _map.busRouteDistance.value;
+    // A metre is a fraction of a pixel at tracking zoom, so skipping smaller
+    // changes costs nothing visually and saves repainting the route.
+    if (previous != null && (value - previous).abs() < 1) return;
+    _map.busRouteDistance.value = value;
   }
 
   /// Keeps the camera on the bus while follow mode is on.
@@ -87,6 +119,9 @@ class _BusTrackerState extends State<BusTracker>
       _controller.stop();
       _path = null;
       _lastFix = null;
+      _fromDistance = null;
+      _toDistance = null;
+      _map.busRouteDistance.value = null;
       if (notify && mounted) setState(() {});
       return;
     }
@@ -106,6 +141,10 @@ class _BusTrackerState extends State<BusTracker>
     final route = _routePoints();
     final points =
         (route == null ? null : pathBetween(route, from, fix)) ?? [from, fix];
+
+    final progress = route == null ? null : _map.progressFor(route);
+    _fromDistance = progress?.distanceAt(from);
+    _toDistance = progress?.distanceAt(fix);
 
     _path = InterpolatedPath(points);
     _controller.duration = _tracking.fixInterval;

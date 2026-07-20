@@ -29,7 +29,10 @@ class UntrackButtons extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    if (trackingProvider.stationsOnRoute != null) ...[
+                    // The socket sends an empty stop list once the bus has
+                    // passed them all, which would open an empty timeline.
+                    if (trackingProvider.stationsOnRoute?.isNotEmpty ??
+                        false) ...[
                       _ControlRow(
                         icon: Icons.timeline,
                         label: AppLocalizations.of(context)!.stationsOnRoute,

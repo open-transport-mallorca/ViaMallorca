@@ -173,3 +173,57 @@ class InterpolatedPath {
     return points.last;
   }
 }
+
+/// The stretch of route covered so far and the stretch still to come.
+typedef RouteSplit = ({List<LatLng> travelled, List<LatLng> remaining});
+
+/// A drawn route that can report how far along it a position sits, and be cut
+/// at that point so the two halves can be styled differently.
+///
+/// Building one walks the whole route, so hold onto it rather than rebuilding
+/// per frame — routes run to a couple of thousand vertices.
+class RouteProgress extends InterpolatedPath {
+  RouteProgress(super.points);
+
+  /// Metres along the route at [point], or null when it is too far off the
+  /// route for the answer to mean anything.
+  double? distanceAt(LatLng point) {
+    final projection = _project(points, point);
+    if (projection == null || projection.distance > _maxSnapMeters) return null;
+
+    final start = _cumulative[projection.segment];
+    final end = _cumulative[projection.segment + 1];
+    return start + (end - start) * projection.t;
+  }
+
+  /// Cuts the route at [distance] metres along it.
+  ///
+  /// Both halves share the cut point, so they meet exactly rather than leaving
+  /// a gap. Either half may be shorter than two points when the bus sits at one
+  /// end of the route; callers should skip drawing those.
+  RouteSplit split(double distance) {
+    if (distance <= 0) return (travelled: const [], remaining: points);
+    if (distance >= length) return (travelled: points, remaining: const []);
+
+    for (int i = 1; i < points.length; i++) {
+      if (_cumulative[i] < distance) continue;
+
+      final segment = _cumulative[i] - _cumulative[i - 1];
+      final local =
+          segment == 0 ? 0.0 : (distance - _cumulative[i - 1]) / segment;
+      final a = points[i - 1];
+      final b = points[i];
+      final cut = LatLng(
+        a.latitude + (b.latitude - a.latitude) * local,
+        a.longitude + (b.longitude - a.longitude) * local,
+      );
+
+      return (
+        travelled: [...points.sublist(0, i), cut],
+        remaining: [cut, ...points.sublist(i)],
+      );
+    }
+
+    return (travelled: points, remaining: const []);
+  }
+}

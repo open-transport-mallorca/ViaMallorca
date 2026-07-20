@@ -17,6 +17,7 @@ import 'package:via_mallorca/components/map/bus_info.dart';
 import 'package:via_mallorca/components/map/bus_tracker.dart';
 import 'package:via_mallorca/components/map/loading_overlay.dart';
 import 'package:via_mallorca/components/map/route_way_switcher.dart';
+import 'package:via_mallorca/components/map/tracked_route_polylines.dart';
 import 'package:via_mallorca/components/map/untrack_buttons.dart';
 import 'package:via_mallorca/components/map/update_location_buttons.dart';
 import 'package:via_mallorca/providers/map_provider.dart';
@@ -188,7 +189,7 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                   if (mapProvider.customRoutes != null &&
                       (mapProvider.customRoutes![0].isNotEmpty &&
                           mapProvider.customRoutes![1].isNotEmpty))
-                    _highlightedRoutePolylines(context),
+                    const TrackedRoutePolylines(),
 
                   // Highlighted Route Stations
                   if (mapProvider.customRoutes != null &&
@@ -324,24 +325,5 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                   ),
                 ))
             .toList());
-  }
-
-  Widget _highlightedRoutePolylines(BuildContext context) {
-    final mapProvider = Provider.of<MapProvider>(context, listen: false);
-    return PolylineLayer(polylines: [
-      mapProvider.customRoutes!.length == 1
-          ? mapProvider.customRoutes![
-              Theme.of(context).colorScheme.brightness == Brightness.light
-                  ? 0
-                  : 1][0]
-          : mapProvider.customRoutes![
-                  Theme.of(context).colorScheme.brightness == Brightness.light
-                      ? 0
-                      : 1][
-              (mapProvider.customWay == null ||
-                      mapProvider.customWay == Way.way)
-                  ? 0
-                  : 1]
-    ]);
   }
 }

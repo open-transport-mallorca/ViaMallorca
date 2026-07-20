@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:via_mallorca/providers/navigation_provider.dart';
 import 'package:via_mallorca/providers/tracking_provider.dart';
 import 'package:via_mallorca/utils/adapt_color.dart';
+import 'package:via_mallorca/utils/route_follower.dart';
 import 'package:mallorca_transit_services/mallorca_transit_services.dart';
 
 /// A provider class that manages the map-related functionality.
@@ -41,6 +42,28 @@ class MapProvider extends ChangeNotifier {
     if (followTrackedBus == value) return;
     followTrackedBus = value;
     notifyListeners();
+  }
+
+  /// How far along the tracked route the bus has got, in metres, or null when
+  /// nothing is tracked or the bus is off the drawn route.
+  ///
+  /// A [ValueNotifier] rather than provider state because it changes many times
+  /// a second while the bus animates; only the route polylines need to repaint,
+  /// not every map layer.
+  final ValueNotifier<double?> busRouteDistance = ValueNotifier<double?>(null);
+
+  RouteProgress? _progress;
+  List<LatLng>? _progressSource;
+
+  /// A cached [RouteProgress] for [points], rebuilt only when the route itself
+  /// changes. Measuring a route is linear in its vertex count, and routes reach
+  /// a couple of thousand of them.
+  RouteProgress progressFor(List<LatLng> points) {
+    if (identical(_progressSource, points) && _progress != null) {
+      return _progress!;
+    }
+    _progressSource = points;
+    return _progress = RouteProgress(points);
   }
 
   /// Registers the [controller] of a freshly shown station bottom sheet so it
