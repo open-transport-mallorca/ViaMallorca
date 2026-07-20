@@ -89,6 +89,7 @@
   "allYear": "Toute l'année",
   "linesServingStop": "Lignes desservant cet arrêt",
   "dropOffOnly": "Descente uniquement",
+  "pickUpOnly": "Montée uniquement",
   "noStationsOnRoute": "Plus d'arrêts sur cet itinéraire",
   "dischargeOnlyDialogTitle": "Arrêt de descente uniquement",
   "dischargeOnlyDialogSubtitle": "À cet arrêt, ce bus ne permet que de descendre, vous ne pourrez donc pas y monter. Le suivre quand même ?",

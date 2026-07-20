@@ -33,7 +33,7 @@ class TrackedRoutePolylines extends StatelessWidget {
     // The dashes cover the whole route rather than only the part still to come,
     // so their geometry never changes and they stay put on the ground. Dashing
     // just the remaining stretch would slide the pattern along as the bus moves
-    // — its start point is the cut, and the default PatternFit rescales every
+    // - its start point is the cut, and the default PatternFit rescales every
     // dash to fit a line that is continuously getting shorter.
     final dashed = Polyline(
       points: base.points,

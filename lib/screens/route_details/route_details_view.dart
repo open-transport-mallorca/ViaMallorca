@@ -4,13 +4,16 @@ import 'package:mallorca_transit_services/mallorca_transit_services.dart';
 import 'package:provider/provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:via_mallorca/components/app_bar.dart';
+import 'package:via_mallorca/components/route_stops_timeline.dart';
 import 'package:via_mallorca/localization/generated/app_localizations.dart';
 import 'package:via_mallorca/providers/favorites_provider.dart';
 import 'package:via_mallorca/providers/map_provider.dart';
 import 'package:via_mallorca/providers/navigation_provider.dart';
 import 'package:via_mallorca/screens/timetable_viewer/timetable_view.dart';
+import 'package:via_mallorca/utils/adapt_color.dart';
 import 'package:via_mallorca/utils/distance_formatter.dart';
 import 'package:via_mallorca/utils/line_icon.dart';
+import 'package:via_mallorca/utils/stop_restrictions.dart';
 import 'route_details_viewmodel.dart';
 
 class RouteDetailsScreen extends StatelessWidget {
@@ -343,25 +346,60 @@ class _SublineTile extends StatelessWidget {
       trailing = Text(wayLabel, style: Theme.of(context).textTheme.labelMedium);
     }
 
+    final lineColour = adaptColor(Color(subline.parentLine.color))[
+        Theme.of(context).colorScheme.brightness == Brightness.light ? 0 : 1];
+
     return Card(
       color: Theme.of(context).colorScheme.surfaceContainerHigh,
-      child: ListTile(
+      clipBehavior: Clip.antiAlias,
+      child: ExpansionTile(
+        shape: const Border(),
         leading: Icon(leadingIcon),
         title: Text(subline.name),
         subtitle: Text(details),
-        trailing: trailing,
-        onTap: () {
-          // Load the full line (keeping the way switcher) but pre-select the
-          // tapped direction. Switch to the map tab first, since viewRoute only
-          // auto-switches when not already on the routes tab. viewRoute closes
-          // any open station sheet itself.
-          Provider.of<NavigationProvider>(context, listen: false).setIndex(1);
-          Provider.of<MapProvider>(context, listen: false).viewRoute(
-            subline.parentLine,
-            context,
-            initialWay: subline.way,
-          );
-        },
+        // The way label sits next to the expand arrow rather than replacing it,
+        // so it stays clear the direction opens up.
+        trailing: trailing == null
+            ? null
+            : Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [trailing, const Icon(Icons.expand_more)],
+              ),
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(12, 0, 12, 8),
+            child: RouteStopsTimeline(
+              stations: subline.stations,
+              color: lineColour,
+              restrictions:
+                  stopRestrictions(subline.parentLine, way: subline.way),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+            child: SizedBox(
+              width: double.infinity,
+              child: FilledButton.tonalIcon(
+                icon: const Icon(Icons.map_outlined),
+                label: Text(l10n.viewOnMap),
+                onPressed: () {
+                  // Load the full line (keeping the way switcher) but
+                  // pre-select the tapped direction. Switch to the map tab
+                  // first, since viewRoute only auto-switches when not already
+                  // on the routes tab. viewRoute closes any open station sheet
+                  // itself.
+                  Provider.of<NavigationProvider>(context, listen: false)
+                      .setIndex(1);
+                  Provider.of<MapProvider>(context, listen: false).viewRoute(
+                    subline.parentLine,
+                    context,
+                    initialWay: subline.way,
+                  );
+                },
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -19,7 +19,9 @@ class CacheManager {
   /// [Station], which the departures list uses to flag discharge-only stops.
   /// v3: line details are stored once under [_linePrefix] and referenced by
   /// station, instead of a full copy per station.
-  static const int _schemaVersion = 3;
+  /// v4: mallorca_transit_services 2.4.1 added `town` to [Station], which the
+  /// route timeline groups stops by.
+  static const int _schemaVersion = 4;
 
   static const String _schemaVersionKey = 'cache_schema_version';
 

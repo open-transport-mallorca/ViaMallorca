@@ -521,10 +521,10 @@ packages:
     dependency: "direct main"
     description:
       name: mallorca_transit_services
-      sha256: "6902f2a122581026c0c49bf6978ac98e067d031757ad03e8d491fb0ee97fde89"
+      sha256: "7341db90098974f47ce8a5d4857d28c2d9aa261b649e4f34b5fc59969e3d06f0"
       url: "https://pub.dev"
     source: hosted
-    version: "2.4.0"
+    version: "2.4.1"
   matcher:
     dependency: transitive
     description:
