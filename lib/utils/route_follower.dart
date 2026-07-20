@@ -96,7 +96,7 @@ double _pathLength(List<LatLng> points) {
 /// The stretch of [route] the bus most likely covered going from [from] to
 /// [to], or null when the route cannot explain that movement.
 ///
-/// Returns null — meaning the caller should fall back to a straight line —
+/// Returns null - meaning the caller should fall back to a straight line -
 /// when either point is more than [_maxSnapMeters] off the route, when the
 /// movement runs backwards along it, or when the route between the two points
 /// is implausibly long compared to the direct distance. That last case is what
@@ -181,7 +181,7 @@ typedef RouteSplit = ({List<LatLng> travelled, List<LatLng> remaining});
 /// at that point so the two halves can be styled differently.
 ///
 /// Building one walks the whole route, so hold onto it rather than rebuilding
-/// per frame — routes run to a couple of thousand vertices.
+/// per frame - routes run to a couple of thousand vertices.
 class RouteProgress extends InterpolatedPath {
   RouteProgress(super.points);
 

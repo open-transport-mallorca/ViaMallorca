@@ -26,7 +26,7 @@ class CacheManager {
   /// A single line, with its sublines and their stops.
   static const String _linePrefix = 'line_';
 
-  /// The line codes serving a station — a reference list, not the lines.
+  /// The line codes serving a station - a reference list, not the lines.
   static const String _stationLinesPrefix = 'station_lines_';
 
   /// Line composition at a stop changes far less often than the lines
@@ -57,7 +57,7 @@ class CacheManager {
   /// Deletes cached lines whose expiry has passed.
   ///
   /// Reads only ever skip expired entries, so without this they would sit in
-  /// the preferences file forever — the whole file is parsed into memory on
+  /// the preferences file forever - the whole file is parsed into memory on
   /// first access, so dead entries cost startup time on every launch.
   static Future<void> _pruneExpired() async {
     final prefs = _prefs;
@@ -145,7 +145,7 @@ class CacheManager {
   /// The codes of the lines that pass through a station, or null when that
   /// list is absent or stale.
   ///
-  /// This is only the reference list — call [getLine] for each code to get the
+  /// This is only the reference list - call [getLine] for each code to get the
   /// lines themselves. The [stationCode] is the `code` (not `id`) of the
   /// station.
   static Future<List<String>?> getStationLineCodes(String stationCode) async {
