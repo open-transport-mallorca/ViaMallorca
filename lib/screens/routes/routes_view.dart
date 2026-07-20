@@ -28,7 +28,7 @@ class RoutesScreen extends StatelessWidget {
               viewModel.onlyFavourites = false;
             }
 
-            final routes = viewModel.filteredRoutes;
+            final routes = viewModel.groupedRoutes;
             final searchQuery = viewModel.searchQuery;
 
             return Column(
@@ -48,8 +48,12 @@ class RoutesScreen extends StatelessWidget {
                           child: Text(AppLocalizations.of(context)!.noResults))
                       : ListView.builder(
                           itemCount: routes.length,
-                          itemBuilder: (context, index) =>
-                              RouteTile(route: routes[index])),
+                          itemBuilder: (context, index) {
+                            final item = routes[index];
+                            return item is SectorHeader
+                                ? _SectorHeaderTile(header: item)
+                                : RouteTile(route: item as RouteLine);
+                          }),
                 ),
               ],
             );
@@ -79,6 +83,42 @@ class RoutesScreen extends StatelessWidget {
                 : null,
           ),
         ],
+      ),
+    );
+  }
+}
+
+/// Names the sector a run of routes belongs to.
+class _SectorHeaderTile extends StatelessWidget {
+  const _SectorHeaderTile({required this.header});
+
+  final SectorHeader header;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final sector = header.sector;
+
+    // The operator's numbered sectors have no names of their own, so they are
+    // labelled by number; the rail modes and unfiled lines get words.
+    final label = sector == null
+        ? l10n.otherLines
+        : sector == 'Metro'
+            ? l10n.metro
+            : sector == 'Tren'
+                ? l10n.train
+                : l10n.sectorNumbered(sector);
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+      child: Text(
+        label.toUpperCase(),
+        style: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 0.8,
+          color: Theme.of(context).colorScheme.primary,
+        ),
       ),
     );
   }

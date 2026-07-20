@@ -89,6 +89,25 @@
   "allYear": "Tot l'any",
   "linesServingStop": "Línies que paren aquí",
   "dropOffOnly": "Només baixada",
+  "sectorNumbered": "Sector {code}",
+  "@sectorNumbered": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "metro": "Metro",
+  "train": "Tren",
+  "otherLines": "Altres",
+  "minutesLate": "{count, plural, one{1 minut de retard} other{{count} minuts de retard}}",
+  "@minutesLate": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "pickUpOnly": "Només pujada",
   "noStationsOnRoute": "No queden parades en aquesta ruta",
   "dischargeOnlyDialogTitle": "Parada només de baixada",

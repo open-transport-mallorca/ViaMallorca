@@ -23,6 +23,18 @@ class TrackingProvider extends ChangeNotifier with WidgetsBindingObserver {
   bool hasBusPosition = false;
   bool hasStationInfo = false;
 
+  /// The last stop the bus called at.
+  ///
+  /// Sent by the socket each time the bus reaches a stop, carrying how late it
+  /// was and how many people were aboard — the only place the app learns the
+  /// size of a delay rather than just that there is one.
+  BusStopped? lastStop;
+
+  /// How far behind schedule the bus was at [lastStop], in minutes.
+  ///
+  /// Null until it calls somewhere. Negative means it was running early.
+  int? get delayMinutes => lastStop?.delay;
+
   /// When the last position fix arrived.
   DateTime? lastFixAt;
 
@@ -117,9 +129,23 @@ class TrackingProvider extends ChangeNotifier with WidgetsBindingObserver {
           currentLocation = LatLng(action.lat, action.long);
           currentSpeed = action.speed?.round();
           _recordFixTiming();
+        } else if (action is BusStopped) {
+          lastStop = action;
         } else if (action is RouteStationInfo) {
           routeStationInfo = action;
           stationsOnRoute = action.stops;
+
+          // Every stop-info message carries a position of its own, so taking it
+          // gives a denser stream than the position messages alone. Duplicates
+          // cost nothing: an unchanged location is ignored downstream, and
+          // _recordFixTiming discards gaps too short to be a real interval.
+          final embedded = action.position;
+          if (embedded != null) {
+            currentLocation = LatLng(embedded.lat, embedded.long);
+            currentSpeed = embedded.speed?.round();
+            hasBusPosition = true;
+            _recordFixTiming();
+          }
         }
 
         notifyListeners();
@@ -165,6 +191,7 @@ class TrackingProvider extends ChangeNotifier with WidgetsBindingObserver {
     currentSpeed = null;
     hasBusPosition = false;
     hasStationInfo = false;
+    lastStop = null;
     lastFixAt = null;
     fixInterval = const Duration(seconds: 15);
 

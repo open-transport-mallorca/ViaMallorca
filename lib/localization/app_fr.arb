@@ -89,6 +89,25 @@
   "allYear": "Toute l'année",
   "linesServingStop": "Lignes desservant cet arrêt",
   "dropOffOnly": "Descente uniquement",
+  "sectorNumbered": "Secteur {code}",
+  "@sectorNumbered": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "metro": "Métro",
+  "train": "Train",
+  "otherLines": "Autres",
+  "minutesLate": "{count, plural, one{1 minute de retard} other{{count} minutes de retard}}",
+  "@minutesLate": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "pickUpOnly": "Montée uniquement",
   "noStationsOnRoute": "Plus d'arrêts sur cet itinéraire",
   "dischargeOnlyDialogTitle": "Arrêt de descente uniquement",

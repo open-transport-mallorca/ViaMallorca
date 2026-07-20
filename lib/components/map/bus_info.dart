@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mallorca_transit_services/mallorca_transit_services.dart';
 import 'package:provider/provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
+import 'package:via_mallorca/localization/generated/app_localizations.dart';
 import 'package:via_mallorca/providers/map_provider.dart';
 import 'package:via_mallorca/providers/tracking_provider.dart';
 import 'package:via_mallorca/utils/line_icon.dart';
@@ -46,6 +47,7 @@ class _StatusPanel extends StatelessWidget {
     final way = map.customWay;
     final stationInfo = tracking.routeStationInfo;
     final speed = tracking.currentSpeed;
+    final delay = tracking.delayMinutes;
     final hasBusPosition = tracking.hasBusPosition;
     final hasStationInfo = tracking.hasStationInfo;
     final hasStops = stationInfo != null && stationInfo.stops.isNotEmpty;
@@ -117,6 +119,17 @@ class _StatusPanel extends StatelessWidget {
               text: "${speed ?? '-'} km/h",
             ),
           ),
+          // Only once the bus has called somewhere, and only when it was
+          // actually behind: "on time" is the assumption, so saying so adds a
+          // row without adding information.
+          if (delay != null && delay > 0) ...[
+            const SizedBox(height: 4),
+            _Stat(
+              icon: Icons.schedule,
+              text: AppLocalizations.of(context)!.minutesLate(delay),
+              color: scheme.error,
+            ),
+          ],
           const SizedBox(height: 4),
           // Next + final stop.
           Skeletonizer(

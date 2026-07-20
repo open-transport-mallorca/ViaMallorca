@@ -89,6 +89,25 @@
   "allYear": "Цілий рік",
   "linesServingStop": "Маршрути цієї зупинки",
   "dropOffOnly": "Тільки висадка",
+  "sectorNumbered": "Сектор {code}",
+  "@sectorNumbered": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "metro": "Метро",
+  "train": "Потяг",
+  "otherLines": "Інші",
+  "minutesLate": "{count, plural, one{запізнення 1 хвилина} other{запізнення {count} хв}}",
+  "@minutesLate": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "pickUpOnly": "Тільки посадка",
   "noStationsOnRoute": "На цьому маршруті більше немає зупинок",
   "dischargeOnlyDialogTitle": "Зупинка тільки для висадки",

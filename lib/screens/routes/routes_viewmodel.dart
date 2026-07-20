@@ -4,6 +4,16 @@ import 'package:via_mallorca/cache/cache_manager.dart';
 import 'package:via_mallorca/extensions/remove_punctuation.dart';
 import 'package:via_mallorca/providers/favorites_provider.dart';
 
+/// Marks the start of a sector's run of routes in [RoutesViewModel.groupedRoutes].
+///
+/// [sector] is the operator's own value — a number like `"300"`, `"Metro"`,
+/// `"Tren"`, or null for lines it files under nothing.
+class SectorHeader {
+  const SectorHeader(this.sector);
+
+  final String? sector;
+}
+
 class RoutesViewModel extends ChangeNotifier {
   final FavoritesProvider favoritesProvider;
   final TextEditingController searchController = TextEditingController();
@@ -66,6 +76,45 @@ class RoutesViewModel extends ChangeNotifier {
     return searchResults.isEmpty && searchController.text.isEmpty
         ? _cachedLines
         : searchResults;
+  }
+
+  /// [filteredRoutes] laid out for a flat list, with a [SectorHeader] opening
+  /// each group.
+  ///
+  /// The operator files every line under a sector, which splits an otherwise
+  /// undifferentiated list of 80-odd routes into a handful of runs.
+  List<Object> get groupedRoutes {
+    final bySector = <String?, List<RouteLine>>{};
+    for (final route in filteredRoutes) {
+      bySector.putIfAbsent(route.sector, () => []).add(route);
+    }
+
+    final sectors = bySector.keys.toList()
+      ..sort((a, b) {
+        final rankA = _sectorRank(a);
+        final rankB = _sectorRank(b);
+        if (rankA != rankB) return rankA.compareTo(rankB);
+        final numA = int.tryParse(a ?? '');
+        final numB = int.tryParse(b ?? '');
+        if (numA != null && numB != null) return numA.compareTo(numB);
+        return (a ?? '').compareTo(b ?? '');
+      });
+
+    return [
+      for (final sector in sectors) ...[
+        SectorHeader(sector),
+        ...bySector[sector]!,
+      ],
+    ];
+  }
+
+  /// Numbered sectors first, then the rail modes, then anything unfiled.
+  static int _sectorRank(String? sector) {
+    if (sector == null) return 3;
+    if (int.tryParse(sector) != null) return 0;
+    if (sector == 'Metro') return 1;
+    if (sector == 'Tren') return 2;
+    return 3;
   }
 
   @override

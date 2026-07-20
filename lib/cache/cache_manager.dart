@@ -21,7 +21,10 @@ class CacheManager {
   /// station, instead of a full copy per station.
   /// v4: mallorca_transit_services 2.4.1 added `town` to [Station], which the
   /// route timeline groups stops by.
-  static const int _schemaVersion = 4;
+  /// v5: 2.5.0 added `sector`/`startDate`/`entityId` to [RouteLine] and
+  /// `description`/`lineId` to [Subline], none of which are in entries written
+  /// by earlier versions.
+  static const int _schemaVersion = 5;
 
   static const String _schemaVersionKey = 'cache_schema_version';
 

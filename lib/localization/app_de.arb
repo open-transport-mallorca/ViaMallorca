@@ -89,6 +89,25 @@
   "allYear": "Ganzjährig",
   "linesServingStop": "Linien an dieser Haltestelle",
   "dropOffOnly": "Nur Ausstieg",
+  "sectorNumbered": "Sektor {code}",
+  "@sectorNumbered": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "metro": "Metro",
+  "train": "Zug",
+  "otherLines": "Sonstige",
+  "minutesLate": "{count, plural, one{1 Minute Verspätung} other{{count} Minuten Verspätung}}",
+  "@minutesLate": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "pickUpOnly": "Nur Einstieg",
   "noStationsOnRoute": "Keine Haltestellen mehr auf dieser Route",
   "dischargeOnlyDialogTitle": "Haltestelle nur zum Ausstieg",

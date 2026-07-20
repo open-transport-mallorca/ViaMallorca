@@ -89,6 +89,25 @@
   "allYear": "Todo el año",
   "linesServingStop": "Líneas que paran aquí",
   "dropOffOnly": "Solo bajada",
+  "sectorNumbered": "Sector {code}",
+  "@sectorNumbered": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "metro": "Metro",
+  "train": "Tren",
+  "otherLines": "Otras",
+  "minutesLate": "{count, plural, one{1 minuto de retraso} other{{count} minutos de retraso}}",
+  "@minutesLate": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "pickUpOnly": "Solo subida",
   "noStationsOnRoute": "No quedan paradas en esta ruta",
   "dischargeOnlyDialogTitle": "Parada solo de bajada",

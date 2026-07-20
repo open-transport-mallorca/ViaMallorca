@@ -160,6 +160,25 @@
   "allYear": "All year",
   "linesServingStop": "Lines serving this stop",
   "dropOffOnly": "Drop-off only",
+  "sectorNumbered": "Sector {code}",
+  "@sectorNumbered": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "metro": "Metro",
+  "train": "Train",
+  "otherLines": "Other",
+  "minutesLate": "{count, plural, one{1 minute late} other{{count} minutes late}}",
+  "@minutesLate": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "pickUpOnly": "Pick-up only",
   "noStationsOnRoute": "No stops left on this route",
   "dischargeOnlyDialogTitle": "Drop-off only stop",
