@@ -40,6 +40,12 @@ class _BusTrackerState extends State<BusTracker>
   double? _fromDistance;
   double? _toDistance;
 
+  /// Whether a live position has been shown for the current connection.
+  ///
+  /// Cleared when tracking stops or the socket drops, so the first fix of a
+  /// new connection is placed outright rather than animated to.
+  bool _hadRealFix = false;
+
   @override
   void initState() {
     super.initState();
@@ -121,6 +127,7 @@ class _BusTrackerState extends State<BusTracker>
       _lastFix = null;
       _fromDistance = null;
       _toDistance = null;
+      _hadRealFix = false;
       _map.busRouteDistance.value = null;
       if (notify && mounted) setState(() {});
       return;
@@ -129,12 +136,28 @@ class _BusTrackerState extends State<BusTracker>
     if (fix == _lastFix) return;
 
     final from = _displayed;
+    // Until a position message has arrived, what the provider holds is the
+    // position tracking started from, not a live one.
+    final isPlaceholder = !_tracking.hasBusPosition;
     _lastFix = fix;
 
-    // Nothing on screen yet, so there is nothing to animate from.
-    if (from == null) {
+    // Put the bus straight where it belongs instead of animating when there is
+    // nothing to animate from, when this is the position carried over a
+    // reconnect, or when it is the first real fix after one. The bus can have
+    // moved a long way while the socket was down, and gliding across that gap
+    // over a fix interval reads as the bus slowly driving there.
+    if (from == null || isPlaceholder || !_hadRealFix) {
+      _hadRealFix = !isPlaceholder;
+      _controller.stop();
       _path = null;
-      if (notify && mounted) setState(() {});
+      _fromDistance = null;
+      _toDistance = _routeProgress()?.distanceAt(fix);
+      // The controller will not tick, so publish and recentre by hand.
+      _publishProgress();
+      if (notify) {
+        _followBus();
+        if (mounted) setState(() {});
+      }
       return;
     }
 
@@ -142,7 +165,7 @@ class _BusTrackerState extends State<BusTracker>
     final points =
         (route == null ? null : pathBetween(route, from, fix)) ?? [from, fix];
 
-    final progress = route == null ? null : _map.progressFor(route);
+    final progress = _routeProgress();
     _fromDistance = progress?.distanceAt(from);
     _toDistance = progress?.distanceAt(fix);
 
@@ -152,6 +175,12 @@ class _BusTrackerState extends State<BusTracker>
     // easing into place.
     _controller.forward(from: 0);
     if (notify && mounted) setState(() {});
+  }
+
+  /// The tracked route, measured so positions can be placed along it.
+  RouteProgress? _routeProgress() {
+    final route = _routePoints();
+    return route == null ? null : _map.progressFor(route);
   }
 
   /// The drawn route for the direction being tracked, if one is on the map.

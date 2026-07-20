@@ -78,11 +78,17 @@ class TrackingProvider extends ChangeNotifier with WidgetsBindingObserver {
     await stopTracking();
     WidgetsBinding.instance.addObserver(this);
     _isTracking = true;
-    _setConnectionStatus(ConnectionStatus.connecting);
 
+    // Restore the last known position before announcing the new status: the
+    // status change is what notifies listeners, and until they have a position
+    // again the bus vanishes from the map. Reconnecting after a spell in the
+    // background waits on a route fetch and a socket handshake, so that gap is
+    // long enough to see.
     trackingTripId = tripId;
     trackingFromStation = trackingFrom;
     currentLocation = initialCoords;
+
+    _setConnectionStatus(ConnectionStatus.connecting);
 
     final routeLine = await RouteLinesApi.getLine(lineCode);
     lineType = routeLine.type;
