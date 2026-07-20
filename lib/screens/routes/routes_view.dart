@@ -196,7 +196,8 @@ class RouteTile extends StatelessWidget {
                 onPressed: () => Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => TimetableViewer(lineCode: route.code),
+                    builder: (context) =>
+                        TimetableViewer(lineCode: route.code, lineId: route.id),
                   ),
                 ),
                 icon: const Icon(Icons.access_time_filled_rounded),

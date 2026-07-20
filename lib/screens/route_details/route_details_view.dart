@@ -74,8 +74,8 @@ class RouteDetailsScreen extends StatelessWidget {
                             onPressed: () => Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (_) =>
-                                    TimetableViewer(lineCode: line.code),
+                                builder: (_) => TimetableViewer(
+                                    lineCode: line.code, lineId: line.id),
                               ),
                             ),
                             icon: const Icon(Icons.access_time_filled_rounded),

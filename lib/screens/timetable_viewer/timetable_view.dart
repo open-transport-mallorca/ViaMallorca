@@ -6,14 +6,17 @@ import 'package:via_mallorca/localization/generated/app_localizations.dart';
 import 'timetable_viewmodel.dart';
 
 class TimetableViewer extends StatelessWidget {
-  const TimetableViewer({super.key, required this.lineCode});
+  const TimetableViewer({super.key, required this.lineCode, this.lineId});
 
   final String lineCode;
+
+  /// Passed through to skip a lookup request; see [TimetableViewModel.lineId].
+  final int? lineId;
 
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => TimetableViewModel(lineCode),
+      create: (_) => TimetableViewModel(lineCode, lineId: lineId),
       child: Consumer<TimetableViewModel>(
         builder: (context, viewModel, _) {
           return Scaffold(

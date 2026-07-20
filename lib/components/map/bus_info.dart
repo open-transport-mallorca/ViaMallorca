@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:mallorca_transit_services/mallorca_transit_services.dart';
 import 'package:provider/provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -119,9 +120,9 @@ class _StatusPanel extends StatelessWidget {
               text: "${speed ?? '-'} km/h",
             ),
           ),
-          // Only once the bus has called somewhere, and only when it was
-          // actually behind: "on time" is the assumption, so saying so adds a
-          // row without adding information.
+          // Only once the bus has reached a stop, and only when it was actually
+          // behind: "on time" is the assumption, so saying so adds a row
+          // without adding information.
           if (delay != null && delay > 0) ...[
             const SizedBox(height: 4),
             _Stat(
@@ -131,7 +132,7 @@ class _StatusPanel extends StatelessWidget {
             ),
           ],
           const SizedBox(height: 4),
-          // Next + final stop.
+          // Next + final stop, the final one with the time it gets there.
           Skeletonizer(
             enabled: !hasStationInfo,
             child: _Stat(
@@ -144,13 +145,23 @@ class _StatusPanel extends StatelessWidget {
             enabled: !hasStationInfo,
             child: _Stat(
               icon: Icons.flag,
-              text: hasStops ? stationInfo.stops.last.stopName : '-',
+              text: hasStops ? _finalStopLabel(stationInfo.stops.last) : '-',
             ),
           ),
         ],
       ),
     );
   }
+}
+
+/// The final stop with the time the bus reaches it.
+///
+/// Prefers the live estimate over the timetable, and shows the name alone if
+/// neither is usable. `scheduledArrival` carries a placeholder date, so only
+/// its time of day means anything.
+String _finalStopLabel(StationOnRoute stop) {
+  final arrival = stop.estimatedArrival ?? stop.scheduledArrival;
+  return "${stop.stopName} · ${DateFormat.Hm().format(arrival)}";
 }
 
 /// A single icon + text stat line used inside the status panel.

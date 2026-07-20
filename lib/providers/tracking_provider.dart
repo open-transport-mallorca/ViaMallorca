@@ -23,7 +23,7 @@ class TrackingProvider extends ChangeNotifier with WidgetsBindingObserver {
   bool hasBusPosition = false;
   bool hasStationInfo = false;
 
-  /// The last stop the bus called at.
+  /// The last stop the bus pulled into.
   ///
   /// Sent by the socket each time the bus reaches a stop, carrying how late it
   /// was and how many people were aboard — the only place the app learns the
@@ -32,7 +32,7 @@ class TrackingProvider extends ChangeNotifier with WidgetsBindingObserver {
 
   /// How far behind schedule the bus was at [lastStop], in minutes.
   ///
-  /// Null until it calls somewhere. Negative means it was running early.
+  /// Null until it reaches its first stop. Negative means it was early.
   int? get delayMinutes => lastStop?.delay;
 
   /// When the last position fix arrived.
@@ -49,10 +49,22 @@ class TrackingProvider extends ChangeNotifier with WidgetsBindingObserver {
   static const Duration _minFixInterval = Duration(seconds: 4);
   static const Duration _maxFixInterval = Duration(seconds: 25);
 
-  void _recordFixTiming() {
-    final now = DateTime.now();
-    final previous = lastFixAt;
-    lastFixAt = now;
+  /// When the vehicle recorded its last position, by its own clock.
+  ///
+  /// Only differences between these are meaningful — the clock is the bus's,
+  /// not the phone's — but that is enough to tell a stale position from a
+  /// fresh one.
+  DateTime? lastFixRecordedAt;
+
+  /// [recordedAt] is the vehicle's own timestamp for the fix. Measuring the
+  /// gap between those rather than between arrivals here keeps network jitter
+  /// out of the animation duration; it falls back to local time when the
+  /// message carries no timestamp.
+  void _recordFixTiming(DateTime? recordedAt) {
+    final now = recordedAt ?? DateTime.now();
+    final previous = recordedAt == null ? lastFixAt : lastFixRecordedAt;
+    lastFixAt = DateTime.now();
+    if (recordedAt != null) lastFixRecordedAt = recordedAt;
     if (previous == null) return;
 
     final observed = now.difference(previous);
@@ -128,7 +140,7 @@ class TrackingProvider extends ChangeNotifier with WidgetsBindingObserver {
         if (action is BusPosition) {
           currentLocation = LatLng(action.lat, action.long);
           currentSpeed = action.speed?.round();
-          _recordFixTiming();
+          _recordFixTiming(action.recordedAt);
         } else if (action is BusStopped) {
           lastStop = action;
         } else if (action is RouteStationInfo) {
@@ -144,7 +156,7 @@ class TrackingProvider extends ChangeNotifier with WidgetsBindingObserver {
             currentLocation = LatLng(embedded.lat, embedded.long);
             currentSpeed = embedded.speed?.round();
             hasBusPosition = true;
-            _recordFixTiming();
+            _recordFixTiming(embedded.recordedAt);
           }
         }
 
@@ -193,6 +205,7 @@ class TrackingProvider extends ChangeNotifier with WidgetsBindingObserver {
     hasStationInfo = false;
     lastStop = null;
     lastFixAt = null;
+    lastFixRecordedAt = null;
     fixInterval = const Duration(seconds: 15);
 
     _setConnectionStatus(ConnectionStatus.disconnected);

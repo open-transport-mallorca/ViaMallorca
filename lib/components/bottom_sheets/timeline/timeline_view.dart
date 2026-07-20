@@ -101,14 +101,19 @@ class TimelineSheet extends StatelessWidget {
                               );
                             },
                             contentsBuilder: (context, index) {
-                              final stopId =
-                                  tracking.stationsOnRoute![index].stopId;
+                              final stop = tracking.stationsOnRoute![index];
                               // A stop the cached station list does not know
                               // about still gets its name and time from the
                               // socket; only the line labels need the station.
+                              // Matched on the public code as well as the
+                              // internal id: the two lists come from different
+                              // endpoints, and the code is the stabler key.
                               Station? station;
                               for (final candidate in stations) {
-                                if (candidate.id != stopId) continue;
+                                if (candidate.id != stop.stopId &&
+                                    candidate.code != stop.stopCode) {
+                                  continue;
+                                }
                                 station = candidate;
                                 break;
                               }
