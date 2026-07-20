@@ -230,27 +230,16 @@ class _StationSheetState extends State<StationSheet> {
                 Departure departure = departures[index];
                 return Consumer<TrackingProvider>(
                     builder: (context, trackingProvider, _) {
-                  return Container(
-                      decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(16),
-                          border: trackingProvider.trackingTripId ==
-                                      departure.realTrip?.id &&
-                                  departure.realTrip != null
-                              ? Border.all(
-                                  color: Theme.of(context)
-                                      .colorScheme
-                                      .tertiary
-                                      .withValues(alpha: 1),
-                                  width: 3)
-                              : null),
-                      child: DepartureCard(
-                        station: widget.station,
-                        departure: departure,
-                        isHighlighted:
-                            widget.highlightedDepartureId == departure.tripId,
-                        isDischargeOnly:
-                            dischargeOnly[departure.lineCode] == true,
-                      ));
+                  return DepartureCard(
+                    station: widget.station,
+                    departure: departure,
+                    isHighlighted:
+                        widget.highlightedDepartureId == departure.tripId,
+                    isDischargeOnly: dischargeOnly[departure.lineCode] == true,
+                    isTracked: departure.realTrip != null &&
+                        trackingProvider.trackingTripId ==
+                            departure.realTrip?.id,
+                  );
                 });
               }),
         ),

@@ -24,7 +24,8 @@ class DepartureCard extends StatelessWidget {
       required this.departure,
       required this.station,
       this.isHighlighted = false,
-      this.isDischargeOnly = false});
+      this.isDischargeOnly = false,
+      this.isTracked = false});
 
   final Departure departure;
   final Station station;
@@ -33,6 +34,14 @@ class DepartureCard extends StatelessWidget {
   /// Whether this stop only lets passengers off this line - boarding here is
   /// not possible, so the card says so.
   final bool isDischargeOnly;
+
+  /// Whether this departure is the trip currently being tracked, which outlines
+  /// the card.
+  ///
+  /// Drawn as the card's own shape rather than a border around it: a wrapping
+  /// container sits outside the card's margin, which leaves a gap between the
+  /// two and shifts the row when tracking starts.
+  final bool isTracked;
 
   Future<void> handleAddNotification(BuildContext context) async {
     final notificationStatus = await Permission.notification.status;
@@ -87,6 +96,15 @@ class DepartureCard extends StatelessWidget {
         color: isHighlighted
             ? Theme.of(context).colorScheme.primaryContainer
             : Theme.of(context).colorScheme.surfaceContainerHigh,
+        shape: isTracked
+            ? RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+                side: BorderSide(
+                  color: Theme.of(context).colorScheme.tertiary,
+                  width: 3,
+                ),
+              )
+            : null,
         child: Stack(
           children: [
             if (departure.estimatedArrival
