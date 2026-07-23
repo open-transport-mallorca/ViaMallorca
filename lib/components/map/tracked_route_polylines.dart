@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:mallorca_transit_services/mallorca_transit_services.dart';
 import 'package:provider/provider.dart';
 import 'package:via_mallorca/providers/map_provider.dart';
 
@@ -27,7 +26,8 @@ class TrackedRoutePolylines extends StatelessWidget {
     // switch or a newly loaded route repaints it even though the parent hands
     // down a canonicalised const instance that would otherwise skip rebuild.
     final mapProvider = context.watch<MapProvider>();
-    final base = _basePolyline(context, mapProvider);
+    final base =
+        mapProvider.basePolyline(Theme.of(context).colorScheme.brightness);
     if (base == null) return const SizedBox.shrink();
 
     // The dashes cover the whole route rather than only the part still to come,
@@ -62,20 +62,5 @@ class TrackedRoutePolylines extends StatelessWidget {
         ]);
       },
     );
-  }
-
-  /// The route as drawn today: one of two colour variants, and for a line with
-  /// separate directions the one matching the way on show.
-  Polyline? _basePolyline(BuildContext context, MapProvider mapProvider) {
-    final routes = mapProvider.customRoutes;
-    if (routes == null || routes.length < 2) return null;
-
-    final polylines = routes[
-        Theme.of(context).colorScheme.brightness == Brightness.light ? 0 : 1];
-    if (polylines.isEmpty) return null;
-    if (polylines.length == 1) return polylines.first;
-
-    final way = mapProvider.customWay;
-    return polylines[way == null || way == Way.way ? 0 : 1];
   }
 }

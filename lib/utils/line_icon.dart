@@ -1,27 +1,31 @@
 import 'package:flutter/material.dart';
 import 'package:mallorca_transit_services/mallorca_transit_services.dart';
 
-Icon getIconForRouteLine(RouteLine line) {
+IconData getIconDataForRouteLine(RouteLine line) {
   switch (line.type) {
     case LineType.metro:
-      return const Icon(Icons.subway_outlined);
+      return Icons.subway_outlined;
     case LineType.train:
-      return const Icon(Icons.train);
+      return Icons.train;
     default:
       return line.code.startsWith("A")
-          ? const Icon(Icons.airplanemode_active_outlined)
-          : const Icon(Icons.directions_bus);
+          ? Icons.airplanemode_active_outlined
+          : Icons.directions_bus;
   }
 }
 
-Icon getIconFromLineCode(String line) {
+IconData getIconDataFromLineCode(String line) {
   if (line.startsWith("M")) {
-    return const Icon(Icons.subway_outlined);
+    return Icons.subway_outlined;
   } else if (line.startsWith("T")) {
-    return const Icon(Icons.train);
+    return Icons.train;
   } else if (line.startsWith("A")) {
-    return const Icon(Icons.airplanemode_active_outlined);
+    return Icons.airplanemode_active_outlined;
   } else {
-    return const Icon(Icons.directions_bus);
+    return Icons.directions_bus;
   }
 }
+
+Icon getIconForRouteLine(RouteLine line) => Icon(getIconDataForRouteLine(line));
+
+Icon getIconFromLineCode(String line) => Icon(getIconDataFromLineCode(line));

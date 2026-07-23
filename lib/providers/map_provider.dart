@@ -66,6 +66,23 @@ class MapProvider extends ChangeNotifier {
     return _progress = RouteProgress(points);
   }
 
+  /// The highlighted route as drawn today: one of the two colour variants held
+  /// in [customRoutes], and for a line with separate directions the one
+  /// matching the way on show.
+  ///
+  /// The geometry is the same in either variant, so callers that only want the
+  /// points can pass any [brightness].
+  Polyline? basePolyline(Brightness brightness) {
+    final routes = customRoutes;
+    if (routes == null || routes.length < 2) return null;
+
+    final polylines = routes[brightness == Brightness.light ? 0 : 1];
+    if (polylines.isEmpty) return null;
+    if (polylines.length == 1) return polylines.first;
+
+    return polylines[customWay == null || customWay == Way.way ? 0 : 1];
+  }
+
   /// Registers the [controller] of a freshly shown station bottom sheet so it
   /// can later be closed via [closeStationSheet]. Self-clears when the sheet is
   /// dismissed by any other means (drag, back button, tab switch).

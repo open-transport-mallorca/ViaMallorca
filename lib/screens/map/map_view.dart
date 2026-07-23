@@ -247,7 +247,6 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
               Align(
                   alignment: Alignment.bottomRight,
                   child: UpdateLocationButtons()),
-
             ]);
           },
         );

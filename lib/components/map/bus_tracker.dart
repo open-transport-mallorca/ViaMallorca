@@ -3,10 +3,24 @@ import 'package:flutter_map_animations/flutter_map_animations.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:mallorca_transit_services/mallorca_transit_services.dart';
 import 'package:provider/provider.dart';
-import 'package:via_mallorca/extensions/grayscale_filter.dart';
 import 'package:via_mallorca/providers/map_provider.dart';
 import 'package:via_mallorca/providers/tracking_provider.dart';
+import 'package:via_mallorca/utils/adapt_color.dart';
+import 'package:via_mallorca/utils/line_icon.dart';
 import 'package:via_mallorca/utils/route_follower.dart';
+
+/// Diameter of the marker's circle, ring included.
+const double _markerSize = 52;
+
+/// Width of the ring that separates the marker from the map underneath.
+const double _ringWidth = 4;
+
+/// How much saturation the line colour gains before it fills the marker.
+///
+/// The route is a three pixel line and the marker a solid disc, so the same
+/// colour reads considerably heavier here; pushing it lets the vehicle stay
+/// the brightest thing on its own route rather than sinking into it.
+const double _fillSaturation = 0.25;
 
 /// The tracked bus on the map.
 ///
@@ -185,17 +199,9 @@ class _BusTrackerState extends State<BusTracker>
 
   /// The drawn route for the direction being tracked, if one is on the map.
   ///
-  /// [MapProvider.customRoutes] holds a light and a dark coloured copy of the
-  /// same geometry, one polyline per subline, so either colour serves and the
-  /// index follows the same way convention the map itself uses.
-  List<LatLng>? _routePoints() {
-    final routes = _map.customRoutes;
-    if (routes == null || routes.isEmpty) return null;
-    final polylines = routes.first;
-    if (polylines.isEmpty) return null;
-    if (polylines.length == 1) return polylines.first.points;
-    return polylines[_map.customWay == Way.back ? 1 : 0].points;
-  }
+  /// Only the geometry is wanted here, which is the same in either colour
+  /// variant, so the brightness passed is arbitrary.
+  List<LatLng>? _routePoints() => _map.basePolyline(Brightness.light)?.points;
 
   @override
   Widget build(BuildContext context) {
@@ -210,58 +216,91 @@ class _BusTrackerState extends State<BusTracker>
                   width: 120,
                   height: 120,
                   point: point,
-                  builder: (_, animation) {
-                    return Container(
-                        width: 60 * animation.value,
-                        height: 60 * animation.value,
-                        decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12),
-                            color: Theme.of(context)
-                                .colorScheme
-                                .tertiaryContainer
-                                .withValues(alpha: 0.9)),
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              ColorFiltered(
-                                colorFilter:
-                                    trackingProvider.connectionStatus !=
-                                            ConnectionStatus.connected
-                                        ? ColorFilterX.grayscale()
-                                        : const ColorFilter.mode(
-                                            Colors.transparent,
-                                            BlendMode.dst,
-                                          ),
-                                child: Image.asset(
-                                  trackingProvider.lineType == LineType.bus ||
-                                          trackingProvider.lineType ==
-                                              LineType.unknown ||
-                                          trackingProvider.lineType == null
-                                      ? "assets/bus.png"
-                                      : "assets/train.png",
-                                  height: 50 * animation.value,
-                                ),
-                              ),
-                              if (trackingProvider.connectionStatus ==
-                                  ConnectionStatus.connecting)
-                                SizedBox(
-                                  width: 40 * animation.value,
-                                  height: 40 * animation.value,
-                                  child: CircularProgressIndicator(
-                                    color:
-                                        Theme.of(context).colorScheme.primary,
-                                    strokeWidth: 3,
-                                  ),
-                                ),
-                            ],
-                          ),
-                        ));
-                  })
+                  builder: (_, animation) => Transform.scale(
+                        scale: animation.value,
+                        child: _VehicleMarker(tracking: trackingProvider),
+                      ))
           ]);
         },
       );
     });
+  }
+}
+
+/// The vehicle itself: the line's own icon on a filled disc, ringed against the
+/// map so it stays legible over both tiles and the drawn route.
+class _VehicleMarker extends StatelessWidget {
+  const _VehicleMarker({required this.tracking});
+
+  final TrackingProvider tracking;
+
+  /// The icon the rest of the app already uses for this line, so the marker
+  /// matches the departure cards and the tracking sheet.
+  IconData get _icon {
+    final code = tracking.routeCode;
+    if (code != null) return getIconDataFromLineCode(code);
+    return switch (tracking.lineType) {
+      LineType.train => Icons.train,
+      LineType.metro => Icons.subway_outlined,
+      _ => Icons.directions_bus,
+    };
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final connected = tracking.connectionStatus == ConnectionStatus.connected;
+
+    // The line's own colour, in the same variant the route is drawn in, so the
+    // vehicle reads as belonging to the route under it. Watched rather than
+    // read so a direction switch recolours the marker even between fixes.
+    // Falls back to the theme when no route is on the map.
+    final line =
+        context.watch<MapProvider>().basePolyline(colors.brightness)?.color;
+    final accent =
+        ColorUtils.saturate(line ?? colors.tertiary, _fillSaturation);
+
+    // Muted while the socket is down: the marker is still where the bus was
+    // last seen, and should not read as a live position.
+    final fill = connected ? accent : colors.outline;
+    final onFill = ThemeData.estimateBrightnessForColor(fill) == Brightness.dark
+        ? Colors.white
+        : Colors.black;
+
+    return SizedBox.square(
+      dimension: _markerSize + _ringWidth * 2,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Container(
+            width: _markerSize,
+            height: _markerSize,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: fill,
+              border: Border.all(color: colors.surface, width: _ringWidth),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.25),
+                  blurRadius: 6,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: Icon(_icon, color: onFill, size: _markerSize / 2),
+          ),
+          // Sits outside the disc rather than over the icon, so the vehicle
+          // stays readable while the connection is being established.
+          if (tracking.connectionStatus == ConnectionStatus.connecting)
+            SizedBox.square(
+              dimension: _markerSize + _ringWidth * 2,
+              child: CircularProgressIndicator(
+                color: accent,
+                strokeWidth: _ringWidth,
+              ),
+            ),
+        ],
+      ),
+    );
   }
 }
