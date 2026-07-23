@@ -174,4 +174,15 @@ class LocalStorageApi {
   static Future setNotificationChannel(String channel) async {
     await _preferences!.setString("notificationChannel", channel);
   }
+
+  /// Whether the leftovers of the map tile caches used before flutter_map's
+  /// built-in caching have already been deleted.
+  static bool legacyMapCachesCleared() {
+    return _preferences!.getBool("legacyMapCachesCleared") ?? false;
+  }
+
+  /// Records whether the legacy map tile caches have been deleted.
+  static Future setLegacyMapCachesCleared(bool cleared) async {
+    await _preferences!.setBool("legacyMapCachesCleared", cleared);
+  }
 }

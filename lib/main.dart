@@ -1,7 +1,9 @@
+import 'dart:async';
+
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_map_tile_caching/flutter_map_tile_caching.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'package:provider/provider.dart';
 import 'package:via_mallorca/apis/local_storage.dart';
 import 'package:via_mallorca/apis/notification.dart';
@@ -15,6 +17,7 @@ import 'package:via_mallorca/providers/notifications_provider.dart';
 import 'package:via_mallorca/providers/theme_provider.dart';
 import 'package:via_mallorca/providers/tracking_provider.dart';
 import 'package:via_mallorca/localization/generated/app_localizations.dart';
+import 'package:via_mallorca/utils/legacy_map_cache_cleanup.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -33,14 +36,19 @@ void main() async {
     }
   }
 
-  /// Switched to another caching mechanism.
-  /// This is here to delete the cached tiles from the old caching mechanism.
-  try {
-    await FMTCObjectBoxBackend().initialise();
-    await FMTCStore('mapStore').manage.reset();
-  } catch (e) {
-    debugPrint("Error deleting old cache: $e");
-  }
+  /// Configures flutter_map's built-in tile cache. Must happen before the map
+  /// loads its first tile, otherwise the defaults are locked in.
+  ///
+  /// [overrideFreshAge] is what makes the map usable offline: without it, tiles
+  /// are only served from disk while the server's own `max-age` holds, and once
+  /// stale they are re-requested rather than reused. OSM tiles for a single
+  /// island barely change, so a month of staleness is a fine trade.
+  BuiltInMapCachingProvider.getOrCreateInstance(
+    maxCacheSize: 200 * 1024 * 1024,
+    overrideFreshAge: const Duration(days: 30),
+  );
+
+  unawaited(clearLegacyMapCaches());
 
   runApp(ViaMallorca());
 }

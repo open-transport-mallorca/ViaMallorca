@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:flutter_map_cancellable_tile_provider/flutter_map_cancellable_tile_provider.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -42,6 +41,12 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
   final QuickActions quickActions = QuickActions();
   List<ConnectivityResult> connectivityResults = [];
   late StreamSubscription<List<ConnectivityResult>> connectivitySubscription;
+
+  /// Held here rather than built inline, because each instance owns an HTTP
+  /// client that only `TileLayer.dispose` ever closes. Rebuilding the map -
+  /// which happens on every tracking update - would otherwise leak a client and
+  /// its connection pool each time, until requests to the tile server stall.
+  final NetworkTileProvider tileProvider = NetworkTileProvider();
 
   @override
   void initState() {
@@ -175,7 +180,10 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                   TileLayer(
                       retinaMode: RetinaMode.isHighDensity(context) &&
                           connectivityResults.contains(ConnectivityResult.wifi),
-                      tileProvider: CancellableNetworkTileProvider(),
+                      // Caches tiles to disk and aborts requests for tiles
+                      // pruned mid-flight. Both are built in and on by default,
+                      // configured in `main`.
+                      tileProvider: tileProvider,
                       tileBuilder:
                           Theme.of(context).brightness == Brightness.dark
                               ? (context, tileWidget, tile) =>

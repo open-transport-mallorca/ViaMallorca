@@ -5,7 +5,6 @@ import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:mallorca_transit_services/mallorca_transit_services.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:via_mallorca/apis/location.dart';
 import 'package:via_mallorca/cache/cache_manager.dart';
@@ -15,14 +14,12 @@ import 'package:via_mallorca/providers/map_provider.dart';
 class MapViewModel extends ChangeNotifier with WidgetsBindingObserver {
   List<Station> _cachedStations = [];
   LocationPermission _locationPermission = LocationPermission.denied;
-  String? cacheDirectory;
   final StreamController<double?> alignPositionStreamController =
       StreamController<double?>.broadcast();
   AlignOnUpdate alignPositionOnUpdate = AlignOnUpdate.never;
 
   List<Station> get cachedStations => _cachedStations;
   LocationPermission get locationPermission => _locationPermission;
-  String? get cacheDir => cacheDirectory;
 
   Future<void> initialize(BuildContext context, TickerProvider vsync) async {
     context
@@ -45,7 +42,6 @@ class MapViewModel extends ChangeNotifier with WidgetsBindingObserver {
       );
     }
 
-    cacheDirectory = await _getCachePath();
     notifyListeners();
   }
 
@@ -82,10 +78,5 @@ class MapViewModel extends ChangeNotifier with WidgetsBindingObserver {
     /// This will move the map to the current location
     /// and set the zoom level to 16
     alignPositionStreamController.add(16);
-  }
-
-  Future<String> _getCachePath() async {
-    final cacheDirectory = await getTemporaryDirectory();
-    return cacheDirectory.path;
   }
 }
