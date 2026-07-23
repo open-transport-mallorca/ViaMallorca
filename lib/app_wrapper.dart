@@ -3,12 +3,12 @@ import 'package:provider/provider.dart';
 import 'package:via_mallorca/components/app_bar.dart';
 import 'package:via_mallorca/components/bottom_bar.dart';
 import 'package:via_mallorca/components/bottom_sheets/pending_notifications.dart';
-import 'package:via_mallorca/components/settings_popup.dart';
 import 'package:via_mallorca/providers/navigation_provider.dart';
 import 'package:via_mallorca/providers/notifications_provider.dart';
 import 'package:via_mallorca/screens/map/map_view.dart';
 import 'package:via_mallorca/screens/nearby/nearby_view.dart';
 import 'package:via_mallorca/screens/routes/routes_view.dart';
+import 'package:via_mallorca/screens/settings/settings_view.dart';
 import 'package:via_mallorca/screens/stations/stations_view.dart';
 
 class AppWrapper extends StatelessWidget {
@@ -31,7 +31,12 @@ class AppWrapper extends StatelessWidget {
                             builder: (context) => NotificationsView())
                       },
                   icon: Icon(Icons.notifications)),
-            SettingsPopup(),
+            IconButton(
+                onPressed: () => Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const SettingsScreen())),
+                icon: const Icon(Icons.settings)),
           ]),
           bottomNavigationBar: const BottomNavigation(),
           body: IndexedStack(

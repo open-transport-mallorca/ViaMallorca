@@ -3,85 +3,97 @@ import 'package:provider/provider.dart';
 import 'package:via_mallorca/providers/theme_provider.dart';
 import 'package:via_mallorca/localization/generated/app_localizations.dart';
 
-/// A widget that allows the user to pick a theme.
-class ThemePicker extends StatefulWidget {
+/// A row of buttons that allows the user to pick a theme.
+///
+/// The buttons share the width they are given rather than being fixed size, so
+/// the row sits inline on the settings page without overflowing on narrow
+/// screens or in languages with long labels.
+class ThemePicker extends StatelessWidget {
   const ThemePicker({super.key});
 
   @override
-  State<ThemePicker> createState() => _ThemePickerState();
-}
-
-class _ThemePickerState extends State<ThemePicker> {
-  @override
   Widget build(BuildContext context) {
     return Consumer<ThemeProvider>(builder: (context, themeProvider, _) {
-      return Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(AppLocalizations.of(context)!.theme,
-                style:
-                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _buildThemeButton(
-                    AppLocalizations.of(context)!.light,
-                    Icons.light_mode,
-                    themeProvider.themeMode == ThemeMode.light,
-                    () => themeProvider.themeMode = ThemeMode.light),
-                _buildThemeButton(
-                    AppLocalizations.of(context)!.dark,
-                    Icons.dark_mode,
-                    themeProvider.themeMode == ThemeMode.dark,
-                    () => themeProvider.themeMode = ThemeMode.dark),
-                _buildThemeButton(
-                    AppLocalizations.of(context)!.system,
-                    Icons.brightness_4,
-                    themeProvider.themeMode == ThemeMode.system,
-                    () => themeProvider.themeMode = ThemeMode.system),
-              ],
+      final localizations = AppLocalizations.of(context)!;
+      return Row(
+        children: [
+          Expanded(
+            child: _ThemeButton(
+              label: localizations.light,
+              icon: Icons.light_mode,
+              isSelected: themeProvider.themeMode == ThemeMode.light,
+              onPressed: () => themeProvider.themeMode = ThemeMode.light,
             ),
-            const SizedBox(height: 16)
-          ],
-        ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: _ThemeButton(
+              label: localizations.dark,
+              icon: Icons.dark_mode,
+              isSelected: themeProvider.themeMode == ThemeMode.dark,
+              onPressed: () => themeProvider.themeMode = ThemeMode.dark,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: _ThemeButton(
+              label: localizations.system,
+              icon: Icons.brightness_4,
+              isSelected: themeProvider.themeMode == ThemeMode.system,
+              onPressed: () => themeProvider.themeMode = ThemeMode.system,
+            ),
+          ),
+        ],
       );
     });
   }
+}
 
-  /// Builds a theme button with the given label, icon, and onPressed callback.
-  Widget _buildThemeButton(
-      String label, IconData icon, bool isSelected, VoidCallback onPressed) {
+/// A single theme option, highlighted with a border while it is the active one.
+class _ThemeButton extends StatelessWidget {
+  const _ThemeButton({
+    required this.label,
+    required this.icon,
+    required this.isSelected,
+    required this.onPressed,
+  });
+
+  final String label;
+  final IconData icon;
+  final bool isSelected;
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
     return Material(
-      color: Theme.of(context).colorScheme.secondaryContainer,
+      color: colors.secondaryContainer,
       borderRadius: BorderRadius.circular(8),
       child: InkWell(
         onTap: onPressed,
         borderRadius: BorderRadius.circular(8),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
-          height: 100,
-          width: 100,
+          height: 84,
+          padding: const EdgeInsets.symmetric(horizontal: 4),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(8),
             border: isSelected
-                ? Border.all(
-                    color: Theme.of(context).colorScheme.secondary, width: 4)
+                ? Border.all(color: colors.secondary, width: 4)
                 : null,
           ),
-          child: Row(
+          child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon,
-                  color: Theme.of(context).colorScheme.onSecondaryContainer),
-              const SizedBox(width: 4),
-              Text(label,
-                  style: TextStyle(
-                      color:
-                          Theme.of(context).colorScheme.onSecondaryContainer)),
+              Icon(icon, color: colors.onSecondaryContainer),
+              const SizedBox(height: 4),
+              Text(
+                label,
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(color: colors.onSecondaryContainer),
+              ),
             ],
           ),
         ),
