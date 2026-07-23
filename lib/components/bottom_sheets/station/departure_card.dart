@@ -418,13 +418,37 @@ class DepartureCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(AppLocalizations.of(context)!.dischargeOnlyDialogSubtitle),
-              CheckboxListTile(
-                value: dontAskAgain,
-                onChanged: (value) =>
-                    setState(() => dontAskAgain = value ?? false),
-                contentPadding: EdgeInsets.zero,
-                controlAffinity: ListTileControlAffinity.leading,
-                title: Text(AppLocalizations.of(context)!.dontShowAgain),
+              const SizedBox(height: 12),
+              // Deliberately quieter than the warning itself: the whole row is
+              // tappable so the target stays comfortable, but the control is
+              // sized and coloured as an aside rather than as a second question.
+              InkWell(
+                onTap: () => setState(() => dontAskAgain = !dontAskAgain),
+                borderRadius: BorderRadius.circular(4),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: Checkbox(
+                        value: dontAskAgain,
+                        onChanged: (value) =>
+                            setState(() => dontAskAgain = value ?? false),
+                        visualDensity: VisualDensity.compact,
+                        materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      AppLocalizations.of(context)!.dontShowAgain,
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color:
+                                Theme.of(context).colorScheme.onSurfaceVariant,
+                          ),
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
