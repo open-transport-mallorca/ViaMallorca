@@ -192,5 +192,29 @@
         "type": "int"
       }
     }
-  }
+  },
+  "licenses": "Licenses",
+  "notAffiliated": "Via Mallorca is an independent, open-source project. It is not affiliated with, endorsed by, or run by any transport operator or public administration.",
+  "transitDataTitle": "Transit data",
+  "transitDataBody": "Stops, lines, timetables and live bus positions come from the public open data of Mallorca's transport consortium. This data is not owned by Via Mallorca: it belongs to its authors, and the app fetches it dynamically, exactly as published.",
+  "mapDataTitle": "Map data",
+  "mapDataBody": "The map and its tiles are provided by OpenStreetMap and its contributors.",
+  "thisAppTitle": "This app",
+  "thisAppBody": "The Via Mallorca app itself is free and open source. You are welcome to read the code, report issues, or contribute.",
+  "licensedBy": "By {author} - {license}",
+  "@licensedBy": {
+    "placeholders": {
+      "author": {
+        "type": "String"
+      },
+      "license": {
+        "type": "String"
+      }
+    }
+  },
+  "openDataPortal": "Open data portal",
+  "viewLicense": "View license",
+  "sourceCode": "Source code",
+  "openSourceLicenses": "Open-source licenses",
+  "openSourceLicensesSubtitle": "Licenses of the libraries used in this app"
 }

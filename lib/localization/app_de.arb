@@ -114,5 +114,29 @@
   "dischargeOnlyDialogSubtitle": "An dieser Haltestelle lässt dieser Bus nur Fahrgäste aussteigen, du kannst hier also nicht einsteigen. Trotzdem verfolgen?",
   "departures": "Abfahrten",
   "openInMaps": "In Karten öffnen",
-  "stopCount": "{count, plural, =0{keine Haltestellen} one{1 Haltestelle} other{{count} Haltestellen}}"
+  "stopCount": "{count, plural, =0{keine Haltestellen} one{1 Haltestelle} other{{count} Haltestellen}}",
+  "licenses": "Lizenzen",
+  "notAffiliated": "Via Mallorca ist ein unabhängiges Open-Source-Projekt. Es steht in keiner Verbindung zu einem Verkehrsunternehmen oder einer Behörde und wird von diesen weder unterstützt noch betrieben.",
+  "transitDataTitle": "Verkehrsdaten",
+  "transitDataBody": "Haltestellen, Linien, Fahrpläne und Live-Positionen der Busse stammen aus den offenen Daten des mallorquinischen Verkehrsverbunds. Diese Daten gehören nicht Via Mallorca, sondern ihren Urhebern; die App ruft sie dynamisch und unverändert ab.",
+  "mapDataTitle": "Kartendaten",
+  "mapDataBody": "Die Karte und ihre Kacheln stammen von OpenStreetMap und seinen Mitwirkenden.",
+  "thisAppTitle": "Diese App",
+  "thisAppBody": "Die App Via Mallorca selbst ist frei und quelloffen. Du kannst gerne den Code lesen, Fehler melden oder mitwirken.",
+  "licensedBy": "Von {author} - {license}",
+  "@licensedBy": {
+    "placeholders": {
+      "author": {
+        "type": "String"
+      },
+      "license": {
+        "type": "String"
+      }
+    }
+  },
+  "openDataPortal": "Open-Data-Portal",
+  "viewLicense": "Lizenz ansehen",
+  "sourceCode": "Quellcode",
+  "openSourceLicenses": "Open-Source-Lizenzen",
+  "openSourceLicensesSubtitle": "Lizenzen der in dieser App verwendeten Bibliotheken"
 }

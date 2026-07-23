@@ -4,6 +4,7 @@ import 'package:flutter_material_design_icons/flutter_material_design_icons.dart
 import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:via_mallorca/apis/local_storage.dart';
+import 'package:via_mallorca/screens/licenses/licenses_view.dart';
 import 'package:via_mallorca/settings/locale_picker.dart';
 import 'package:via_mallorca/settings/theme_picker.dart';
 import 'package:via_mallorca/localization/generated/app_localizations.dart';
@@ -53,6 +54,13 @@ class _SettingsPopupState extends State<SettingsPopup> {
                 )),
         ],
         PopupMenuItem(
+          value: 'licenses',
+          child: ListTile(
+            title: Text(AppLocalizations.of(context)!.licenses),
+            leading: const Icon(Icons.description_outlined),
+          ),
+        ),
+        PopupMenuItem(
             value: 'github',
             child: ListTile(
               title: const Text("GitHub"),
@@ -88,6 +96,14 @@ class _SettingsPopupState extends State<SettingsPopup> {
 
           case 'inprecise_notifications':
             await LocalStorageApi.setUseInexactNotifications(true);
+            break;
+
+          case 'licenses':
+            if (!context.mounted) return;
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => const LicensesScreen()));
             break;
 
           case 'github':
