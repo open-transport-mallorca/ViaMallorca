@@ -16,6 +16,7 @@ dependencies:
   intl: any
   flutter_local_notifications: ^21.0.0
   flutter_map: ^8.3.0
+  http: ^1.6.0 # Owns the map tile provider's client, see `map_view.dart`
   flutter_map_marker_cluster: ^8.2.2
   latlong2: ^0.9.1
   permission_handler: ^12.0.1

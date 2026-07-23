@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/retry.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 import 'package:quick_actions/quick_actions.dart';
@@ -14,7 +16,6 @@ import 'package:via_mallorca/cache/cache_manager.dart';
 import 'package:via_mallorca/components/bottom_sheets/station/station_view.dart';
 import 'package:via_mallorca/components/map/bus_info.dart';
 import 'package:via_mallorca/components/map/bus_tracker.dart';
-import 'package:via_mallorca/components/map/loading_overlay.dart';
 import 'package:via_mallorca/components/map/route_way_switcher.dart';
 import 'package:via_mallorca/components/map/tracked_route_polylines.dart';
 import 'package:via_mallorca/components/map/untrack_buttons.dart';
@@ -42,11 +43,19 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
   List<ConnectivityResult> connectivityResults = [];
   late StreamSubscription<List<ConnectivityResult>> connectivitySubscription;
 
-  /// Held here rather than built inline, because each instance owns an HTTP
-  /// client that only `TileLayer.dispose` ever closes. Rebuilding the map -
-  /// which happens on every tracking update - would otherwise leak a client and
-  /// its connection pool each time, until requests to the tile server stall.
-  final NetworkTileProvider tileProvider = NetworkTileProvider();
+  /// The tile provider, and the HTTP client behind it, belong to this state
+  /// rather than to the `TileLayer`.
+  ///
+  /// A provider left to create its own client has that client closed by
+  /// `TileLayer.dispose`, and a closed client fails every later tile request as
+  /// a silent transparent tile - a blank map with nothing in the logs. Since
+  /// this provider outlives any single layer, the client is passed in so that
+  /// ownership stays here and disposal cannot reach it.
+  ///
+  /// Matches the client flutter_map would have built for itself.
+  late final http.Client _tileHttpClient = RetryClient(http.Client());
+  late final NetworkTileProvider tileProvider =
+      NetworkTileProvider(httpClient: _tileHttpClient);
 
   @override
   void initState() {
@@ -75,6 +84,7 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
   @override
   void dispose() {
     connectivitySubscription.cancel();
+    _tileHttpClient.close();
     super.dispose();
   }
 
@@ -153,14 +163,10 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
           builder: (context, mapProvider, trackingProvider, _) {
         return Consumer<MapViewModel>(
           builder: (context, viewModel, _) {
-            if (mapProvider.loadingProgress < 1.0) {
-              return Center(
-                child: CircularProgressIndicator(
-                  value: mapProvider.loadingProgress,
-                ),
-              );
-            }
-
+            // The map stays in the tree and interactive at all times, including
+            // while a route loads. Swapping it out for a loading indicator
+            // would dispose the `TileLayer`, which permanently closes the tile
+            // provider's HTTP client, and would lose the camera position.
             return Stack(children: [
               FlutterMap(
                 mapController: mapProvider.mapController!.mapController,
@@ -242,7 +248,6 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                   alignment: Alignment.bottomRight,
                   child: UpdateLocationButtons()),
 
-              if (mapProvider.loadingProgress < 1) LoadingOverlay()
             ]);
           },
         );
