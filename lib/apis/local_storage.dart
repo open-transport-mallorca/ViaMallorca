@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+/// The units distances are shown in.
+///
+/// Mallorca is signposted in metric, but a large share of the app's users are
+/// visitors from countries that are not.
+enum DistanceUnits { metric, imperial }
+
 /// API for local storage.
 ///
 /// This class is used to store data locally on the device.
@@ -173,6 +179,78 @@ class LocalStorageApi {
   ///  The [channel] parameter specifies the notification channel to be set.
   static Future setNotificationChannel(String channel) async {
     await _preferences!.setString("notificationChannel", channel);
+  }
+
+  /// The units distances are shown in. Defaults to metric, as Mallorca is.
+  static DistanceUnits getDistanceUnits() {
+    final units = _preferences!.getString('distanceUnits');
+    return DistanceUnits.values.firstWhere(
+      (value) => value.name == units,
+      orElse: () => DistanceUnits.metric,
+    );
+  }
+
+  /// Sets the units distances are shown in.
+  static Future setDistanceUnits(DistanceUnits units) async {
+    await _preferences!.setString('distanceUnits', units.name);
+  }
+
+  /// The tab the app opens on, as an index into the bottom navigation bar.
+  ///
+  /// Clamped on read so a tab index saved by a version with more tabs cannot
+  /// leave the app opening on a screen that no longer exists.
+  static int getStartupTab(int tabCount) {
+    final index = _preferences!.getInt('startupTab') ?? 0;
+    return index.clamp(0, tabCount - 1);
+  }
+
+  /// Sets the tab the app opens on.
+  static Future setStartupTab(int index) async {
+    await _preferences!.setInt('startupTab', index);
+  }
+
+  /// How many stops the nearby screen lists.
+  static int getNearbyStopCount() {
+    return _preferences!.getInt('nearbyStopCount') ?? 5;
+  }
+
+  /// Sets how many stops the nearby screen lists.
+  static Future setNearbyStopCount(int count) async {
+    await _preferences!.setInt('nearbyStopCount', count);
+  }
+
+  /// How many minutes before a departure a reminder is scheduled by default.
+  ///
+  /// Only a starting point for the picker in the departure dialog, which
+  /// narrows it to what the time left before that particular departure allows.
+  static int getNotificationLeadTime() {
+    return _preferences!.getInt('notificationLeadTime') ?? 5;
+  }
+
+  /// Sets the default number of minutes before a departure to be reminded.
+  static Future setNotificationLeadTime(int minutes) async {
+    await _preferences!.setInt('notificationLeadTime', minutes);
+  }
+
+  /// Whether to confirm before tracking a bus from a stop where it only lets
+  /// passengers off.
+  static bool showDischargeOnlyWarning() {
+    return _preferences!.getBool('showDischargeOnlyWarning') ?? true;
+  }
+
+  /// Sets whether to confirm before tracking a drop-off only departure.
+  static Future setShowDischargeOnlyWarning(bool show) async {
+    await _preferences!.setBool('showDischargeOnlyWarning', show);
+  }
+
+  /// Whether to hold the screen awake while a bus is being tracked.
+  static bool keepScreenOnWhileTracking() {
+    return _preferences!.getBool('keepScreenOnWhileTracking') ?? false;
+  }
+
+  /// Sets whether to hold the screen awake while tracking.
+  static Future setKeepScreenOnWhileTracking(bool keepOn) async {
+    await _preferences!.setBool('keepScreenOnWhileTracking', keepOn);
   }
 
   /// Whether the leftovers of the map tile caches used before flutter_map's

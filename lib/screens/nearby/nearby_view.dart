@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:mallorca_transit_services/mallorca_transit_services.dart';
 import 'package:provider/provider.dart';
 import 'package:via_mallorca/components/popups/location_denied_popup.dart';
 import 'package:via_mallorca/components/skeletons/nearby_card_skeleton.dart';
 import 'package:via_mallorca/components/station_line_labels/station_line_labels_view.dart';
 import 'package:via_mallorca/providers/favorites_provider.dart';
+import 'package:via_mallorca/providers/settings_provider.dart';
 import 'package:via_mallorca/screens/nearby/nearby_viewmodel.dart';
 import 'package:via_mallorca/screens/station_details/station_details_view.dart';
 import 'package:via_mallorca/localization/generated/app_localizations.dart';
@@ -48,18 +50,25 @@ class NearbyStops extends StatelessWidget {
                           LocationPermission.always ||
                       viewModel.locationPermission ==
                           LocationPermission.whileInUse)
-                    Expanded(
-                      child: ListView.builder(
-                        itemCount: viewModel.isLoading
-                            ? 5
-                            : viewModel.nearbyStations.length,
-                        itemBuilder: (context, index) {
-                          if (viewModel.isLoading) {
-                            return const NearbyCardSkeleton();
-                          }
-                          return nearbyCard(viewModel, index, context);
-                        },
-                      ),
+                    Consumer<SettingsProvider>(
+                      builder: (context, settings, _) {
+                        final stations = viewModel.stationsByDistance
+                            .take(settings.nearbyStopCount)
+                            .toList();
+                        return Expanded(
+                          child: ListView.builder(
+                            itemCount:
+                                viewModel.isLoading ? 5 : stations.length,
+                            itemBuilder: (context, index) {
+                              if (viewModel.isLoading) {
+                                return const NearbyCardSkeleton();
+                              }
+                              return nearbyCard(
+                                  viewModel, stations[index], context);
+                            },
+                          ),
+                        );
+                      },
                     )
                   else
                     locationNotLoaded(context, viewModel),
@@ -71,8 +80,7 @@ class NearbyStops extends StatelessWidget {
   }
 
   Widget nearbyCard(
-      NearbyStopsViewModel viewModel, int index, BuildContext context) {
-    final station = viewModel.nearbyStations[index];
+      NearbyStopsViewModel viewModel, Station station, BuildContext context) {
     String formattedDistance = '';
     if (viewModel.currentLocation != null) {
       int distanceInMeters = calculateDistance(
@@ -81,7 +89,7 @@ class NearbyStops extends StatelessWidget {
               lat2: station.lat,
               lon2: station.long)
           .round();
-      formattedDistance = MetricDistanceFormatter.formatDistance(
+      formattedDistance = DistanceFormatter.formatDistance(
           distanceInMeters.toDouble(), context);
     }
     return Consumer<FavoritesProvider>(

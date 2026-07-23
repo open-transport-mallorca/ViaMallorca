@@ -6,75 +6,65 @@ import 'package:via_mallorca/localization/generated/app_localizations.dart';
 import 'package:locale_names/locale_names.dart';
 
 /// A widget that allows the user to pick a locale.
-class LocalePicker extends StatefulWidget {
+///
+/// Sizes itself to its content, so as a bottom sheet it is only as tall as the
+/// list of languages needs, and scrolls instead of growing when that list is
+/// taller than the screen allows.
+class LocalePicker extends StatelessWidget {
   const LocalePicker({super.key});
 
-  @override
-  State<LocalePicker> createState() => _LocalePickerState();
-}
+  /// A null entry stands for the system locale, and leads the list.
+  static final List<Locale?> _options = [
+    null,
+    ...AppLocalizations.supportedLocales,
+  ];
 
-class _LocalePickerState extends State<LocalePicker> {
   @override
   Widget build(BuildContext context) {
     return Consumer<LocaleProvider>(
       builder: (context, localeProvider, _) {
         return Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            Text(
-              AppLocalizations.of(context)!.language,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 8),
+              child: Text(
+                AppLocalizations.of(context)!.language,
+                textAlign: TextAlign.center,
+                style:
+                    const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
             ),
-            const SizedBox(height: 16),
-            SizedBox(
-              height: 300,
+            Flexible(
               child: RadioGroup<Locale?>(
                 groupValue: localeProvider.locale,
                 onChanged: (value) => localeProvider.locale = value,
-                child: SingleChildScrollView(
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      // System locale
-                      ListTile(
-                        title: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            const Radio<Locale?>(value: null),
-                            const SizedBox(width: 8),
-                            Text(AppLocalizations.of(context)!.system),
-                          ],
-                        ),
-                        onTap: () => localeProvider.locale = null,
-                      ),
-
-                      // Supported locales
-                      ...AppLocalizations.supportedLocales.map((locale) {
-                        return ListTile(
-                          title: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Radio<Locale?>(value: locale),
-                              const SizedBox(width: 8),
-                              Text(
-                                Locale.fromSubtags(
-                                  languageCode: locale.languageCode,
-                                ).nativeDisplayLanguage.capitalize(),
-                              ),
-                            ],
-                          ),
-                          onTap: () => localeProvider.locale = locale,
-                        );
-                      }),
-                    ],
-                  ),
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: _options.length,
+                  itemBuilder: (context, index) {
+                    final locale = _options[index];
+                    return RadioListTile<Locale?>(
+                      value: locale,
+                      title: Text(_label(context, locale)),
+                    );
+                  },
                 ),
               ),
             ),
+            const SizedBox(height: 8),
           ],
         );
       },
     );
+  }
+
+  /// The language's name in its own language, or the system label for null.
+  static String _label(BuildContext context, Locale? locale) {
+    if (locale == null) return AppLocalizations.of(context)!.system;
+    return Locale.fromSubtags(languageCode: locale.languageCode)
+        .nativeDisplayLanguage
+        .capitalize();
   }
 }

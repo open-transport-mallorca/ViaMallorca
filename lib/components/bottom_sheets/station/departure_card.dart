@@ -13,6 +13,7 @@ import 'package:via_mallorca/localization/generated/app_localizations.dart';
 import 'package:via_mallorca/providers/favorites_provider.dart';
 import 'package:via_mallorca/providers/map_provider.dart';
 import 'package:via_mallorca/providers/notifications_provider.dart';
+import 'package:via_mallorca/providers/settings_provider.dart';
 import 'package:via_mallorca/providers/tracking_provider.dart';
 import 'package:via_mallorca/utils/distance_formatter.dart';
 import 'package:via_mallorca/utils/line_icon.dart';
@@ -305,8 +306,12 @@ class DepartureCard extends StatelessWidget {
                               borderRadius: BorderRadius.circular(12),
                               onTap: () async {
                                 // Boarding is not possible here, so make sure
-                                // the user knows before they follow this bus.
-                                if (isDischargeOnly) {
+                                // the user knows before they follow this bus -
+                                // unless they have asked not to be warned.
+                                if (isDischargeOnly &&
+                                    context
+                                        .read<SettingsProvider>()
+                                        .showDischargeOnlyWarning) {
                                   final confirmed =
                                       await confirmTrackDischargeOnly(context);
                                   if (confirmed != true) return;
@@ -372,7 +377,7 @@ class DepartureCard extends StatelessWidget {
                             ),
                           ),
                           Text(
-                            MetricDistanceFormatter.formatDistance(
+                            DistanceFormatter.formatDistance(
                                 calculateDistance(
                                     lon1: station.long,
                                     lat1: station.lat,
@@ -396,23 +401,49 @@ class DepartureCard extends StatelessWidget {
 
   /// Asks the user to confirm before tracking a bus they cannot board at this
   /// stop. Resolves to true only if they choose to track it anyway.
+  ///
+  /// The dialog carries its own "don't show again" checkbox: a suppression that
+  /// could only be enabled from the settings page is one nobody would find
+  /// while being interrupted by the thing they want to suppress.
   Future<bool?> confirmTrackDischargeOnly(BuildContext context) {
+    final settings = Provider.of<SettingsProvider>(context, listen: false);
+    bool dontAskAgain = false;
     return showDialog<bool>(
       context: context,
-      builder: (context) => AlertDialog(
-        title: Text(AppLocalizations.of(context)!.dischargeOnlyDialogTitle),
-        content:
-            Text(AppLocalizations.of(context)!.dischargeOnlyDialogSubtitle),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text(AppLocalizations.of(context)!.cancel),
+      builder: (context) => StatefulBuilder(
+        builder: (context, setState) => AlertDialog(
+          title: Text(AppLocalizations.of(context)!.dischargeOnlyDialogTitle),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(AppLocalizations.of(context)!.dischargeOnlyDialogSubtitle),
+              CheckboxListTile(
+                value: dontAskAgain,
+                onChanged: (value) =>
+                    setState(() => dontAskAgain = value ?? false),
+                contentPadding: EdgeInsets.zero,
+                controlAffinity: ListTileControlAffinity.leading,
+                title: Text(AppLocalizations.of(context)!.dontShowAgain),
+              ),
+            ],
           ),
-          FilledButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: Text(AppLocalizations.of(context)!.track),
-          ),
-        ],
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text(AppLocalizations.of(context)!.cancel),
+            ),
+            FilledButton(
+              onPressed: () {
+                // Only honoured when they go ahead - ticking the box and then
+                // cancelling is not agreement to stop being warned.
+                if (dontAskAgain) settings.showDischargeOnlyWarning = false;
+                Navigator.of(context).pop(true);
+              },
+              child: Text(AppLocalizations.of(context)!.track),
+            ),
+          ],
+        ),
       ),
     );
   }

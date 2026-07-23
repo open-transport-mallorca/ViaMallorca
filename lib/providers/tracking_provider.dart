@@ -3,7 +3,9 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:mallorca_transit_services/mallorca_transit_services.dart';
+import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:web_socket_channel/web_socket_channel.dart';
+import 'package:via_mallorca/apis/local_storage.dart';
 
 enum ConnectionStatus {
   disconnected,
@@ -102,6 +104,7 @@ class TrackingProvider extends ChangeNotifier with WidgetsBindingObserver {
     await stopTracking();
     WidgetsBinding.instance.addObserver(this);
     _isTracking = true;
+    await refreshWakelock();
 
     // Restore the last known position before announcing the new status: the
     // status change is what notifies listeners, and until they have a position
@@ -185,9 +188,23 @@ class TrackingProvider extends ChangeNotifier with WidgetsBindingObserver {
     );
   }
 
+  /// Holds the screen awake for as long as a bus is being followed, if the user
+  /// asked for that.
+  ///
+  /// Watching a bus approach is the one thing this app is used for with the
+  /// screen on and untouched, which is exactly when the display times out.
+  /// Called again when the preference changes so it takes effect mid-trip.
+  Future<void> refreshWakelock() async {
+    final shouldHold =
+        _isTracking && LocalStorageApi.keepScreenOnWhileTracking();
+    if (await WakelockPlus.enabled == shouldHold) return;
+    await WakelockPlus.toggle(enable: shouldHold);
+  }
+
   Future<void> stopTracking() async {
     WidgetsBinding.instance.removeObserver(this);
     _isTracking = false;
+    await refreshWakelock();
 
     await _locationStream?.cancel();
     _locationStream = null;

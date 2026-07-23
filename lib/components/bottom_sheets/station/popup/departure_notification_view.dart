@@ -14,6 +14,7 @@ import 'package:via_mallorca/components/bottom_sheets/station/popup/departure_no
 import 'package:timezone/timezone.dart' as tz;
 import 'package:via_mallorca/localization/generated/app_localizations.dart';
 import 'package:via_mallorca/providers/notifications_provider.dart';
+import 'package:via_mallorca/providers/settings_provider.dart';
 
 class DepartureNotification extends StatelessWidget {
   const DepartureNotification(
@@ -120,7 +121,8 @@ class DepartureNotification extends StatelessWidget {
     return MediaQuery(
       data: MediaQuery.of(context).copyWith(textScaler: TextScaler.noScaling),
       child: ChangeNotifierProvider(
-        create: (_) => DepartureNotificationViewModel(departure),
+        create: (context) => DepartureNotificationViewModel(
+            departure, context.read<SettingsProvider>().notificationLeadTime),
         child: Consumer<DepartureNotificationViewModel>(
             builder: (context, viewModel, child) {
           return Consumer<NotificationsProvider>(
@@ -143,8 +145,8 @@ class DepartureNotification extends StatelessWidget {
                       NumberPicker(
                         haptics: true,
                         itemWidth: 60,
-                        minValue: 2,
-                        maxValue: viewModel.departureInMinutes - 1,
+                        minValue: SettingsProvider.minNotificationLeadTime,
+                        maxValue: viewModel.maxLeadTime,
                         value: viewModel.timeBeforeDeparture,
                         onChanged: (value) {
                           viewModel.setTimeBeforeDeparture(value);

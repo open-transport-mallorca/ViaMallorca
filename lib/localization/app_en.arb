@@ -220,5 +220,42 @@
   "viewLicense": "View license",
   "sourceCode": "Source code",
   "openSourceLicenses": "Open-source licenses",
-  "openSourceLicensesSubtitle": "Licenses of the libraries used in this app"
+  "openSourceLicensesSubtitle": "Licenses of the libraries used in this app",
+  "general": "General",
+  "tracking": "Tracking",
+  "startupTab": "Open the app on",
+  "distanceUnits": "Distance units",
+  "metric": "Metric (m, km)",
+  "imperial": "Imperial (ft, mi)",
+  "nearbyStopCount": "Nearby stops shown",
+  "nearbyStopCountValue": "{count, plural, one{1 stop} other{{count} stops}}",
+  "@nearbyStopCountValue": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "defaultReminderTime": "Default reminder time",
+  "defaultReminderTimeDescription": "How much warning new departure reminders are set for. Shortened automatically when a bus is leaving sooner than that.",
+  "minutesBeforeValue": "{count, plural, one{1 minute before} other{{count} minutes before}}",
+  "@minutesBeforeValue": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dontShowAgain": "Don't show this again",
+  "warnDropOffOnly": "Warn about drop-off only stops",
+  "warnDropOffOnlyDescription": "Confirm before tracking a bus from a stop where you cannot board it.",
+  "keepScreenOn": "Keep screen on while tracking",
+  "keepScreenOnDescription": "Stops the display turning off while you are following a bus.",
+  "storage": "Storage",
+  "clearCache": "Clear cached data",
+  "clearCacheDescription": "Stops, lines and map tiles saved on this device.",
+  "clearCacheDialogTitle": "Clear cached data?",
+  "clearCacheDialogSubtitle": "Stops, lines and map tiles will be downloaded again the next time they are needed. Your favourites and settings are not affected.",
+  "clear": "Clear",
+  "cacheCleared": "Cached data cleared"
 }

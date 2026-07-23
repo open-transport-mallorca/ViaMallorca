@@ -331,7 +331,7 @@ class _SublineTile extends StatelessWidget {
     final details = <String>[
       l10n.stopCount(subline.stations.length),
       if (subline.distance != null)
-        MetricDistanceFormatter.formatDistance(subline.distance!, context),
+        DistanceFormatter.formatDistance(subline.distance!, context),
     ].join(' · ');
 
     final IconData leadingIcon = !showWayLabel
