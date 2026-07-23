@@ -38,7 +38,15 @@ class MapViewModel extends ChangeNotifier with WidgetsBindingObserver {
       // Delay the location update to ensure the map is fully loaded
       Future.delayed(
         const Duration(seconds: 2),
-        () => context.mounted ? moveToCurrentLocation(context) : null,
+        () {
+          // A trip already being tracked when the map mounted owns the camera;
+          // the opening centre-on-me is a convenience and gives way to it.
+          if (!context.mounted ||
+              context.read<MapProvider>().followTrackedBus) {
+            return;
+          }
+          moveToCurrentLocation(context);
+        },
       );
     }
 
@@ -74,6 +82,14 @@ class MapViewModel extends ChangeNotifier with WidgetsBindingObserver {
       }
       return;
     }
+
+    if (!context.mounted) return;
+
+    // The camera can only serve one master. Recentring on the user gives up
+    // following the tracked bus, which reports no gesture when it moves the
+    // map and so would otherwise pull the camera straight back on the next
+    // frame, leaving this button looking broken.
+    context.read<MapProvider>().setFollowTrackedBus(false);
 
     /// This will move the map to the current location
     /// and set the zoom level to 16
