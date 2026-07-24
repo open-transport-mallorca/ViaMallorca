@@ -28,18 +28,18 @@ class StationViewModel extends ChangeNotifier {
 
   List<RouteLine>? _cachedLines;
 
-  Map<String, bool> _dischargeOnlyByLine = const {};
+  Map<String, StopRestriction> _restrictionByLine = const {};
 
   /// Returns the active lines that pass through the station.
   List<RouteLine> get activeLines =>
       (_cachedLines ?? []).where((line) => line.active).toList();
 
-  /// Whether the station is discharge-only - passengers may get off but not
-  /// board - on each line serving it, keyed by line code.
+  /// How boarding at this station is restricted on each line serving it, keyed
+  /// by line code.
   ///
-  /// Empty until [loadLines] completes; a missing key means the flag is
-  /// unknown for that line.
-  Map<String, bool> get dischargeOnlyByLine => _dischargeOnlyByLine;
+  /// Empty until [loadLines] completes; a missing key means the station either
+  /// boards normally on that line or the flags are unknown.
+  Map<String, StopRestriction> get restrictionByLine => _restrictionByLine;
 
   /// Returns whether the data has been loaded.
   bool get isDataLoaded => _cachedLines != null;
@@ -50,7 +50,7 @@ class StationViewModel extends ChangeNotifier {
 
     try {
       _cachedLines = await _fetchLines();
-      _dischargeOnlyByLine = _computeDischargeOnly(_cachedLines!);
+      _restrictionByLine = _computeRestrictions(_cachedLines!);
     } finally {
       // notifyListeners() is only called if the object is still valid
       if (!_isDisposed) {
@@ -95,12 +95,12 @@ class StationViewModel extends ChangeNotifier {
   /// No [Way] is passed: a departure names its line but not its subline, so
   /// every direction gets a say and a stop restricted in only one of them is
   /// left unreported rather than warned about.
-  Map<String, bool> _computeDischargeOnly(List<RouteLine> lines) {
-    final result = <String, bool>{};
+  Map<String, StopRestriction> _computeRestrictions(List<RouteLine> lines) {
+    final result = <String, StopRestriction>{};
     for (final line in lines) {
       final restriction = stopRestrictions(line)[station.id];
       if (restriction == null) continue;
-      result[line.code] = restriction == StopRestriction.dropOffOnly;
+      result[line.code] = restriction;
     }
     return result;
   }

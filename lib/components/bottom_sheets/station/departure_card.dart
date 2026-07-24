@@ -18,6 +18,7 @@ import 'package:via_mallorca/providers/tracking_provider.dart';
 import 'package:via_mallorca/utils/distance_formatter.dart';
 import 'package:via_mallorca/utils/line_icon.dart';
 import 'package:via_mallorca/utils/station_sort.dart';
+import 'package:via_mallorca/utils/stop_restrictions.dart';
 
 class DepartureCard extends StatelessWidget {
   const DepartureCard(
@@ -25,16 +26,18 @@ class DepartureCard extends StatelessWidget {
       required this.departure,
       required this.station,
       this.isHighlighted = false,
-      this.isDischargeOnly = false,
+      this.restriction,
       this.isTracked = false});
 
   final Departure departure;
   final Station station;
   final bool isHighlighted;
 
-  /// Whether this stop only lets passengers off this line - boarding here is
-  /// not possible, so the card says so.
-  final bool isDischargeOnly;
+  /// How boarding this line is restricted at this stop, or null when it is not.
+  ///
+  /// Either direction matters to a passenger standing here: a drop-off only
+  /// stop cannot be boarded, and a pick-up only stop cannot be alighted at.
+  final StopRestriction? restriction;
 
   /// Whether this departure is the trip currently being tracked, which outlines
   /// the card.
@@ -167,7 +170,8 @@ class DepartureCard extends StatelessWidget {
                           );
                         }),
 
-                        if (isDischargeOnly) _DischargeOnlyBadge(),
+                        if (restriction != null)
+                          _StopRestrictionBadge(restriction!),
 
                         // Subtitle content
                         Text(
@@ -253,6 +257,28 @@ class DepartureCard extends StatelessWidget {
                                           Theme.of(context).colorScheme.primary,
                                     ),
                                   ),
+                                // When the trip reaches its terminus, which is
+                                // what says whether this bus gets you there in
+                                // time. `endTime` carries no real date, so only
+                                // its clock time is meaningful.
+                                if (departure.endTime != null &&
+                                    departure.destination != null)
+                                  Text(
+                                    l10n.arrivesAt(
+                                        departure.destination!,
+                                        DateFormat.Hm()
+                                            .format(departure.endTime!)),
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      color: isHighlighted
+                                          ? Theme.of(context)
+                                              .colorScheme
+                                              .onPrimaryContainer
+                                          : Theme.of(context)
+                                              .colorScheme
+                                              .onSurfaceVariant,
+                                    ),
+                                  ),
                               ],
                             );
                           },
@@ -308,7 +334,8 @@ class DepartureCard extends StatelessWidget {
                                 // Boarding is not possible here, so make sure
                                 // the user knows before they follow this bus -
                                 // unless they have asked not to be warned.
-                                if (isDischargeOnly &&
+                                if (restriction ==
+                                        StopRestriction.dropOffOnly &&
                                     context
                                         .read<SettingsProvider>()
                                         .showDischargeOnlyWarning) {
@@ -521,11 +548,23 @@ class DepartureCard extends StatelessWidget {
   }
 }
 
-/// Marks a departure whose stop lets passengers off but not on.
-class _DischargeOnlyBadge extends StatelessWidget {
+/// Marks a departure whose stop only lets passengers off, or only lets them on.
+class _StopRestrictionBadge extends StatelessWidget {
+  const _StopRestrictionBadge(this.restriction);
+
+  final StopRestriction restriction;
+
   @override
   Widget build(BuildContext context) {
     final scheme = Theme.of(context).colorScheme;
+    final localizations = AppLocalizations.of(context)!;
+    final (icon, label) = switch (restriction) {
+      StopRestriction.dropOffOnly => (
+          Icons.exit_to_app,
+          localizations.dropOffOnly
+        ),
+      StopRestriction.pickUpOnly => (Icons.login, localizations.pickUpOnly),
+    };
     return Padding(
       padding: const EdgeInsets.only(top: 2, bottom: 2),
       child: Container(
@@ -538,10 +577,9 @@ class _DischargeOnlyBadge extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           spacing: 4,
           children: [
-            Icon(Icons.exit_to_app,
-                size: 14, color: scheme.onTertiaryContainer),
+            Icon(icon, size: 14, color: scheme.onTertiaryContainer),
             Text(
-              AppLocalizations.of(context)!.dropOffOnly,
+              label,
               style: TextStyle(fontSize: 12, color: scheme.onTertiaryContainer),
             ),
           ],

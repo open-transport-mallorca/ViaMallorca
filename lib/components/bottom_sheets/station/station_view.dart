@@ -9,6 +9,7 @@ import 'package:via_mallorca/components/bottom_sheets/station/departure_card.dar
 import 'package:via_mallorca/components/station_line_labels/station_line_labels_view.dart';
 import 'package:via_mallorca/components/station_line_labels/station_line_labels_viewmodel.dart';
 import 'package:via_mallorca/localization/generated/app_localizations.dart';
+import 'package:via_mallorca/components/warnings_summary_chip.dart';
 import 'package:via_mallorca/providers/favorites_provider.dart';
 import 'package:via_mallorca/providers/tracking_provider.dart';
 import 'station_viewmodel.dart';
@@ -197,51 +198,64 @@ class _StationSheetState extends State<StationSheet> {
     }
 
     final departures = viewModel.departures ?? [];
-    final dischargeOnly = context.watch<StationViewModel>().dischargeOnlyByLine;
+    final restrictions = context.watch<StationViewModel>().restrictionByLine;
     return RefreshIndicator(
       onRefresh: viewModel.fetchDepartures,
       child: ConstrainedBox(
         constraints:
             BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.5),
-        child: Skeletonizer(
-          enabled: departures.isEmpty,
-          child: ListView.separated(
-              separatorBuilder: (context, index) => const SizedBox(height: 8),
-              shrinkWrap: true,
-              itemCount: departures.isEmpty ? 5 : departures.length,
-              itemBuilder: (context, index) {
-                if (departures.isEmpty) {
-                  // Show a loading skeleton if there are no departures yet.
-                  return Card(
-                      color: Theme.of(context).colorScheme.surfaceContainerHigh,
-                      child: Padding(
-                          padding: const EdgeInsets.all(4.0),
-                          child: ListTile(
-                            leading: Icon(Icons.directions_bus),
-                            title: Text(AppLocalizations.of(context)!.loading,
-                                style: const TextStyle(fontSize: 20)),
-                            subtitle: Text(
-                              AppLocalizations.of(context)!.pleaseWait,
-                              style: const TextStyle(fontSize: 16),
-                            ),
-                            trailing: Icon(Icons.directions_bus),
-                          )));
-                }
-                Departure departure = departures[index];
-                return Consumer<TrackingProvider>(
-                    builder: (context, trackingProvider, _) {
-                  return DepartureCard(
-                    station: widget.station,
-                    departure: departure,
-                    isHighlighted:
-                        widget.highlightedDepartureId == departure.tripId,
-                    isDischargeOnly: dischargeOnly[departure.lineCode] == true,
-                    isTracked: departure.realTrip != null &&
-                        trackingProvider.trackingTripId ==
-                            departure.realTrip?.id,
-                  );
-                });
-              }),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            WarningsSummaryChip(
+                lineCodes: departures.map((d) => d.lineCode).toList()),
+            Flexible(
+              child: Skeletonizer(
+                enabled: departures.isEmpty,
+                child: ListView.separated(
+                    separatorBuilder: (context, index) =>
+                        const SizedBox(height: 8),
+                    shrinkWrap: true,
+                    itemCount: departures.isEmpty ? 5 : departures.length,
+                    itemBuilder: (context, index) {
+                      if (departures.isEmpty) {
+                        // Show a loading skeleton if there are no departures yet.
+                        return Card(
+                            color: Theme.of(context)
+                                .colorScheme
+                                .surfaceContainerHigh,
+                            child: Padding(
+                                padding: const EdgeInsets.all(4.0),
+                                child: ListTile(
+                                  leading: Icon(Icons.directions_bus),
+                                  title: Text(
+                                      AppLocalizations.of(context)!.loading,
+                                      style: const TextStyle(fontSize: 20)),
+                                  subtitle: Text(
+                                    AppLocalizations.of(context)!.pleaseWait,
+                                    style: const TextStyle(fontSize: 16),
+                                  ),
+                                  trailing: Icon(Icons.directions_bus),
+                                )));
+                      }
+                      Departure departure = departures[index];
+                      return Consumer<TrackingProvider>(
+                          builder: (context, trackingProvider, _) {
+                        return DepartureCard(
+                          station: widget.station,
+                          departure: departure,
+                          isHighlighted:
+                              widget.highlightedDepartureId == departure.tripId,
+                          restriction: restrictions[departure.lineCode],
+                          isTracked: departure.realTrip != null &&
+                              trackingProvider.trackingTripId ==
+                                  departure.realTrip?.id,
+                        );
+                      });
+                    }),
+              ),
+            ),
+          ],
         ),
       ),
     );

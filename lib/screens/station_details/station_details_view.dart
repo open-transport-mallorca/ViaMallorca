@@ -9,6 +9,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:via_mallorca/components/app_bar.dart';
 import 'package:via_mallorca/components/bottom_sheets/station/departure_card.dart';
 import 'package:via_mallorca/components/station_line_labels/station_line_labels_view.dart';
+import 'package:via_mallorca/components/warnings_summary_chip.dart';
 import 'package:via_mallorca/components/station_line_labels/station_line_labels_viewmodel.dart';
 import 'package:via_mallorca/localization/generated/app_localizations.dart';
 import 'package:via_mallorca/providers/favorites_provider.dart';
@@ -252,7 +253,7 @@ class _DeparturesSection extends StatelessWidget {
 
     final loaded = departures != null;
     final items = loaded ? departures : <Departure?>[null, null, null, null];
-    final dischargeOnly = context.watch<StationViewModel>().dischargeOnlyByLine;
+    final restrictions = context.watch<StationViewModel>().restrictionByLine;
 
     return _Section(
       title: l10n.departures,
@@ -261,6 +262,11 @@ class _DeparturesSection extends StatelessWidget {
         enabled: !loaded,
         child: Column(
           children: [
+            WarningsSummaryChip(
+                lineCodes: items
+                    .whereType<Departure>()
+                    .map((d) => d.lineCode)
+                    .toList()),
             for (final departure in items)
               Padding(
                 padding: const EdgeInsets.only(bottom: 8),
@@ -277,8 +283,7 @@ class _DeparturesSection extends StatelessWidget {
                     : DepartureCard(
                         station: station,
                         departure: departure,
-                        isDischargeOnly:
-                            dischargeOnly[departure.lineCode] == true,
+                        restriction: restrictions[departure.lineCode],
                       ),
               ),
           ],

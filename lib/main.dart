@@ -17,6 +17,7 @@ import 'package:via_mallorca/providers/theme_provider.dart';
 import 'package:via_mallorca/providers/tracking_provider.dart';
 import 'package:via_mallorca/localization/generated/app_localizations.dart';
 import 'package:via_mallorca/providers/settings_provider.dart';
+import 'package:via_mallorca/providers/warnings_provider.dart';
 import 'package:via_mallorca/utils/legacy_map_cache_cleanup.dart';
 import 'package:via_mallorca/utils/map_tile_cache.dart';
 
@@ -59,6 +60,7 @@ class ViaMallorca extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => LocaleProvider()),
         ChangeNotifierProvider(create: (context) => NotificationsProvider()),
         ChangeNotifierProvider(create: (context) => SettingsProvider()),
+        ChangeNotifierProvider(create: (context) => WarningsProvider()),
       ],
       child: DynamicColorBuilder(builder: (lightDynamic, darkDynamic) {
         return Consumer2<ThemeProvider, LocaleProvider>(

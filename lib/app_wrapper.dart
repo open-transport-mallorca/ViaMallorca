@@ -3,8 +3,12 @@ import 'package:provider/provider.dart';
 import 'package:via_mallorca/components/app_bar.dart';
 import 'package:via_mallorca/components/bottom_bar.dart';
 import 'package:via_mallorca/components/bottom_sheets/pending_notifications.dart';
+import 'package:via_mallorca/localization/generated/app_localizations.dart';
+import 'package:via_mallorca/providers/favorites_provider.dart';
 import 'package:via_mallorca/providers/navigation_provider.dart';
 import 'package:via_mallorca/providers/notifications_provider.dart';
+import 'package:via_mallorca/providers/warnings_provider.dart';
+import 'package:via_mallorca/screens/warnings/warnings_view.dart';
 import 'package:via_mallorca/screens/map/map_view.dart';
 import 'package:via_mallorca/screens/nearby/nearby_view.dart';
 import 'package:via_mallorca/screens/routes/routes_view.dart';
@@ -31,6 +35,7 @@ class AppWrapper extends StatelessWidget {
                             builder: (context) => NotificationsView())
                       },
                   icon: Icon(Icons.notifications)),
+            const _WarningsAction(),
             IconButton(
                 onPressed: () => Navigator.push(
                     context,
@@ -51,5 +56,52 @@ class AppWrapper extends StatelessWidget {
         );
       });
     });
+  }
+}
+
+/// Opens the service warnings, badged with how many unread ones concern a line
+/// the user has favourited.
+///
+/// Loads the feed on first build rather than on first visit, since the point of
+/// the badge is to tell the user about a disruption they have not gone looking
+/// for. Counting only their own lines is what keeps that from being a permanent
+/// unread marker - the operator publishes for the whole island.
+class _WarningsAction extends StatefulWidget {
+  const _WarningsAction();
+
+  @override
+  State<_WarningsAction> createState() => _WarningsActionState();
+}
+
+class _WarningsActionState extends State<_WarningsAction> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      context.read<WarningsProvider>().load(Localizations.localeOf(context));
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer2<WarningsProvider, FavoritesProvider>(
+      builder: (context, warnings, favorites, _) {
+        if (warnings.warnings.isEmpty) return const SizedBox.shrink();
+        final unread = warnings.unreadCountForLines(favorites.favoriteRoutes);
+        return IconButton(
+          tooltip: AppLocalizations.of(context)!.warnings,
+          onPressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const WarningsScreen()),
+          ),
+          icon: Badge.count(
+            count: unread,
+            isLabelVisible: unread > 0,
+            child: const Icon(Icons.warning_amber_rounded),
+          ),
+        );
+      },
+    );
   }
 }

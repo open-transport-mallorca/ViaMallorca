@@ -93,21 +93,14 @@ class LocalStorageApi {
     await _preferences!.setBool('openedFirstTime', openedFirstTime);
   }
 
-  /// Retrieves the list of shown warnings from the local storage preferences.
-  ///
-  /// The [warningList] parameter is the list of warnings to filter.
-  /// Returns a list of strings representing the shown warnings.
-  static List<String> getShownWarnings(List<String> warningList) {
+  /// The ids of the service warnings the user has already seen.
+  static List<String> getShownWarnings() {
     return _preferences!.getStringList("shownWarnings") ?? [];
   }
 
-  /// Sets the list of shown warnings in the local storage.
-  ///
-  /// The [warningList] parameter is a list of strings representing the warnings to be stored.
-  /// This method uses the shared preferences to store the list of shown warnings.
-  /// Returns a Future that completes when the operation is done.
-  static Future setShownWarnings(List<String> warningList) async {
-    await _preferences!.setStringList("shownWarnings", warningList);
+  /// Records the ids of the service warnings the user has seen.
+  static Future setShownWarnings(List<String> warningIds) async {
+    await _preferences!.setStringList("shownWarnings", warningIds);
   }
 
   /// Retrieves the list of shown news from the local storage.

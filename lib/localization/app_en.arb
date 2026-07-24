@@ -184,6 +184,17 @@
     }
   },
   "pickUpOnly": "Pick-up only",
+  "arrivesAt": "Arrives {destination} at {time}",
+  "@arrivesAt": {
+    "placeholders": {
+      "destination": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
   "noStationsOnRoute": "No stops left on this route",
   "dischargeOnlyDialogTitle": "Drop-off only stop",
   "dischargeOnlyDialogSubtitle": "This bus only lets passengers off at this stop, so you will not be able to board it here. Track it anyway?",
@@ -223,6 +234,29 @@
   "openSourceLicensesSubtitle": "Licenses of the libraries used in this app",
   "general": "General",
   "tracking": "Tracking",
+  "noWarnings": "No service warnings right now",
+  "warningsFailed": "Could not load service warnings",
+  "warningDetailUnavailable": "The full text could not be loaded. Open it in your browser to read it.",
+  "affectedLines": "Affected lines",
+  "markAllRead": "Mark all as read",
+  "openInBrowser": "Open in browser",
+  "viewNotice": "View notice",
+  "warningsForLine": "Warnings for {line}",
+  "@warningsForLine": {
+    "placeholders": {
+      "line": {
+        "type": "String"
+      }
+    }
+  },
+  "lineWarningCount": "{count, plural, one{1 warning} other{{count} warnings}}",
+  "@lineWarningCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
   "startupTab": "Open the app on",
   "distanceUnits": "Distance units",
   "metric": "Metric (m, km)",

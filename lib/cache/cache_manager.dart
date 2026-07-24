@@ -40,6 +40,13 @@ class CacheManager {
 
   static const Duration _lineTtl = Duration(days: 2);
 
+  /// Service warnings, per feed language.
+  static const String _warningsPrefix = 'warnings_';
+
+  /// Short, because a warning the user is shown after it has been lifted is
+  /// worse than one that arrives a few minutes late.
+  static const Duration _warningsTtl = Duration(minutes: 30);
+
   /// Initialize the cache manager.
   ///
   /// This method should be called before any other method in this class.
@@ -70,7 +77,8 @@ class CacheManager {
     final now = DateTime.now();
     for (final key in prefs.getKeys().toList()) {
       if (!key.startsWith('expiry_$_linePrefix') &&
-          !key.startsWith('expiry_$_stationLinesPrefix')) {
+          !key.startsWith('expiry_$_stationLinesPrefix') &&
+          !key.startsWith('expiry_$_warningsPrefix')) {
         continue;
       }
       final expiry = DateTime.tryParse(prefs.getString(key) ?? '');
@@ -236,6 +244,34 @@ class CacheManager {
     await setExpiry(resourceName, expiry);
   }
 
+  /// The cached service warnings for [language], or null when absent or stale.
+  static Future<List<TransitWarning>?> getWarnings(String language) async {
+    final String resourceName = '$_warningsPrefix$language';
+    if ((await getExpiry(resourceName)).isBefore(DateTime.now())) {
+      return null;
+    }
+    final data = _prefs?.getStringList(resourceName);
+    if (data == null) return null;
+    try {
+      return data
+          .map((warning) => TransitWarning.fromJson(jsonDecode(warning)))
+          .toList();
+    } catch (_) {
+      await _prefs?.remove(resourceName);
+      await _prefs?.remove('expiry_$resourceName');
+      return null;
+    }
+  }
+
+  /// Stores the service warnings for [language].
+  static Future<void> setWarnings(
+      String language, List<TransitWarning> warnings) async {
+    final String resourceName = '$_warningsPrefix$language';
+    await _prefs?.setStringList(resourceName,
+        warnings.map((w) => jsonEncode(TransitWarning.toJson(w))).toList());
+    await setExpiry(resourceName, DateTime.now().add(_warningsTtl));
+  }
+
   /// Clear the cache. Remove all cached data.
   /// The data will be fetched again when needed.
   ///
@@ -255,6 +291,7 @@ class CacheManager {
       if (key.startsWith('lines_') ||
           key.startsWith(_linePrefix) ||
           key.startsWith(_stationLinesPrefix) ||
+          key.startsWith(_warningsPrefix) ||
           key == 'lines' ||
           key.startsWith('expiry_')) {
         await prefs.remove(key);
