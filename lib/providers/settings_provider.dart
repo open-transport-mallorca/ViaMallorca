@@ -13,6 +13,8 @@ class SettingsProvider extends ChangeNotifier {
   int _notificationLeadTime = LocalStorageApi.getNotificationLeadTime();
   bool _showDischargeOnlyWarning = LocalStorageApi.showDischargeOnlyWarning();
   bool _keepScreenOnWhileTracking = LocalStorageApi.keepScreenOnWhileTracking();
+  bool _showServiceBadges = LocalStorageApi.showServiceBadges();
+  bool _showDepartureWarnings = LocalStorageApi.showDepartureWarnings();
   int _startupTab = LocalStorageApi.getStartupTab(NavigationProvider.tabCount);
 
   /// The smallest and largest number of stops the nearby screen may list.
@@ -29,6 +31,8 @@ class SettingsProvider extends ChangeNotifier {
   int get notificationLeadTime => _notificationLeadTime;
   bool get showDischargeOnlyWarning => _showDischargeOnlyWarning;
   bool get keepScreenOnWhileTracking => _keepScreenOnWhileTracking;
+  bool get showServiceBadges => _showServiceBadges;
+  bool get showDepartureWarnings => _showDepartureWarnings;
   int get startupTab => _startupTab;
 
   set distanceUnits(DistanceUnits value) {
@@ -66,6 +70,20 @@ class SettingsProvider extends ChangeNotifier {
     if (value == _keepScreenOnWhileTracking) return;
     _keepScreenOnWhileTracking = value;
     LocalStorageApi.setKeepScreenOnWhileTracking(value);
+    notifyListeners();
+  }
+
+  set showServiceBadges(bool value) {
+    if (value == _showServiceBadges) return;
+    _showServiceBadges = value;
+    LocalStorageApi.setShowServiceBadges(value);
+    notifyListeners();
+  }
+
+  set showDepartureWarnings(bool value) {
+    if (value == _showDepartureWarnings) return;
+    _showDepartureWarnings = value;
+    LocalStorageApi.setShowDepartureWarnings(value);
     notifyListeners();
   }
 

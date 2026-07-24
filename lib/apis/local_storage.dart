@@ -271,6 +271,26 @@ class LocalStorageApi {
     await _preferences!.setBool('keepScreenOnWhileTracking', keepOn);
   }
 
+  /// Whether to show the unread count on the news and warnings buttons.
+  static bool showServiceBadges() {
+    return _preferences!.getBool('showServiceBadges') ?? true;
+  }
+
+  /// Sets whether the news and warnings buttons show an unread badge.
+  static Future setShowServiceBadges(bool show) async {
+    await _preferences!.setBool('showServiceBadges', show);
+  }
+
+  /// Whether to show the warnings summary above a stop's departures.
+  static bool showDepartureWarnings() {
+    return _preferences!.getBool('showDepartureWarnings') ?? true;
+  }
+
+  /// Sets whether the warnings summary is shown above departures.
+  static Future setShowDepartureWarnings(bool show) async {
+    await _preferences!.setBool('showDepartureWarnings', show);
+  }
+
   /// Whether the leftovers of the map tile caches used before flutter_map's
   /// built-in caching have already been deleted.
   static bool legacyMapCachesCleared() {

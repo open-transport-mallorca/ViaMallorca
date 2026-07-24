@@ -71,6 +71,9 @@ class SettingsScreen extends StatelessWidget {
             _SectionHeader(localizations.tracking),
             const _DischargeWarningSwitch(),
             const _KeepScreenOnSwitch(),
+            _SectionHeader(localizations.warningsAndNews),
+            const _ServiceBadgesSwitch(),
+            const _DepartureWarningsSwitch(),
             _SectionHeader(localizations.storage),
             const _ClearCacheTile(),
             _SectionHeader(localizations.about),
@@ -328,6 +331,44 @@ class _KeepScreenOnSwitch extends StatelessWidget {
         secondary: const Icon(Icons.screen_lock_portrait),
         title: Text(localizations.keepScreenOn),
         subtitle: Text(localizations.keepScreenOnDescription),
+      ),
+    );
+  }
+}
+
+/// Whether the news and warnings buttons show an unread badge.
+class _ServiceBadgesSwitch extends StatelessWidget {
+  const _ServiceBadgesSwitch();
+
+  @override
+  Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+    return Consumer<SettingsProvider>(
+      builder: (context, settings, _) => SwitchListTile(
+        value: settings.showServiceBadges,
+        onChanged: (value) => settings.showServiceBadges = value,
+        secondary: const Icon(Icons.notifications_active_outlined),
+        title: Text(localizations.showServiceBadges),
+        subtitle: Text(localizations.showServiceBadgesDescription),
+      ),
+    );
+  }
+}
+
+/// Whether the warnings summary is shown above a stop's departures.
+class _DepartureWarningsSwitch extends StatelessWidget {
+  const _DepartureWarningsSwitch();
+
+  @override
+  Widget build(BuildContext context) {
+    final localizations = AppLocalizations.of(context)!;
+    return Consumer<SettingsProvider>(
+      builder: (context, settings, _) => SwitchListTile(
+        value: settings.showDepartureWarnings,
+        onChanged: (value) => settings.showDepartureWarnings = value,
+        secondary: const Icon(Icons.warning_amber_rounded),
+        title: Text(localizations.showDepartureWarnings),
+        subtitle: Text(localizations.showDepartureWarningsDescription),
       ),
     );
   }

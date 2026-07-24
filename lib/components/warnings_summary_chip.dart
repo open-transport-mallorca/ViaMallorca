@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:via_mallorca/localization/generated/app_localizations.dart';
+import 'package:via_mallorca/providers/settings_provider.dart';
 import 'package:via_mallorca/providers/warnings_provider.dart';
 import 'package:via_mallorca/screens/warnings/warnings_view.dart';
 
@@ -18,6 +19,9 @@ class WarningsSummaryChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (!context.watch<SettingsProvider>().showDepartureWarnings) {
+      return const SizedBox.shrink();
+    }
     return Consumer<WarningsProvider>(
       builder: (context, provider, _) {
         final warned = provider.warnedLines(lineCodes);

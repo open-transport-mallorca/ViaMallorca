@@ -7,6 +7,7 @@ import 'package:via_mallorca/localization/generated/app_localizations.dart';
 import 'package:via_mallorca/providers/favorites_provider.dart';
 import 'package:via_mallorca/providers/navigation_provider.dart';
 import 'package:via_mallorca/providers/news_provider.dart';
+import 'package:via_mallorca/providers/settings_provider.dart';
 import 'package:via_mallorca/providers/notifications_provider.dart';
 import 'package:via_mallorca/providers/warnings_provider.dart';
 import 'package:via_mallorca/screens/news/news_view.dart';
@@ -89,6 +90,7 @@ class _NewsActionState extends State<_NewsAction> {
     return Consumer<NewsProvider>(
       builder: (context, news, _) {
         if (news.news.isEmpty) return const SizedBox.shrink();
+        final showBadge = context.watch<SettingsProvider>().showServiceBadges;
         return IconButton(
           tooltip: AppLocalizations.of(context)!.news,
           onPressed: () => Navigator.push(
@@ -96,7 +98,7 @@ class _NewsActionState extends State<_NewsAction> {
             MaterialPageRoute(builder: (context) => const NewsScreen()),
           ),
           icon: Badge(
-            isLabelVisible: news.unreadCount > 0,
+            isLabelVisible: showBadge && news.unreadCount > 0,
             child: const Icon(Icons.feed_outlined),
           ),
         );
@@ -134,6 +136,7 @@ class _WarningsActionState extends State<_WarningsAction> {
     return Consumer2<WarningsProvider, FavoritesProvider>(
       builder: (context, warnings, favorites, _) {
         if (warnings.warnings.isEmpty) return const SizedBox.shrink();
+        final showBadge = context.watch<SettingsProvider>().showServiceBadges;
         final unread = warnings.unreadCountForLines(favorites.favoriteRoutes);
         return IconButton(
           tooltip: AppLocalizations.of(context)!.warnings,
@@ -143,7 +146,7 @@ class _WarningsActionState extends State<_WarningsAction> {
           ),
           icon: Badge.count(
             count: unread,
-            isLabelVisible: unread > 0,
+            isLabelVisible: showBadge && unread > 0,
             child: const Icon(Icons.warning_amber_rounded),
           ),
         );
