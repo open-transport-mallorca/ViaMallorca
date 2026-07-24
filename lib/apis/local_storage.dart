@@ -98,6 +98,21 @@ class LocalStorageApi {
     return _preferences!.getStringList("shownWarnings") ?? [];
   }
 
+  /// The moment warnings were first loaded on this install, or null before then.
+  ///
+  /// Only warnings published after this count as unread, so a fresh install
+  /// does not flag disruptions the user was never around for.
+  static DateTime? getWarningsBaseline() {
+    final value = _preferences!.getString("warningsBaseline");
+    return value == null ? null : DateTime.tryParse(value);
+  }
+
+  /// Records the warnings baseline. Set once, on the first warnings load.
+  static Future setWarningsBaseline(DateTime baseline) async {
+    await _preferences!
+        .setString("warningsBaseline", baseline.toIso8601String());
+  }
+
   /// Records the ids of the service warnings the user has seen.
   static Future setShownWarnings(List<String> warningIds) async {
     await _preferences!.setStringList("shownWarnings", warningIds);

@@ -10,6 +10,12 @@ class WarningsProvider extends ChangeNotifier {
   List<TransitWarning> _warnings = const [];
   late Set<String> _seen = LocalStorageApi.getShownWarnings().toSet();
 
+  /// Warnings published on or before this were already open when the user
+  /// installed, so they are not theirs to catch up on. Set on the first load
+  /// and kept. Unlike news, warnings badge only for followed lines, so this
+  /// mainly guards against an old disruption on a newly favourited line.
+  DateTime? _baseline = LocalStorageApi.getWarningsBaseline();
+
   bool _isLoading = false;
   bool _hasFailed = false;
 
@@ -25,10 +31,20 @@ class WarningsProvider extends ChangeNotifier {
   bool get hasFailed => _hasFailed;
 
   /// How many warnings the user has not opened yet.
-  int get unreadCount =>
-      _warnings.where((warning) => !_seen.contains(_seenKey(warning))).length;
+  int get unreadCount => _warnings.where(isUnread).length;
 
-  bool isUnread(TransitWarning warning) => !_seen.contains(_seenKey(warning));
+  /// Unread, and new since the user installed.
+  ///
+  /// A warning read on any device-language counts as read; one that predates
+  /// the install baseline is never unread, so the pre-existing backlog does not
+  /// badge. A warning with no publication date is treated as old, since there
+  /// is no way to place it after the baseline.
+  bool isUnread(TransitWarning warning) {
+    if (_seen.contains(_seenKey(warning))) return false;
+    final published = warning.published;
+    final baseline = _baseline;
+    return published != null && baseline != null && published.isAfter(baseline);
+  }
 
   /// A read-state key that is the same for one warning in every language.
   ///
@@ -85,6 +101,14 @@ class WarningsProvider extends ChangeNotifier {
   /// Safe to call on every build of the screens that show warnings: it returns
   /// immediately unless the language changed or [force] is set.
   Future<void> load(Locale locale, {bool force = false}) async {
+    // Stamp the install baseline the first time warnings are ever loaded,
+    // before any early return, so "new since install" is anchored from the
+    // user's first encounter with the feed.
+    if (_baseline == null) {
+      _baseline = DateTime.now();
+      await LocalStorageApi.setWarningsBaseline(_baseline!);
+    }
+
     final language = WarningsApi.feedLanguage(locale);
     if (_isLoading) return;
     if (!force && language == _loadedLanguage && _warnings.isNotEmpty) return;
