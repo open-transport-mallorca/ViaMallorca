@@ -39,7 +39,10 @@ class LocalePicker extends StatelessWidget {
             Flexible(
               child: RadioGroup<Locale?>(
                 groupValue: localeProvider.locale,
-                onChanged: (value) => localeProvider.locale = value,
+                onChanged: (value) {
+                  localeProvider.locale = value;
+                  Navigator.of(context).pop();
+                },
                 child: ListView.builder(
                   shrinkWrap: true,
                   itemCount: _options.length,
