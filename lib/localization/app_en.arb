@@ -241,6 +241,9 @@
   "markAllRead": "Mark all as read",
   "openInBrowser": "Open in browser",
   "viewNotice": "View notice",
+  "noNews": "No news right now",
+  "newsFailed": "Could not load news",
+  "newsDetailUnavailable": "The full article could not be loaded. Open it in your browser to read it.",
   "warningsForLine": "Warnings for {line}",
   "@warningsForLine": {
     "placeholders": {

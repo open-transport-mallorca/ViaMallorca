@@ -47,6 +47,13 @@ class CacheManager {
   /// worse than one that arrives a few minutes late.
   static const Duration _warningsTtl = Duration(minutes: 30);
 
+  /// News, per feed language.
+  static const String _newsPrefix = 'news_';
+
+  /// Longer than warnings: news is not time-critical, so a stale-by-an-hour
+  /// article list is fine, and the feed carries fifty items.
+  static const Duration _newsTtl = Duration(hours: 6);
+
   /// Initialize the cache manager.
   ///
   /// This method should be called before any other method in this class.
@@ -78,7 +85,8 @@ class CacheManager {
     for (final key in prefs.getKeys().toList()) {
       if (!key.startsWith('expiry_$_linePrefix') &&
           !key.startsWith('expiry_$_stationLinesPrefix') &&
-          !key.startsWith('expiry_$_warningsPrefix')) {
+          !key.startsWith('expiry_$_warningsPrefix') &&
+          !key.startsWith('expiry_$_newsPrefix')) {
         continue;
       }
       final expiry = DateTime.tryParse(prefs.getString(key) ?? '');
@@ -272,6 +280,33 @@ class CacheManager {
     await setExpiry(resourceName, DateTime.now().add(_warningsTtl));
   }
 
+  /// The cached news for [language], or null when absent or stale.
+  static Future<List<TransitNews>?> getNews(String language) async {
+    final String resourceName = '$_newsPrefix$language';
+    if ((await getExpiry(resourceName)).isBefore(DateTime.now())) {
+      return null;
+    }
+    final data = _prefs?.getStringList(resourceName);
+    if (data == null) return null;
+    try {
+      return data
+          .map((news) => TransitNews.fromJson(jsonDecode(news)))
+          .toList();
+    } catch (_) {
+      await _prefs?.remove(resourceName);
+      await _prefs?.remove('expiry_$resourceName');
+      return null;
+    }
+  }
+
+  /// Stores the news for [language].
+  static Future<void> setNews(String language, List<TransitNews> news) async {
+    final String resourceName = '$_newsPrefix$language';
+    await _prefs?.setStringList(resourceName,
+        news.map((n) => jsonEncode(TransitNews.toJson(n))).toList());
+    await setExpiry(resourceName, DateTime.now().add(_newsTtl));
+  }
+
   /// Clear the cache. Remove all cached data.
   /// The data will be fetched again when needed.
   ///
@@ -292,6 +327,7 @@ class CacheManager {
           key.startsWith(_linePrefix) ||
           key.startsWith(_stationLinesPrefix) ||
           key.startsWith(_warningsPrefix) ||
+          key.startsWith(_newsPrefix) ||
           key == 'lines' ||
           key.startsWith('expiry_')) {
         await prefs.remove(key);

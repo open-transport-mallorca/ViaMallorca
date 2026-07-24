@@ -103,18 +103,28 @@ class LocalStorageApi {
     await _preferences!.setStringList("shownWarnings", warningIds);
   }
 
-  /// Retrieves the list of shown news from the local storage.
-  ///
-  /// Returns a list of strings representing the shown news.
-  static List<String> getShownNews(List<String> newsList) {
+  /// The ids of the news items the user has already seen.
+  static List<String> getShownNews() {
     return _preferences!.getStringList("shownNews") ?? [];
   }
 
-  /// Sets the list of shown news in the local storage.
+  /// The moment news was first loaded on this install, or null before then.
   ///
-  /// [newsList] - A list of strings representing the shown news.
-  static Future setShownNews(List<String> newsList) async {
-    await _preferences!.setStringList("shownNews", newsList);
+  /// Only items published after this count as unread, so a fresh install does
+  /// not flag the whole backlog the user was never around for.
+  static DateTime? getNewsBaseline() {
+    final value = _preferences!.getString("newsBaseline");
+    return value == null ? null : DateTime.tryParse(value);
+  }
+
+  /// Records the news baseline. Set once, on the first news load.
+  static Future setNewsBaseline(DateTime baseline) async {
+    await _preferences!.setString("newsBaseline", baseline.toIso8601String());
+  }
+
+  /// Records the ids of the news items the user has seen.
+  static Future setShownNews(List<String> newsIds) async {
+    await _preferences!.setStringList("shownNews", newsIds);
   }
 
   /// Retrieves the list of favourite stations from the local storage.

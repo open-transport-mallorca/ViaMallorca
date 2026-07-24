@@ -6,8 +6,10 @@ import 'package:via_mallorca/components/bottom_sheets/pending_notifications.dart
 import 'package:via_mallorca/localization/generated/app_localizations.dart';
 import 'package:via_mallorca/providers/favorites_provider.dart';
 import 'package:via_mallorca/providers/navigation_provider.dart';
+import 'package:via_mallorca/providers/news_provider.dart';
 import 'package:via_mallorca/providers/notifications_provider.dart';
 import 'package:via_mallorca/providers/warnings_provider.dart';
+import 'package:via_mallorca/screens/news/news_view.dart';
 import 'package:via_mallorca/screens/warnings/warnings_view.dart';
 import 'package:via_mallorca/screens/map/map_view.dart';
 import 'package:via_mallorca/screens/nearby/nearby_view.dart';
@@ -35,6 +37,7 @@ class AppWrapper extends StatelessWidget {
                             builder: (context) => NotificationsView())
                       },
                   icon: Icon(Icons.notifications)),
+            const _NewsAction(),
             const _WarningsAction(),
             IconButton(
                 onPressed: () => Navigator.push(
@@ -56,6 +59,49 @@ class AppWrapper extends StatelessWidget {
         );
       });
     });
+  }
+}
+
+/// Opens the news feed, marked when there is anything unread.
+///
+/// A plain dot rather than a count: news has no per-line data to scope a number
+/// to, so on a first launch every item is unread and a count would just read
+/// "20". The dot signals there is something new without shouting a figure.
+class _NewsAction extends StatefulWidget {
+  const _NewsAction();
+
+  @override
+  State<_NewsAction> createState() => _NewsActionState();
+}
+
+class _NewsActionState extends State<_NewsAction> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      context.read<NewsProvider>().load(Localizations.localeOf(context));
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Consumer<NewsProvider>(
+      builder: (context, news, _) {
+        if (news.news.isEmpty) return const SizedBox.shrink();
+        return IconButton(
+          tooltip: AppLocalizations.of(context)!.news,
+          onPressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const NewsScreen()),
+          ),
+          icon: Badge(
+            isLabelVisible: news.unreadCount > 0,
+            child: const Icon(Icons.feed_outlined),
+          ),
+        );
+      },
+    );
   }
 }
 
