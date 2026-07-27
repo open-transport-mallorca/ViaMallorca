@@ -8,6 +8,9 @@
   "map": "Mapa",
   "warnings": "Advertencias",
   "news": "Noticias",
+  "settings": "Ajustes",
+  "appearance": "Apariencia",
+  "about": "Acerca de",
   "theme": "Tema",
   "light": "Claro",
   "dark": "Oscuro",
@@ -73,6 +76,112 @@
   "remindersDeniedDialogSubtitle": "Para recibir notificaciones precisas, permite alarmas programadas para Via Mallorca.",
   "useInexact": "Usar inexactas",
   "allowExact": "Permitir exactas",
-  "switchToExact": "Cambiar a notificaciones exactas",
-  "switchToInexact": "Cambiar a notificaciones inexactas"
+  "notifications": "Notificaciones",
+  "exactNotifications": "Notificaciones exactas",
+  "exactNotificationsDescription": "Envía los recordatorios de salida en el minuto exacto. Si lo desactivas, ahorras batería, pero los recordatorios pueden llegar unos minutos antes o después.",
+  "onDemand": "Bajo demanda",
+  "summerOnly": "Solo en verano",
+  "viewOnMap": "Ver en el mapa",
+  "townsServed": "Municipios servidos",
+  "operatingPeriod": "Período de operación",
+  "currentlyOperating": "En operación actualmente",
+  "serviceHolidays": "Festivos que afectan al servicio",
+  "directions": "Direcciones",
+  "outbound": "Ida",
+  "inbound": "Vuelta",
+  "timetable": "Horario",
+  "allYear": "Todo el año",
+  "linesServingStop": "Líneas que paran aquí",
+  "dropOffOnly": "Solo bajada",
+  "sectorNumbered": "Sector {code}",
+  "@sectorNumbered": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "metro": "Metro",
+  "train": "Tren",
+  "otherLines": "Otras",
+  "minutesLate": "{count, plural, one{1 minuto de retraso} other{{count} minutos de retraso}}",
+  "@minutesLate": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "pickUpOnly": "Solo subida",
+  "arrivesAt": "Llega a {destination} a las {time}",
+  "noStationsOnRoute": "No quedan paradas en esta ruta",
+  "dischargeOnlyDialogTitle": "Parada solo de bajada",
+  "dischargeOnlyDialogSubtitle": "En esta parada este autobús solo permite bajar, por lo que no podrás subir aquí. ¿Quieres seguirlo igualmente?",
+  "departures": "Salidas",
+  "openInMaps": "Abrir en Mapas",
+  "stopCount": "{count, plural, =0{sin paradas} one{1 parada} other{{count} paradas}}",
+  "licenses": "Licencias",
+  "notAffiliated": "Via Mallorca es un proyecto independiente y de código abierto. No está afiliada, avalada ni gestionada por ninguna empresa de transporte ni administración pública.",
+  "transitDataTitle": "Datos de transporte",
+  "transitDataBody": "Las paradas, líneas, horarios y posiciones en vivo de los autobuses proceden de los datos abiertos públicos del consorcio de transportes de Mallorca. Estos datos no son propiedad de Via Mallorca: pertenecen a sus autores, y la aplicación los obtiene dinámicamente, tal y como se publican.",
+  "mapDataTitle": "Datos del mapa",
+  "mapDataBody": "El mapa y sus teselas los proporcionan OpenStreetMap y sus colaboradores.",
+  "thisAppTitle": "Esta aplicación",
+  "thisAppBody": "La aplicación Via Mallorca es libre y de código abierto. Puedes consultar el código, informar de errores o contribuir.",
+  "licensedBy": "Por {author} - {license}",
+  "@licensedBy": {
+    "placeholders": {
+      "author": {
+        "type": "String"
+      },
+      "license": {
+        "type": "String"
+      }
+    }
+  },
+  "openDataPortal": "Portal de datos abiertos",
+  "viewLicense": "Ver licencia",
+  "sourceCode": "Código fuente",
+  "openSourceLicenses": "Licencias de código abierto",
+  "openSourceLicensesSubtitle": "Licencias de las bibliotecas usadas en esta aplicación",
+  "general": "General",
+  "tracking": "Seguimiento",
+  "warningsAndNews": "Avisos y noticias",
+  "showServiceBadges": "Distintivos de no leído",
+  "showServiceBadgesDescription": "Muestra un distintivo en los botones de noticias y avisos cuando hay novedades.",
+  "showDepartureWarnings": "Avisos en las salidas",
+  "showDepartureWarningsDescription": "Muestra un resumen de las líneas afectadas encima de las salidas de una parada.",
+  "noWarnings": "Ahora mismo no hay avisos de servicio",
+  "warningsFailed": "No se han podido cargar los avisos de servicio",
+  "warningDetailUnavailable": "No se ha podido cargar el texto completo. Ábrelo en el navegador para leerlo.",
+  "affectedLines": "Líneas afectadas",
+  "markAllRead": "Marcar todo como leído",
+  "openInBrowser": "Abrir en el navegador",
+  "viewNotice": "Ver el aviso",
+  "noNews": "Ahora mismo no hay noticias",
+  "newsFailed": "No se han podido cargar las noticias",
+  "newsDetailUnavailable": "No se ha podido cargar el artículo completo. Ábrelo en el navegador para leerlo.",
+  "warningsForLine": "Avisos de la línea {line}",
+  "lineWarningCount": "{count, plural, one{1 aviso} other{{count} avisos}}",
+  "startupTab": "Abrir la aplicación en",
+  "distanceUnits": "Unidades de distancia",
+  "metric": "Métrico (m, km)",
+  "imperial": "Imperial (ft, mi)",
+  "nearbyStopCount": "Paradas cercanas mostradas",
+  "nearbyStopCountValue": "{count, plural, one{1 parada} other{{count} paradas}}",
+  "defaultReminderTime": "Tiempo de aviso predeterminado",
+  "defaultReminderTimeDescription": "Con cuánta antelación se programan los nuevos recordatorios de salida. Se reduce automáticamente si el autobús sale antes.",
+  "minutesBeforeValue": "{count, plural, one{1 minuto antes} other{{count} minutos antes}}",
+  "dontShowAgain": "No volver a mostrar",
+  "warnDropOffOnly": "Avisar de paradas solo de bajada",
+  "warnDropOffOnlyDescription": "Confirmar antes de seguir un autobús desde una parada donde no puedes subir.",
+  "keepScreenOn": "Mantener la pantalla encendida al seguir",
+  "keepScreenOnDescription": "Evita que la pantalla se apague mientras sigues un autobús.",
+  "storage": "Almacenamiento",
+  "clearCache": "Borrar datos guardados",
+  "clearCacheDescription": "Paradas, líneas y teselas del mapa guardadas en este dispositivo.",
+  "clearCacheDialogTitle": "¿Borrar los datos guardados?",
+  "clearCacheDialogSubtitle": "Las paradas, las líneas y las teselas del mapa se descargarán de nuevo cuando se necesiten. Tus favoritos y ajustes no se ven afectados.",
+  "clear": "Borrar",
+  "cacheCleared": "Datos guardados borrados"
 }

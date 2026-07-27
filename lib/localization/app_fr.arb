@@ -8,6 +8,9 @@
   "map": "Carte",
   "warnings": "Avertissements",
   "news": "Nouvelles",
+  "settings": "Paramètres",
+  "appearance": "Apparence",
+  "about": "À propos",
   "theme": "Thème",
   "light": "Clair",
   "dark": "Sombre",
@@ -73,6 +76,112 @@
   "remindersDeniedDialogSubtitle": "Pour recevoir des notifications précises, autorisez les alarmes programmées pour Via Mallorca.",
   "useInexact": "Utiliser approximatif",
   "allowExact": "Autoriser précis",
-  "switchToExact": "Passer aux notifications précises",
-  "switchToInexact": "Passer aux notifications approximatives"
+  "notifications": "Notifications",
+  "exactNotifications": "Notifications précises",
+  "exactNotificationsDescription": "Envoie les rappels de départ à la minute près. Si vous désactivez cette option, vous économisez de la batterie, mais les rappels peuvent arriver quelques minutes plus tôt ou plus tard.",
+  "onDemand": "À la demande",
+  "summerOnly": "Été seulement",
+  "viewOnMap": "Voir sur la carte",
+  "townsServed": "Communes desservies",
+  "operatingPeriod": "Période d'exploitation",
+  "currentlyOperating": "En service actuellement",
+  "serviceHolidays": "Jours fériés affectant le service",
+  "directions": "Directions",
+  "outbound": "Aller",
+  "inbound": "Retour",
+  "timetable": "Horaire",
+  "allYear": "Toute l'année",
+  "linesServingStop": "Lignes desservant cet arrêt",
+  "dropOffOnly": "Descente uniquement",
+  "sectorNumbered": "Secteur {code}",
+  "@sectorNumbered": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "metro": "Métro",
+  "train": "Train",
+  "otherLines": "Autres",
+  "minutesLate": "{count, plural, one{1 minute de retard} other{{count} minutes de retard}}",
+  "@minutesLate": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "pickUpOnly": "Montée uniquement",
+  "arrivesAt": "Arrive à {destination} à {time}",
+  "noStationsOnRoute": "Plus d'arrêts sur cet itinéraire",
+  "dischargeOnlyDialogTitle": "Arrêt de descente uniquement",
+  "dischargeOnlyDialogSubtitle": "À cet arrêt, ce bus ne permet que de descendre, vous ne pourrez donc pas y monter. Le suivre quand même ?",
+  "departures": "Départs",
+  "openInMaps": "Ouvrir dans Maps",
+  "stopCount": "{count, plural, =0{aucun arrêt} one{1 arrêt} other{{count} arrêts}}",
+  "licenses": "Licences",
+  "notAffiliated": "Via Mallorca est un projet indépendant et open source. Il n'est ni affilié, ni approuvé, ni exploité par un opérateur de transport ou une administration publique.",
+  "transitDataTitle": "Données de transport",
+  "transitDataBody": "Les arrêts, lignes, horaires et positions en direct des bus proviennent des données ouvertes publiques du consortium des transports de Majorque. Ces données n'appartiennent pas à Via Mallorca : elles appartiennent à leurs auteurs, et l'application les récupère dynamiquement, telles qu'elles sont publiées.",
+  "mapDataTitle": "Données cartographiques",
+  "mapDataBody": "La carte et ses tuiles sont fournies par OpenStreetMap et ses contributeurs.",
+  "thisAppTitle": "Cette application",
+  "thisAppBody": "L'application Via Mallorca est libre et open source. Vous pouvez consulter le code, signaler des problèmes ou y contribuer.",
+  "licensedBy": "Par {author} - {license}",
+  "@licensedBy": {
+    "placeholders": {
+      "author": {
+        "type": "String"
+      },
+      "license": {
+        "type": "String"
+      }
+    }
+  },
+  "openDataPortal": "Portail de données ouvertes",
+  "viewLicense": "Voir la licence",
+  "sourceCode": "Code source",
+  "openSourceLicenses": "Licences open source",
+  "openSourceLicensesSubtitle": "Licences des bibliothèques utilisées dans cette application",
+  "general": "Général",
+  "tracking": "Suivi",
+  "warningsAndNews": "Alertes et actualités",
+  "showServiceBadges": "Pastilles de non-lu",
+  "showServiceBadgesDescription": "Affiche une pastille sur les boutons d'actualités et d'alertes lorsqu'il y a du nouveau.",
+  "showDepartureWarnings": "Alertes sur les départs",
+  "showDepartureWarningsDescription": "Affiche un résumé des lignes concernées au-dessus des départs d'un arrêt.",
+  "noWarnings": "Aucune alerte de service pour le moment",
+  "warningsFailed": "Impossible de charger les alertes de service",
+  "warningDetailUnavailable": "Le texte complet n'a pas pu être chargé. Ouvrez-le dans votre navigateur pour le lire.",
+  "affectedLines": "Lignes concernées",
+  "markAllRead": "Tout marquer comme lu",
+  "openInBrowser": "Ouvrir dans le navigateur",
+  "viewNotice": "Voir l'avis",
+  "noNews": "Aucune actualité pour le moment",
+  "newsFailed": "Impossible de charger les actualités",
+  "newsDetailUnavailable": "L'article complet n'a pas pu être chargé. Ouvrez-le dans votre navigateur pour le lire.",
+  "warningsForLine": "Alertes pour la ligne {line}",
+  "lineWarningCount": "{count, plural, one{1 alerte} other{{count} alertes}}",
+  "startupTab": "Ouvrir l'application sur",
+  "distanceUnits": "Unités de distance",
+  "metric": "Métrique (m, km)",
+  "imperial": "Impérial (ft, mi)",
+  "nearbyStopCount": "Arrêts à proximité affichés",
+  "nearbyStopCountValue": "{count, plural, one{1 arrêt} other{{count} arrêts}}",
+  "defaultReminderTime": "Délai de rappel par défaut",
+  "defaultReminderTimeDescription": "Combien de temps à l'avance les nouveaux rappels de départ sont programmés. Réduit automatiquement si le bus part plus tôt.",
+  "minutesBeforeValue": "{count, plural, one{1 minute avant} other{{count} minutes avant}}",
+  "dontShowAgain": "Ne plus afficher",
+  "warnDropOffOnly": "Avertir pour les arrêts de descente uniquement",
+  "warnDropOffOnlyDescription": "Confirmer avant de suivre un bus depuis un arrêt où vous ne pouvez pas monter.",
+  "keepScreenOn": "Garder l'écran allumé pendant le suivi",
+  "keepScreenOnDescription": "Empêche l'écran de s'éteindre pendant que vous suivez un bus.",
+  "storage": "Stockage",
+  "clearCache": "Effacer les données enregistrées",
+  "clearCacheDescription": "Arrêts, lignes et tuiles de carte enregistrés sur cet appareil.",
+  "clearCacheDialogTitle": "Effacer les données enregistrées ?",
+  "clearCacheDialogSubtitle": "Les arrêts, les lignes et les tuiles de carte seront téléchargés à nouveau lorsqu'ils seront nécessaires. Vos favoris et vos paramètres ne sont pas affectés.",
+  "clear": "Effacer",
+  "cacheCleared": "Données enregistrées effacées"
 }

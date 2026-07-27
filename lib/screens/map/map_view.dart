@@ -1,12 +1,13 @@
 import 'dart:async';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
-import 'package:flutter_map_cancellable_tile_provider/flutter_map_cancellable_tile_provider.dart';
 import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_map_marker_cluster/flutter_map_marker_cluster.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:http/http.dart' as http;
+import 'package:http/retry.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:provider/provider.dart';
 import 'package:quick_actions/quick_actions.dart';
@@ -15,8 +16,8 @@ import 'package:via_mallorca/cache/cache_manager.dart';
 import 'package:via_mallorca/components/bottom_sheets/station/station_view.dart';
 import 'package:via_mallorca/components/map/bus_info.dart';
 import 'package:via_mallorca/components/map/bus_tracker.dart';
-import 'package:via_mallorca/components/map/loading_overlay.dart';
 import 'package:via_mallorca/components/map/route_way_switcher.dart';
+import 'package:via_mallorca/components/map/tracked_route_polylines.dart';
 import 'package:via_mallorca/components/map/untrack_buttons.dart';
 import 'package:via_mallorca/components/map/update_location_buttons.dart';
 import 'package:via_mallorca/providers/map_provider.dart';
@@ -41,6 +42,20 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
   final QuickActions quickActions = QuickActions();
   List<ConnectivityResult> connectivityResults = [];
   late StreamSubscription<List<ConnectivityResult>> connectivitySubscription;
+
+  /// The tile provider, and the HTTP client behind it, belong to this state
+  /// rather than to the `TileLayer`.
+  ///
+  /// A provider left to create its own client has that client closed by
+  /// `TileLayer.dispose`, and a closed client fails every later tile request as
+  /// a silent transparent tile - a blank map with nothing in the logs. Since
+  /// this provider outlives any single layer, the client is passed in so that
+  /// ownership stays here and disposal cannot reach it.
+  ///
+  /// Matches the client flutter_map would have built for itself.
+  late final http.Client _tileHttpClient = RetryClient(http.Client());
+  late final NetworkTileProvider tileProvider =
+      NetworkTileProvider(httpClient: _tileHttpClient);
 
   @override
   void initState() {
@@ -69,6 +84,7 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
   @override
   void dispose() {
     connectivitySubscription.cancel();
+    _tileHttpClient.close();
     super.dispose();
   }
 
@@ -125,7 +141,7 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
       LatLng(station.lat, station.long),
       18,
     );
-    showBottomSheet(
+    final sheet = showBottomSheet(
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(10.0)),
       ),
@@ -135,6 +151,8 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
         highlightedDepartureId: tripId,
       ),
     );
+    Provider.of<MapProvider>(context, listen: false)
+        .registerStationSheet(sheet);
   }
 
   @override
@@ -145,27 +163,33 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
           builder: (context, mapProvider, trackingProvider, _) {
         return Consumer<MapViewModel>(
           builder: (context, viewModel, _) {
-            if (mapProvider.loadingProgress < 1.0) {
-              return Center(
-                child: CircularProgressIndicator(
-                  value: mapProvider.loadingProgress,
-                ),
-              );
-            }
-
+            // The map stays in the tree and interactive at all times, including
+            // while a route loads. Swapping it out for a loading indicator
+            // would dispose the `TileLayer`, which permanently closes the tile
+            // provider's HTTP client, and would lose the camera position.
             return Stack(children: [
               FlutterMap(
                 mapController: mapProvider.mapController!.mapController,
                 options: MapOptions(
                     interactionOptions: const InteractionOptions(
                         flags: InteractiveFlag.all & ~InteractiveFlag.rotate),
+                    // Any hands-on move of the map hands control back to the
+                    // user. Camera moves we make ourselves report no gesture,
+                    // so following does not cancel itself.
+                    onPositionChanged: (_, hasGesture) {
+                      if (!hasGesture) return;
+                      mapProvider.setFollowTrackedBus(false);
+                    },
                     initialZoom: 9,
                     initialCenter: const LatLng(39.607331, 2.983704)),
                 children: [
                   TileLayer(
                       retinaMode: RetinaMode.isHighDensity(context) &&
                           connectivityResults.contains(ConnectivityResult.wifi),
-                      tileProvider: CancellableNetworkTileProvider(),
+                      // Caches tiles to disk and aborts requests for tiles
+                      // pruned mid-flight. Both are built in and on by default,
+                      // configured in `main`.
+                      tileProvider: tileProvider,
                       tileBuilder:
                           Theme.of(context).brightness == Brightness.dark
                               ? (context, tileWidget, tile) =>
@@ -179,7 +203,7 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                   if (mapProvider.customRoutes != null &&
                       (mapProvider.customRoutes![0].isNotEmpty &&
                           mapProvider.customRoutes![1].isNotEmpty))
-                    _highlightedRoutePolylines(context),
+                    const TrackedRoutePolylines(),
 
                   // Highlighted Route Stations
                   if (mapProvider.customRoutes != null &&
@@ -223,8 +247,6 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
               Align(
                   alignment: Alignment.bottomRight,
                   child: UpdateLocationButtons()),
-
-              if (mapProvider.loadingProgress < 1) LoadingOverlay()
             ]);
           },
         );
@@ -236,6 +258,14 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
     return MarkerClusterLayerWidget(
       options: MarkerClusterLayerOptions(
         showPolygon: false,
+        // Tapping a cluster zooms to fit its bounds, capped by maxZoom - which
+        // defaults to 17, where the 80px cluster radius still covers ~74m. Over
+        // half the island's stops have a neighbour closer than that, so those
+        // clusters could never be opened however many times you tapped. Allow
+        // the zoom to go deeper, and stop clustering before it gets there so
+        // the markers always come apart.
+        maxZoom: 19,
+        disableClusteringAtZoom: 18,
         builder: (context, markers) {
           return Container(
             decoration: BoxDecoration(
@@ -257,12 +287,14 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                   point: LatLng(station.lat, station.long),
                   child: GestureDetector(
                     onTap: () {
-                      showBottomSheet(
+                      final sheet = showBottomSheet(
                           shape: const RoundedRectangleBorder(
                               borderRadius: BorderRadius.vertical(
                                   top: Radius.circular(10.0))),
                           context: context,
                           builder: (context) => StationSheet(station: station));
+                      Provider.of<MapProvider>(context, listen: false)
+                          .registerStationSheet(sheet);
                     },
                     child: Image.asset(
                       "assets/stop_icon.png",
@@ -290,12 +322,14 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                   point: LatLng(station.lat, station.long),
                   child: GestureDetector(
                     onTap: () {
-                      showBottomSheet(
+                      final sheet = showBottomSheet(
                           shape: const RoundedRectangleBorder(
                               borderRadius: BorderRadius.vertical(
                                   top: Radius.circular(10.0))),
                           context: context,
                           builder: (context) => StationSheet(station: station));
+                      Provider.of<MapProvider>(context, listen: false)
+                          .registerStationSheet(sheet);
                     },
                     child: ColorFiltered(
                       colorFilter: ColorFilter.matrix(
@@ -311,24 +345,5 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                   ),
                 ))
             .toList());
-  }
-
-  Widget _highlightedRoutePolylines(BuildContext context) {
-    final mapProvider = Provider.of<MapProvider>(context, listen: false);
-    return PolylineLayer(polylines: [
-      mapProvider.customRoutes!.length == 1
-          ? mapProvider.customRoutes![
-              Theme.of(context).colorScheme.brightness == Brightness.light
-                  ? 0
-                  : 1][0]
-          : mapProvider.customRoutes![
-                  Theme.of(context).colorScheme.brightness == Brightness.light
-                      ? 0
-                      : 1][
-              (mapProvider.customWay == null ||
-                      mapProvider.customWay == Way.way)
-                  ? 0
-                  : 1]
-    ]);
   }
 }

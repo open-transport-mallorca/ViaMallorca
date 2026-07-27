@@ -1,7 +1,8 @@
+import 'dart:async';
+
 import 'package:dynamic_color/dynamic_color.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:flutter_map_tile_caching/flutter_map_tile_caching.dart';
 import 'package:provider/provider.dart';
 import 'package:via_mallorca/apis/local_storage.dart';
 import 'package:via_mallorca/apis/notification.dart';
@@ -15,6 +16,11 @@ import 'package:via_mallorca/providers/notifications_provider.dart';
 import 'package:via_mallorca/providers/theme_provider.dart';
 import 'package:via_mallorca/providers/tracking_provider.dart';
 import 'package:via_mallorca/localization/generated/app_localizations.dart';
+import 'package:via_mallorca/providers/settings_provider.dart';
+import 'package:via_mallorca/providers/news_provider.dart';
+import 'package:via_mallorca/providers/warnings_provider.dart';
+import 'package:via_mallorca/utils/legacy_map_cache_cleanup.dart';
+import 'package:via_mallorca/utils/map_tile_cache.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -33,14 +39,9 @@ void main() async {
     }
   }
 
-  /// Switched to another caching mechanism.
-  /// This is here to delete the cached tiles from the old caching mechanism.
-  try {
-    await FMTCObjectBoxBackend().initialise();
-    await FMTCStore('mapStore').manage.reset();
-  } catch (e) {
-    debugPrint("Error deleting old cache: $e");
-  }
+  configureMapTileCache();
+
+  unawaited(clearLegacyMapCaches());
 
   runApp(ViaMallorca());
 }
@@ -59,6 +60,9 @@ class ViaMallorca extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => ThemeProvider()),
         ChangeNotifierProvider(create: (context) => LocaleProvider()),
         ChangeNotifierProvider(create: (context) => NotificationsProvider()),
+        ChangeNotifierProvider(create: (context) => SettingsProvider()),
+        ChangeNotifierProvider(create: (context) => WarningsProvider()),
+        ChangeNotifierProvider(create: (context) => NewsProvider()),
       ],
       child: DynamicColorBuilder(builder: (lightDynamic, darkDynamic) {
         return Consumer2<ThemeProvider, LocaleProvider>(

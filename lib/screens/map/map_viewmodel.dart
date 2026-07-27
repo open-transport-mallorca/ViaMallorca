@@ -5,7 +5,6 @@ import 'package:flutter_map_location_marker/flutter_map_location_marker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:mallorca_transit_services/mallorca_transit_services.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:via_mallorca/apis/location.dart';
 import 'package:via_mallorca/cache/cache_manager.dart';
@@ -15,14 +14,12 @@ import 'package:via_mallorca/providers/map_provider.dart';
 class MapViewModel extends ChangeNotifier with WidgetsBindingObserver {
   List<Station> _cachedStations = [];
   LocationPermission _locationPermission = LocationPermission.denied;
-  String? cacheDirectory;
   final StreamController<double?> alignPositionStreamController =
       StreamController<double?>.broadcast();
   AlignOnUpdate alignPositionOnUpdate = AlignOnUpdate.never;
 
   List<Station> get cachedStations => _cachedStations;
   LocationPermission get locationPermission => _locationPermission;
-  String? get cacheDir => cacheDirectory;
 
   Future<void> initialize(BuildContext context, TickerProvider vsync) async {
     context
@@ -41,11 +38,18 @@ class MapViewModel extends ChangeNotifier with WidgetsBindingObserver {
       // Delay the location update to ensure the map is fully loaded
       Future.delayed(
         const Duration(seconds: 2),
-        () => context.mounted ? moveToCurrentLocation(context) : null,
+        () {
+          // A trip already being tracked when the map mounted owns the camera;
+          // the opening centre-on-me is a convenience and gives way to it.
+          if (!context.mounted ||
+              context.read<MapProvider>().followTrackedBus) {
+            return;
+          }
+          moveToCurrentLocation(context);
+        },
       );
     }
 
-    cacheDirectory = await _getCachePath();
     notifyListeners();
   }
 
@@ -79,13 +83,16 @@ class MapViewModel extends ChangeNotifier with WidgetsBindingObserver {
       return;
     }
 
+    if (!context.mounted) return;
+
+    // The camera can only serve one master. Recentring on the user gives up
+    // following the tracked bus, which reports no gesture when it moves the
+    // map and so would otherwise pull the camera straight back on the next
+    // frame, leaving this button looking broken.
+    context.read<MapProvider>().setFollowTrackedBus(false);
+
     /// This will move the map to the current location
     /// and set the zoom level to 16
     alignPositionStreamController.add(16);
-  }
-
-  Future<String> _getCachePath() async {
-    final cacheDirectory = await getTemporaryDirectory();
-    return cacheDirectory.path;
   }
 }

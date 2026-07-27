@@ -8,6 +8,9 @@
   "map": "Map",
   "warnings": "Warnings",
   "news": "News",
+  "settings": "Settings",
+  "appearance": "Appearance",
+  "about": "About",
   "theme": "Theme",
   "light": "Light",
   "dark": "Dark",
@@ -144,6 +147,157 @@
   "remindersDeniedDialogSubtitle": "To receive precise notifications, please allow scheduled alarms for Via Mallorca.",
   "useInexact": "Use inexact",
   "allowExact": "Allow exact",
-  "switchToExact": "Switch to exact notifications",
-  "switchToInexact": "Switch to inexact notifications"
+  "notifications": "Notifications",
+  "exactNotifications": "Exact notifications",
+  "exactNotificationsDescription": "Deliver departure reminders at the exact minute. Turning this off saves battery, but reminders may arrive a few minutes early or late.",
+  "onDemand": "On demand",
+  "summerOnly": "Summer only",
+  "viewOnMap": "View on map",
+  "townsServed": "Towns served",
+  "operatingPeriod": "Operating period",
+  "currentlyOperating": "Currently operating",
+  "serviceHolidays": "Holidays affecting service",
+  "directions": "Directions",
+  "outbound": "Outbound",
+  "inbound": "Return",
+  "timetable": "Timetable",
+  "allYear": "All year",
+  "linesServingStop": "Lines serving this stop",
+  "dropOffOnly": "Drop-off only",
+  "sectorNumbered": "Sector {code}",
+  "@sectorNumbered": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "metro": "Metro",
+  "train": "Train",
+  "otherLines": "Other",
+  "minutesLate": "{count, plural, one{1 minute late} other{{count} minutes late}}",
+  "@minutesLate": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "pickUpOnly": "Pick-up only",
+  "arrivesAt": "Arrives {destination} at {time}",
+  "@arrivesAt": {
+    "placeholders": {
+      "destination": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "noStationsOnRoute": "No stops left on this route",
+  "dischargeOnlyDialogTitle": "Drop-off only stop",
+  "dischargeOnlyDialogSubtitle": "This bus only lets passengers off at this stop, so you will not be able to board it here. Track it anyway?",
+  "departures": "Departures",
+  "openInMaps": "Open in Maps",
+  "stopCount": "{count, plural, =0{no stops} one{1 stop} other{{count} stops}}",
+  "@stopCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "licenses": "Licenses",
+  "notAffiliated": "Via Mallorca is an independent, open-source project. It is not affiliated with, endorsed by, or run by any transport operator or public administration.",
+  "transitDataTitle": "Transit data",
+  "transitDataBody": "Stops, lines, timetables and live bus positions come from the public open data of Mallorca's transport consortium. This data is not owned by Via Mallorca: it belongs to its authors, and the app fetches it dynamically, exactly as published.",
+  "mapDataTitle": "Map data",
+  "mapDataBody": "The map and its tiles are provided by OpenStreetMap and its contributors.",
+  "thisAppTitle": "This app",
+  "thisAppBody": "The Via Mallorca app itself is free and open source. You are welcome to read the code, report issues, or contribute.",
+  "licensedBy": "By {author} - {license}",
+  "@licensedBy": {
+    "placeholders": {
+      "author": {
+        "type": "String"
+      },
+      "license": {
+        "type": "String"
+      }
+    }
+  },
+  "openDataPortal": "Open data portal",
+  "viewLicense": "View license",
+  "sourceCode": "Source code",
+  "openSourceLicenses": "Open-source licenses",
+  "openSourceLicensesSubtitle": "Licenses of the libraries used in this app",
+  "general": "General",
+  "tracking": "Tracking",
+  "warningsAndNews": "Warnings & news",
+  "showServiceBadges": "Unread badges",
+  "showServiceBadgesDescription": "Show a badge on the news and warnings buttons when there is something new.",
+  "showDepartureWarnings": "Warnings on departures",
+  "showDepartureWarningsDescription": "Show a summary of affected lines above a stop's departures.",
+  "noWarnings": "No service warnings right now",
+  "warningsFailed": "Could not load service warnings",
+  "warningDetailUnavailable": "The full text could not be loaded. Open it in your browser to read it.",
+  "affectedLines": "Affected lines",
+  "markAllRead": "Mark all as read",
+  "openInBrowser": "Open in browser",
+  "viewNotice": "View notice",
+  "noNews": "No news right now",
+  "newsFailed": "Could not load news",
+  "newsDetailUnavailable": "The full article could not be loaded. Open it in your browser to read it.",
+  "warningsForLine": "Warnings for {line}",
+  "@warningsForLine": {
+    "placeholders": {
+      "line": {
+        "type": "String"
+      }
+    }
+  },
+  "lineWarningCount": "{count, plural, one{1 warning} other{{count} warnings}}",
+  "@lineWarningCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "startupTab": "Open the app on",
+  "distanceUnits": "Distance units",
+  "metric": "Metric (m, km)",
+  "imperial": "Imperial (ft, mi)",
+  "nearbyStopCount": "Nearby stops shown",
+  "nearbyStopCountValue": "{count, plural, one{1 stop} other{{count} stops}}",
+  "@nearbyStopCountValue": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "defaultReminderTime": "Default reminder time",
+  "defaultReminderTimeDescription": "How much warning new departure reminders are set for. Shortened automatically when a bus is leaving sooner than that.",
+  "minutesBeforeValue": "{count, plural, one{1 minute before} other{{count} minutes before}}",
+  "@minutesBeforeValue": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "dontShowAgain": "Don't show this again",
+  "warnDropOffOnly": "Warn about drop-off only stops",
+  "warnDropOffOnlyDescription": "Confirm before tracking a bus from a stop where you cannot board it.",
+  "keepScreenOn": "Keep screen on while tracking",
+  "keepScreenOnDescription": "Stops the display turning off while you are following a bus.",
+  "storage": "Storage",
+  "clearCache": "Clear cached data",
+  "clearCacheDescription": "Stops, lines and map tiles saved on this device.",
+  "clearCacheDialogTitle": "Clear cached data?",
+  "clearCacheDialogSubtitle": "Stops, lines and map tiles will be downloaded again the next time they are needed. Your favourites and settings are not affected.",
+  "clear": "Clear",
+  "cacheCleared": "Cached data cleared"
 }

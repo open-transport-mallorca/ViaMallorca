@@ -4,11 +4,19 @@ import 'package:url_launcher/url_launcher.dart';
 
 class TimetableViewModel extends ChangeNotifier {
   final String lineCode;
+
+  /// The line's numeric id, when the caller already has it.
+  ///
+  /// Without it [RouteLinesApi.getPdfTimetable] fetches the line first purely
+  /// to read this, costing a whole round trip before the timetable is even
+  /// requested.
+  final int? lineId;
+
   Uri? _timetableUri;
   bool _isLoading = true;
   String? _errorMessage;
 
-  TimetableViewModel(this.lineCode) {
+  TimetableViewModel(this.lineCode, {this.lineId}) {
     _fetchTimetable();
   }
 
@@ -18,7 +26,8 @@ class TimetableViewModel extends ChangeNotifier {
 
   Future<void> _fetchTimetable() async {
     try {
-      _timetableUri = await RouteLinesApi.getPdfTimetable(lineCode);
+      _timetableUri =
+          await RouteLinesApi.getPdfTimetable(lineCode, lineId: lineId);
     } catch (e) {
       _errorMessage = e.toString();
     } finally {

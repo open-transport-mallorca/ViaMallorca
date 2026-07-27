@@ -7,7 +7,7 @@ environment:
   sdk: ">=3.4.0 <4.0.0"
 
 dependencies:
-  mallorca_transit_services: ^2.3.0
+  mallorca_transit_services: ^2.7.0
   dynamic_color: ^1.8.1
   flutter:
     sdk: flutter
@@ -16,6 +16,7 @@ dependencies:
   intl: any
   flutter_local_notifications: ^21.0.0
   flutter_map: ^8.3.0
+  http: ^1.6.0 # Owns the map tile provider's client, see `map_view.dart`
   flutter_map_marker_cluster: ^8.2.2
   latlong2: ^0.9.1
   permission_handler: ^12.0.1
@@ -35,13 +36,11 @@ dependencies:
       url: https://github.com/quqo-dev/timelines.git
       ref: main
   flutter_material_design_icons: ^3.1.0+7447
-  flutter_map_tile_caching: ^10.1.1
   path_provider: ^2.1.5
-  flutter_map_cancellable_tile_provider: ^3.1.1
   numberpicker: ^2.1.2
   web_socket_channel: ^3.0.3
   quick_actions: ^1.1.0
-
+  wakelock_plus: ^1.5.2
 dependency_overrides:
   intl: ^0.20.2 # Due to downstream dart_rss dependency of mallorca_transit_services
 dev_dependencies:

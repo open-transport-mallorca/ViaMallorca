@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:via_mallorca/components/search_bar.dart';
 import 'package:via_mallorca/providers/favorites_provider.dart';
-import 'package:via_mallorca/providers/map_provider.dart';
-import 'package:via_mallorca/providers/navigation_provider.dart';
+import 'package:via_mallorca/screens/route_details/route_details_view.dart';
 import 'package:via_mallorca/screens/timetable_viewer/timetable_view.dart';
 import 'package:via_mallorca/localization/generated/app_localizations.dart';
 import 'package:mallorca_transit_services/mallorca_transit_services.dart';
@@ -29,7 +28,7 @@ class RoutesScreen extends StatelessWidget {
               viewModel.onlyFavourites = false;
             }
 
-            final routes = viewModel.filteredRoutes;
+            final routes = viewModel.groupedRoutes;
             final searchQuery = viewModel.searchQuery;
 
             return Column(
@@ -49,8 +48,12 @@ class RoutesScreen extends StatelessWidget {
                           child: Text(AppLocalizations.of(context)!.noResults))
                       : ListView.builder(
                           itemCount: routes.length,
-                          itemBuilder: (context, index) =>
-                              RouteTile(route: routes[index])),
+                          itemBuilder: (context, index) {
+                            final item = routes[index];
+                            return item is SectorHeader
+                                ? _SectorHeaderTile(header: item)
+                                : RouteTile(route: item as RouteLine);
+                          }),
                 ),
               ],
             );
@@ -85,6 +88,42 @@ class RoutesScreen extends StatelessWidget {
   }
 }
 
+/// Names the sector a run of routes belongs to.
+class _SectorHeaderTile extends StatelessWidget {
+  const _SectorHeaderTile({required this.header});
+
+  final SectorHeader header;
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final sector = header.sector;
+
+    // The operator's numbered sectors have no names of their own, so they are
+    // labelled by number; the rail modes and unfiled lines get words.
+    final label = sector == null
+        ? l10n.otherLines
+        : sector == 'Metro'
+            ? l10n.metro
+            : sector == 'Tren'
+                ? l10n.train
+                : l10n.sectorNumbered(sector);
+
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(16, 16, 16, 4),
+      child: Text(
+        label.toUpperCase(),
+        style: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w700,
+          letterSpacing: 0.8,
+          color: Theme.of(context).colorScheme.primary,
+        ),
+      ),
+    );
+  }
+}
+
 class RouteTile extends StatelessWidget {
   const RouteTile({
     super.key,
@@ -106,7 +145,49 @@ class RouteTile extends StatelessWidget {
             borderRadius: BorderRadius.circular(10),
           ),
           title: Text(route.code, style: const TextStyle(fontSize: 20)),
-          subtitle: Text(route.name),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(route.name),
+              if (route.onDemand == true || route.summerOnly == true)
+                Padding(
+                  padding: const EdgeInsets.only(top: 4),
+                  child: Wrap(
+                    spacing: 4,
+                    children: [
+                      if (route.onDemand == true)
+                        Chip(
+                          avatar: Icon(Icons.touch_app,
+                              size: 14,
+                              color: Theme.of(context).colorScheme.tertiary),
+                          label: Text(
+                            AppLocalizations.of(context)!.onDemand,
+                            style: const TextStyle(fontSize: 11),
+                          ),
+                          visualDensity: VisualDensity.compact,
+                          padding: EdgeInsets.zero,
+                          materialTapTargetSize:
+                              MaterialTapTargetSize.shrinkWrap,
+                        ),
+                      if (route.summerOnly == true)
+                        Chip(
+                          avatar: Icon(Icons.wb_sunny,
+                              size: 14, color: Colors.orange.shade700),
+                          label: Text(
+                            AppLocalizations.of(context)!.summerOnly,
+                            style: const TextStyle(fontSize: 11),
+                          ),
+                          visualDensity: VisualDensity.compact,
+                          padding: EdgeInsets.zero,
+                          materialTapTargetSize:
+                              MaterialTapTargetSize.shrinkWrap,
+                        ),
+                    ],
+                  ),
+                ),
+            ],
+          ),
           leading: tileIcon,
           trailing: Row(
             mainAxisSize: MainAxisSize.min,
@@ -115,7 +196,8 @@ class RouteTile extends StatelessWidget {
                 onPressed: () => Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => TimetableViewer(lineCode: route.code),
+                    builder: (context) =>
+                        TimetableViewer(lineCode: route.code, lineId: route.id),
                   ),
                 ),
                 icon: const Icon(Icons.access_time_filled_rounded),
@@ -140,9 +222,12 @@ class RouteTile extends StatelessWidget {
           ),
           onTap: () {
             FocusManager.instance.primaryFocus?.unfocus();
-            Provider.of<NavigationProvider>(context, listen: false).setIndex(1);
-            Provider.of<MapProvider>(context, listen: false)
-                .viewRoute(route, context);
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => RouteDetailsScreen(route: route),
+              ),
+            );
           },
         ),
       );

@@ -1,6 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+/// The units distances are shown in.
+///
+/// Mallorca is signposted in metric, but a large share of the app's users are
+/// visitors from countries that are not.
+enum DistanceUnits { metric, imperial }
+
 /// API for local storage.
 ///
 /// This class is used to store data locally on the device.
@@ -87,35 +93,53 @@ class LocalStorageApi {
     await _preferences!.setBool('openedFirstTime', openedFirstTime);
   }
 
-  /// Retrieves the list of shown warnings from the local storage preferences.
-  ///
-  /// The [warningList] parameter is the list of warnings to filter.
-  /// Returns a list of strings representing the shown warnings.
-  static List<String> getShownWarnings(List<String> warningList) {
+  /// The ids of the service warnings the user has already seen.
+  static List<String> getShownWarnings() {
     return _preferences!.getStringList("shownWarnings") ?? [];
   }
 
-  /// Sets the list of shown warnings in the local storage.
+  /// The moment warnings were first loaded on this install, or null before then.
   ///
-  /// The [warningList] parameter is a list of strings representing the warnings to be stored.
-  /// This method uses the shared preferences to store the list of shown warnings.
-  /// Returns a Future that completes when the operation is done.
-  static Future setShownWarnings(List<String> warningList) async {
-    await _preferences!.setStringList("shownWarnings", warningList);
+  /// Only warnings published after this count as unread, so a fresh install
+  /// does not flag disruptions the user was never around for.
+  static DateTime? getWarningsBaseline() {
+    final value = _preferences!.getString("warningsBaseline");
+    return value == null ? null : DateTime.tryParse(value);
   }
 
-  /// Retrieves the list of shown news from the local storage.
-  ///
-  /// Returns a list of strings representing the shown news.
-  static List<String> getShownNews(List<String> newsList) {
+  /// Records the warnings baseline. Set once, on the first warnings load.
+  static Future setWarningsBaseline(DateTime baseline) async {
+    await _preferences!
+        .setString("warningsBaseline", baseline.toIso8601String());
+  }
+
+  /// Records the ids of the service warnings the user has seen.
+  static Future setShownWarnings(List<String> warningIds) async {
+    await _preferences!.setStringList("shownWarnings", warningIds);
+  }
+
+  /// The ids of the news items the user has already seen.
+  static List<String> getShownNews() {
     return _preferences!.getStringList("shownNews") ?? [];
   }
 
-  /// Sets the list of shown news in the local storage.
+  /// The moment news was first loaded on this install, or null before then.
   ///
-  /// [newsList] - A list of strings representing the shown news.
-  static Future setShownNews(List<String> newsList) async {
-    await _preferences!.setStringList("shownNews", newsList);
+  /// Only items published after this count as unread, so a fresh install does
+  /// not flag the whole backlog the user was never around for.
+  static DateTime? getNewsBaseline() {
+    final value = _preferences!.getString("newsBaseline");
+    return value == null ? null : DateTime.tryParse(value);
+  }
+
+  /// Records the news baseline. Set once, on the first news load.
+  static Future setNewsBaseline(DateTime baseline) async {
+    await _preferences!.setString("newsBaseline", baseline.toIso8601String());
+  }
+
+  /// Records the ids of the news items the user has seen.
+  static Future setShownNews(List<String> newsIds) async {
+    await _preferences!.setStringList("shownNews", newsIds);
   }
 
   /// Retrieves the list of favourite stations from the local storage.
@@ -173,5 +197,108 @@ class LocalStorageApi {
   ///  The [channel] parameter specifies the notification channel to be set.
   static Future setNotificationChannel(String channel) async {
     await _preferences!.setString("notificationChannel", channel);
+  }
+
+  /// The units distances are shown in. Defaults to metric, as Mallorca is.
+  static DistanceUnits getDistanceUnits() {
+    final units = _preferences!.getString('distanceUnits');
+    return DistanceUnits.values.firstWhere(
+      (value) => value.name == units,
+      orElse: () => DistanceUnits.metric,
+    );
+  }
+
+  /// Sets the units distances are shown in.
+  static Future setDistanceUnits(DistanceUnits units) async {
+    await _preferences!.setString('distanceUnits', units.name);
+  }
+
+  /// The tab the app opens on, as an index into the bottom navigation bar.
+  ///
+  /// Clamped on read so a tab index saved by a version with more tabs cannot
+  /// leave the app opening on a screen that no longer exists.
+  static int getStartupTab(int tabCount) {
+    final index = _preferences!.getInt('startupTab') ?? 0;
+    return index.clamp(0, tabCount - 1);
+  }
+
+  /// Sets the tab the app opens on.
+  static Future setStartupTab(int index) async {
+    await _preferences!.setInt('startupTab', index);
+  }
+
+  /// How many stops the nearby screen lists.
+  static int getNearbyStopCount() {
+    return _preferences!.getInt('nearbyStopCount') ?? 5;
+  }
+
+  /// Sets how many stops the nearby screen lists.
+  static Future setNearbyStopCount(int count) async {
+    await _preferences!.setInt('nearbyStopCount', count);
+  }
+
+  /// How many minutes before a departure a reminder is scheduled by default.
+  ///
+  /// Only a starting point for the picker in the departure dialog, which
+  /// narrows it to what the time left before that particular departure allows.
+  static int getNotificationLeadTime() {
+    return _preferences!.getInt('notificationLeadTime') ?? 5;
+  }
+
+  /// Sets the default number of minutes before a departure to be reminded.
+  static Future setNotificationLeadTime(int minutes) async {
+    await _preferences!.setInt('notificationLeadTime', minutes);
+  }
+
+  /// Whether to confirm before tracking a bus from a stop where it only lets
+  /// passengers off.
+  static bool showDischargeOnlyWarning() {
+    return _preferences!.getBool('showDischargeOnlyWarning') ?? true;
+  }
+
+  /// Sets whether to confirm before tracking a drop-off only departure.
+  static Future setShowDischargeOnlyWarning(bool show) async {
+    await _preferences!.setBool('showDischargeOnlyWarning', show);
+  }
+
+  /// Whether to hold the screen awake while a bus is being tracked.
+  static bool keepScreenOnWhileTracking() {
+    return _preferences!.getBool('keepScreenOnWhileTracking') ?? false;
+  }
+
+  /// Sets whether to hold the screen awake while tracking.
+  static Future setKeepScreenOnWhileTracking(bool keepOn) async {
+    await _preferences!.setBool('keepScreenOnWhileTracking', keepOn);
+  }
+
+  /// Whether to show the unread count on the news and warnings buttons.
+  static bool showServiceBadges() {
+    return _preferences!.getBool('showServiceBadges') ?? true;
+  }
+
+  /// Sets whether the news and warnings buttons show an unread badge.
+  static Future setShowServiceBadges(bool show) async {
+    await _preferences!.setBool('showServiceBadges', show);
+  }
+
+  /// Whether to show the warnings summary above a stop's departures.
+  static bool showDepartureWarnings() {
+    return _preferences!.getBool('showDepartureWarnings') ?? true;
+  }
+
+  /// Sets whether the warnings summary is shown above departures.
+  static Future setShowDepartureWarnings(bool show) async {
+    await _preferences!.setBool('showDepartureWarnings', show);
+  }
+
+  /// Whether the leftovers of the map tile caches used before flutter_map's
+  /// built-in caching have already been deleted.
+  static bool legacyMapCachesCleared() {
+    return _preferences!.getBool("legacyMapCachesCleared") ?? false;
+  }
+
+  /// Records whether the legacy map tile caches have been deleted.
+  static Future setLegacyMapCachesCleared(bool cleared) async {
+    await _preferences!.setBool("legacyMapCachesCleared", cleared);
   }
 }

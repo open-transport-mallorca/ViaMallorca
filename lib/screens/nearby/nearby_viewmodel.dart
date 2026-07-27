@@ -8,13 +8,19 @@ import 'package:via_mallorca/utils/station_sort.dart';
 class NearbyStopsViewModel extends ChangeNotifier {
   LocationPermission _locationPermission = LocationPermission.denied;
   List<Station> _cachedStations = [];
-  List<Station> _nearbyStations = [];
+  List<Station> _stationsByDistance = [];
   Position? _currentLocation;
   bool _isLoading = false;
   String? _errorMessage;
 
   LocationPermission get locationPermission => _locationPermission;
-  List<Station> get nearbyStations => _nearbyStations;
+
+  /// Every known stop, nearest first.
+  ///
+  /// Not truncated here: how many of these to show is a user preference, and
+  /// slicing at the point of display means changing it re-renders the list
+  /// without refetching and re-sorting everything.
+  List<Station> get stationsByDistance => _stationsByDistance;
   Position? get currentLocation => _currentLocation;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
@@ -46,9 +52,8 @@ class NearbyStopsViewModel extends ChangeNotifier {
       }
 
       _currentLocation = await LocationApi.getCurrentLocation();
-      _nearbyStations =
+      _stationsByDistance =
           StationSort.sortByDistance(_cachedStations, _currentLocation!)
-              .take(10)
               .toList();
     } catch (e) {
       _errorMessage = e.toString();

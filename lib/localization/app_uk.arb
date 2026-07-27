@@ -8,6 +8,9 @@
   "map": "Карта",
   "warnings": "Попередження",
   "news": "Новини",
+  "settings": "Налаштування",
+  "appearance": "Вигляд",
+  "about": "Про застосунок",
   "theme": "Тема",
   "light": "Світла",
   "dark": "Темна",
@@ -73,6 +76,112 @@
   "remindersDeniedDialogSubtitle": "Щоб отримувати точні сповіщення, дозвольте заплановані будильники для Via Mallorca.",
   "useInexact": "Використовувати неточні",
   "allowExact": "Дозволити точні",
-  "switchToExact": "Перемкнутися на точні сповіщення",
-  "switchToInexact": "Перемкнутися на неточні сповіщення"
+  "notifications": "Сповіщення",
+  "exactNotifications": "Точні сповіщення",
+  "exactNotificationsDescription": "Надсилати нагадування про відправлення точно у вказану хвилину. Якщо вимкнути, заряд батареї заощаджується, але нагадування можуть надходити на кілька хвилин раніше чи пізніше.",
+  "onDemand": "На замовлення",
+  "summerOnly": "Лише влітку",
+  "viewOnMap": "Показати на карті",
+  "townsServed": "Населені пункти",
+  "operatingPeriod": "Період роботи",
+  "currentlyOperating": "Зараз працює",
+  "serviceHolidays": "Свята, що впливають на рух",
+  "directions": "Напрямки",
+  "outbound": "Туди",
+  "inbound": "Назад",
+  "timetable": "Розклад",
+  "allYear": "Цілий рік",
+  "linesServingStop": "Маршрути цієї зупинки",
+  "dropOffOnly": "Тільки висадка",
+  "sectorNumbered": "Сектор {code}",
+  "@sectorNumbered": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "metro": "Метро",
+  "train": "Потяг",
+  "otherLines": "Інші",
+  "minutesLate": "{count, plural, one{запізнення 1 хвилина} other{запізнення {count} хв}}",
+  "@minutesLate": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "pickUpOnly": "Тільки посадка",
+  "arrivesAt": "Прибуття до {destination} о {time}",
+  "noStationsOnRoute": "На цьому маршруті більше немає зупинок",
+  "dischargeOnlyDialogTitle": "Зупинка тільки для висадки",
+  "dischargeOnlyDialogSubtitle": "На цій зупинці цей автобус лише висаджує пасажирів, тож сісти тут не вдасться. Усе одно стежити за ним?",
+  "departures": "Відправлення",
+  "openInMaps": "Відкрити в Картах",
+  "stopCount": "{count, plural, =0{немає зупинок} one{1 зупинка} other{{count} зупинок}}",
+  "licenses": "Ліцензії",
+  "notAffiliated": "Via Mallorca - незалежний проєкт з відкритим кодом. Він не пов'язаний із жодним перевізником чи державною установою, не схвалений ними та не керується ними.",
+  "transitDataTitle": "Транспортні дані",
+  "transitDataBody": "Зупинки, маршрути, розклади та місцезнаходження автобусів у реальному часі беруться з публічних відкритих даних транспортного консорціуму Мальорки. Ці дані не належать Via Mallorca: вони належать своїм авторам, а застосунок отримує їх динамічно, у тому вигляді, в якому вони опубліковані.",
+  "mapDataTitle": "Дані карти",
+  "mapDataBody": "Карту та її тайли надають OpenStreetMap і його учасники.",
+  "thisAppTitle": "Цей застосунок",
+  "thisAppBody": "Сам застосунок Via Mallorca є вільним і має відкритий код. Ви можете переглянути код, повідомити про помилки або долучитися до розробки.",
+  "licensedBy": "Автор: {author} - {license}",
+  "@licensedBy": {
+    "placeholders": {
+      "author": {
+        "type": "String"
+      },
+      "license": {
+        "type": "String"
+      }
+    }
+  },
+  "openDataPortal": "Портал відкритих даних",
+  "viewLicense": "Переглянути ліцензію",
+  "sourceCode": "Вихідний код",
+  "openSourceLicenses": "Ліцензії відкритого коду",
+  "openSourceLicensesSubtitle": "Ліцензії бібліотек, використаних у цьому застосунку",
+  "general": "Загальні",
+  "tracking": "Стеження",
+  "warningsAndNews": "Повідомлення та новини",
+  "showServiceBadges": "Позначки непрочитаного",
+  "showServiceBadgesDescription": "Показувати позначку на кнопках новин і повідомлень, коли з'являється щось нове.",
+  "showDepartureWarnings": "Повідомлення у відправленнях",
+  "showDepartureWarningsDescription": "Показувати зведення задіяних маршрутів над відправленнями зупинки.",
+  "noWarnings": "Наразі немає повідомлень про збої",
+  "warningsFailed": "Не вдалося завантажити повідомлення про збої",
+  "warningDetailUnavailable": "Не вдалося завантажити повний текст. Відкрийте його у браузері, щоб прочитати.",
+  "affectedLines": "Задіяні маршрути",
+  "markAllRead": "Позначити все як прочитане",
+  "openInBrowser": "Відкрити у браузері",
+  "viewNotice": "Переглянути повідомлення",
+  "noNews": "Наразі немає новин",
+  "newsFailed": "Не вдалося завантажити новини",
+  "newsDetailUnavailable": "Не вдалося завантажити повну статтю. Відкрийте її у браузері, щоб прочитати.",
+  "warningsForLine": "Повідомлення для маршруту {line}",
+  "lineWarningCount": "{count, plural, one{1 повідомлення} few{{count} повідомлення} many{{count} повідомлень} other{{count} повідомлення}}",
+  "startupTab": "Відкривати застосунок на",
+  "distanceUnits": "Одиниці відстані",
+  "metric": "Метричні (m, km)",
+  "imperial": "Імперські (ft, mi)",
+  "nearbyStopCount": "Показувати зупинок поблизу",
+  "nearbyStopCountValue": "{count, plural, one{1 зупинка} few{{count} зупинки} many{{count} зупинок} other{{count} зупинки}}",
+  "defaultReminderTime": "Стандартний час нагадування",
+  "defaultReminderTimeDescription": "За скільки часу наперед створюються нові нагадування про відправлення. Автоматично скорочується, якщо автобус відправляється раніше.",
+  "minutesBeforeValue": "{count, plural, one{за 1 хвилину} few{за {count} хвилини} many{за {count} хвилин} other{за {count} хвилини}}",
+  "dontShowAgain": "Більше не показувати",
+  "warnDropOffOnly": "Попереджати про зупинки лише для висадки",
+  "warnDropOffOnlyDescription": "Підтверджувати перед стеженням за автобусом із зупинки, де неможливо сісти.",
+  "keepScreenOn": "Не вимикати екран під час стеження",
+  "keepScreenOnDescription": "Запобігає вимкненню екрана, поки ви стежите за автобусом.",
+  "storage": "Сховище",
+  "clearCache": "Очистити збережені дані",
+  "clearCacheDescription": "Зупинки, маршрути й фрагменти карти, збережені на цьому пристрої.",
+  "clearCacheDialogTitle": "Очистити збережені дані?",
+  "clearCacheDialogSubtitle": "Зупинки, маршрути й фрагменти карти буде завантажено знову, коли вони знадобляться. Ваші вибрані та налаштування не постраждають.",
+  "clear": "Очистити",
+  "cacheCleared": "Збережені дані очищено"
 }

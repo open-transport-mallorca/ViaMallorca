@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:via_mallorca/providers/navigation_provider.dart';
 import 'package:via_mallorca/providers/tracking_provider.dart';
 import 'package:via_mallorca/utils/adapt_color.dart';
+import 'package:via_mallorca/utils/route_follower.dart';
 import 'package:mallorca_transit_services/mallorca_transit_services.dart';
 
 /// A provider class that manages the map-related functionality.
@@ -17,10 +18,86 @@ class MapProvider extends ChangeNotifier {
   List<String>? customRouteDestinations;
   Way? customWay;
 
+  /// The currently open station bottom sheet, if any. Tracked so it can be
+  /// dismissed when navigating away to the map (e.g. when opening a route or a
+  /// direction from the route details screen).
+  PersistentBottomSheetController? _stationSheet;
+
   /// The loading progress, represented as a double value.
   ///
   /// The value ranges from 0 to 1.
   double loadingProgress = 1;
+
+  /// Zoom used when framing a tracked bus.
+  static const double trackingZoom = 15;
+
+  /// Whether the camera keeps the tracked bus centred as it moves.
+  ///
+  /// Enabled when tracking starts and switched off by the first map gesture,
+  /// so panning away is never fought by the follow. The bus button turns it
+  /// back on.
+  bool followTrackedBus = false;
+
+  void setFollowTrackedBus(bool value) {
+    if (followTrackedBus == value) return;
+    followTrackedBus = value;
+    notifyListeners();
+  }
+
+  /// How far along the tracked route the bus has got, in metres, or null when
+  /// nothing is tracked or the bus is off the drawn route.
+  ///
+  /// A [ValueNotifier] rather than provider state because it changes many times
+  /// a second while the bus animates; only the route polylines need to repaint,
+  /// not every map layer.
+  final ValueNotifier<double?> busRouteDistance = ValueNotifier<double?>(null);
+
+  RouteProgress? _progress;
+  List<LatLng>? _progressSource;
+
+  /// A cached [RouteProgress] for [points], rebuilt only when the route itself
+  /// changes. Measuring a route is linear in its vertex count, and routes reach
+  /// a couple of thousand of them.
+  RouteProgress progressFor(List<LatLng> points) {
+    if (identical(_progressSource, points) && _progress != null) {
+      return _progress!;
+    }
+    _progressSource = points;
+    return _progress = RouteProgress(points);
+  }
+
+  /// The highlighted route as drawn today: one of the two colour variants held
+  /// in [customRoutes], and for a line with separate directions the one
+  /// matching the way on show.
+  ///
+  /// The geometry is the same in either variant, so callers that only want the
+  /// points can pass any [brightness].
+  Polyline? basePolyline(Brightness brightness) {
+    final routes = customRoutes;
+    if (routes == null || routes.length < 2) return null;
+
+    final polylines = routes[brightness == Brightness.light ? 0 : 1];
+    if (polylines.isEmpty) return null;
+    if (polylines.length == 1) return polylines.first;
+
+    return polylines[customWay == null || customWay == Way.way ? 0 : 1];
+  }
+
+  /// Registers the [controller] of a freshly shown station bottom sheet so it
+  /// can later be closed via [closeStationSheet]. Self-clears when the sheet is
+  /// dismissed by any other means (drag, back button, tab switch).
+  void registerStationSheet(PersistentBottomSheetController controller) {
+    _stationSheet = controller;
+    controller.closed.whenComplete(() {
+      if (_stationSheet == controller) _stationSheet = null;
+    });
+  }
+
+  /// Closes the open station bottom sheet if there is one; a no-op otherwise.
+  void closeStationSheet() {
+    _stationSheet?.close();
+    _stationSheet = null;
+  }
 
   /// Sets the custom polylines for the map.
   ///
@@ -83,9 +160,11 @@ class MapProvider extends ChangeNotifier {
   ///
   /// The [line] parameter is a [RouteLine] object representing the route line to be viewed.
   /// The [context] parameter is the build context.
-  /// The [isTracking] parameter is an optional boolean value indicating whether tracking is enabled.
+  /// The [isTracking] parameter indicates whether tracking is enabled.
+  /// The [initialWay] parameter pre-selects which direction is shown first; the
+  /// way switcher can still flip to the other one. Defaults to [Way.way].
   Future<void> viewRoute(RouteLine line, BuildContext context,
-      [bool? isTracking]) async {
+      {bool? isTracking, Way? initialWay}) async {
     final trackingProvider =
         Provider.of<TrackingProvider>(context, listen: false);
     final navigationProvider =
@@ -94,9 +173,11 @@ class MapProvider extends ChangeNotifier {
     customRouteDestinations = [];
     customRoutes = [[], []];
 
-    if (Navigator.canPop(context)) {
-      Navigator.pop(context);
-    }
+    // Close any open station bottom sheet (it lives as a local-history entry on
+    // the root route, which popUntil won't dismiss), then return to the root
+    // scaffold regardless of depth so the map below becomes visible.
+    closeStationSheet();
+    Navigator.of(context).popUntil((route) => route.isFirst);
 
     if (trackingProvider.currentLocation != null) {
       trackingProvider.stopTracking();
@@ -112,7 +193,9 @@ class MapProvider extends ChangeNotifier {
 
     setMapLoadingProgress(0.3);
 
-    customWay = Way.way;
+    // Only flip to the back direction when the line actually has more than one
+    // subline; a loop has a single polyline at index 0.
+    customWay = (sublines.length > 1 ? initialWay : null) ?? Way.way;
 
     for (Subline subline in sublines) {
       List<LatLng> points = [];

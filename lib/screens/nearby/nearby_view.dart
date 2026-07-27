@@ -1,15 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:latlong2/latlong.dart';
+import 'package:mallorca_transit_services/mallorca_transit_services.dart';
 import 'package:provider/provider.dart';
-import 'package:via_mallorca/components/bottom_sheets/station/station_view.dart';
 import 'package:via_mallorca/components/popups/location_denied_popup.dart';
 import 'package:via_mallorca/components/skeletons/nearby_card_skeleton.dart';
 import 'package:via_mallorca/components/station_line_labels/station_line_labels_view.dart';
 import 'package:via_mallorca/providers/favorites_provider.dart';
-import 'package:via_mallorca/providers/map_provider.dart';
-import 'package:via_mallorca/providers/navigation_provider.dart';
+import 'package:via_mallorca/providers/settings_provider.dart';
 import 'package:via_mallorca/screens/nearby/nearby_viewmodel.dart';
+import 'package:via_mallorca/screens/station_details/station_details_view.dart';
 import 'package:via_mallorca/localization/generated/app_localizations.dart';
 import 'package:via_mallorca/utils/distance_formatter.dart';
 import 'package:via_mallorca/utils/station_sort.dart';
@@ -51,18 +50,25 @@ class NearbyStops extends StatelessWidget {
                           LocationPermission.always ||
                       viewModel.locationPermission ==
                           LocationPermission.whileInUse)
-                    Expanded(
-                      child: ListView.builder(
-                        itemCount: viewModel.isLoading
-                            ? 5
-                            : viewModel.nearbyStations.length,
-                        itemBuilder: (context, index) {
-                          if (viewModel.isLoading) {
-                            return const NearbyCardSkeleton();
-                          }
-                          return nearbyCard(viewModel, index, context);
-                        },
-                      ),
+                    Consumer<SettingsProvider>(
+                      builder: (context, settings, _) {
+                        final stations = viewModel.stationsByDistance
+                            .take(settings.nearbyStopCount)
+                            .toList();
+                        return Expanded(
+                          child: ListView.builder(
+                            itemCount:
+                                viewModel.isLoading ? 5 : stations.length,
+                            itemBuilder: (context, index) {
+                              if (viewModel.isLoading) {
+                                return const NearbyCardSkeleton();
+                              }
+                              return nearbyCard(
+                                  viewModel, stations[index], context);
+                            },
+                          ),
+                        );
+                      },
                     )
                   else
                     locationNotLoaded(context, viewModel),
@@ -74,11 +80,7 @@ class NearbyStops extends StatelessWidget {
   }
 
   Widget nearbyCard(
-      NearbyStopsViewModel viewModel, int index, BuildContext context) {
-    final cardColor = Theme.of(context).colorScheme.surfaceContainerHigh;
-    final favoriteBorder = Theme.of(context).colorScheme.primaryContainer;
-
-    final station = viewModel.nearbyStations[index];
+      NearbyStopsViewModel viewModel, Station station, BuildContext context) {
     String formattedDistance = '';
     if (viewModel.currentLocation != null) {
       int distanceInMeters = calculateDistance(
@@ -87,11 +89,16 @@ class NearbyStops extends StatelessWidget {
               lat2: station.lat,
               lon2: station.long)
           .round();
-      formattedDistance = MetricDistanceFormatter.formatDistance(
+      formattedDistance = DistanceFormatter.formatDistance(
           distanceInMeters.toDouble(), context);
     }
     return Consumer<FavoritesProvider>(
         builder: (context, favoritesProvider, child) {
+      // Read theme colours inside the builder so they refresh when switching
+      // between light/dark mode. The outer itemBuilder context isn't rebuilt on
+      // a theme change, so capturing them there leaves the card colour stale.
+      final cardColor = Theme.of(context).colorScheme.surfaceContainerHigh;
+      final favoriteBorder = Theme.of(context).colorScheme.primaryContainer;
       return Card(
         color: cardColor,
         child: ListTile(
@@ -147,17 +154,12 @@ class NearbyStops extends StatelessWidget {
               const Icon(Icons.arrow_forward_ios_rounded),
             ],
           ),
-          onTap: () {
-            Provider.of<NavigationProvider>(context, listen: false).setIndex(1);
-            Provider.of<MapProvider>(context, listen: false)
-                .updateLocation(LatLng(station.lat, station.long), 18);
-            showBottomSheet(
-                shape: const RoundedRectangleBorder(
-                    borderRadius:
-                        BorderRadius.vertical(top: Radius.circular(10.0))),
-                context: context,
-                builder: (context) => StationSheet(station: station));
-          },
+          onTap: () => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => StationDetailsScreen(station: station),
+            ),
+          ),
         ),
       );
     });

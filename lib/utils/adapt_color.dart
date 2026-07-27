@@ -38,6 +38,19 @@ class ColorUtils {
     return hslLight.toColor();
   }
 
+  /// Saturates the given [color] by the specified [amount].
+  /// The [amount] should be a value between 0 and 1,
+  /// where 0 represents no change and 1 represents fully saturated.
+  static Color saturate(Color color, [double amount = .1]) {
+    assert(amount >= 0 && amount <= 1);
+
+    final hsl = HSLColor.fromColor(color);
+    final hslSaturated =
+        hsl.withSaturation((hsl.saturation + amount).clamp(0.0, 1.0));
+
+    return hslSaturated.toColor();
+  }
+
   static List<double> createHueShiftMatrix(double degree) {
     final rad = degree * (math.pi / 180);
     final cosA = math.cos(rad);
