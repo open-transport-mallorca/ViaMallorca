@@ -8,6 +8,7 @@ import 'package:skeletonizer/skeletonizer.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:via_mallorca/components/app_bar.dart';
 import 'package:via_mallorca/components/bottom_sheets/station/departure_card.dart';
+import 'package:via_mallorca/components/map/station_map_preview.dart';
 import 'package:via_mallorca/components/station_line_labels/station_line_labels_view.dart';
 import 'package:via_mallorca/components/warnings_summary_chip.dart';
 import 'package:via_mallorca/components/station_line_labels/station_line_labels_viewmodel.dart';
@@ -95,6 +96,10 @@ class _StationDetailsScreenState extends State<StationDetailsScreen> {
                   padding: const EdgeInsets.only(bottom: 24),
                   children: [
                     _Header(station: station),
+                    StationMapPreview(
+                      station: station,
+                      onTap: () => _viewOnMap(context, station),
+                    ),
                     Padding(
                       padding: const EdgeInsets.all(16),
                       child: Row(

@@ -4,6 +4,7 @@ import 'package:mallorca_transit_services/mallorca_transit_services.dart';
 import 'package:provider/provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:via_mallorca/components/app_bar.dart';
+import 'package:via_mallorca/components/map/map_preview.dart';
 import 'package:via_mallorca/components/map/route_map_preview.dart';
 import 'package:via_mallorca/components/route_stops_timeline.dart';
 import 'package:via_mallorca/localization/generated/app_localizations.dart';
@@ -48,7 +49,7 @@ class RouteDetailsScreen extends StatelessWidget {
                 children: [
                   _Header(line: line),
                   if (viewModel.isPreviewLoading)
-                    const RouteMapPreviewPlaceholder()
+                    const MapPreviewPlaceholder()
                   else if (viewModel.previewPoints.isNotEmpty)
                     RouteMapPreview(
                       points: viewModel.previewPoints,
