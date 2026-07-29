@@ -4,6 +4,7 @@ import 'package:mallorca_transit_services/mallorca_transit_services.dart';
 import 'package:provider/provider.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:via_mallorca/components/app_bar.dart';
+import 'package:via_mallorca/components/map/route_map_preview.dart';
 import 'package:via_mallorca/components/route_stops_timeline.dart';
 import 'package:via_mallorca/localization/generated/app_localizations.dart';
 import 'package:via_mallorca/providers/favorites_provider.dart';
@@ -46,23 +47,22 @@ class RouteDetailsScreen extends StatelessWidget {
                 padding: const EdgeInsets.only(bottom: 24),
                 children: [
                   _Header(line: line),
+                  if (viewModel.isPreviewLoading)
+                    const RouteMapPreviewPlaceholder()
+                  else if (viewModel.previewPoints.isNotEmpty)
+                    RouteMapPreview(
+                      points: viewModel.previewPoints,
+                      stations: viewModel.previewStations,
+                      color: Color(line.color),
+                      onTap: () => _openOnMap(context, line),
+                    ),
                   Padding(
                     padding: const EdgeInsets.all(16),
                     child: Row(
                       children: [
                         Expanded(
                           child: FilledButton.icon(
-                            onPressed: () {
-                              // Switch to the map tab first: viewRoute only
-                              // auto-switches when not already on the routes tab
-                              // (index 3), which is where we are here. viewRoute
-                              // closes any open station sheet itself.
-                              Provider.of<NavigationProvider>(context,
-                                      listen: false)
-                                  .setIndex(1);
-                              Provider.of<MapProvider>(context, listen: false)
-                                  .viewRoute(line, context);
-                            },
+                            onPressed: () => _openOnMap(context, line),
                             icon: const Icon(Icons.map_outlined),
                             label:
                                 Text(AppLocalizations.of(context)!.viewOnMap),
@@ -142,6 +142,17 @@ class RouteDetailsScreen extends StatelessWidget {
         ),
     ];
   }
+}
+
+/// Shows [line] on the map tab, optionally with [initialWay] pre-selected.
+///
+/// The tab is switched first because `viewRoute` only auto-switches when not
+/// already on the routes tab (index 3), which is where this screen sits. It
+/// closes any open station sheet itself.
+void _openOnMap(BuildContext context, RouteLine line, {Way? initialWay}) {
+  Provider.of<NavigationProvider>(context, listen: false).setIndex(1);
+  Provider.of<MapProvider>(context, listen: false)
+      .viewRoute(line, context, initialWay: initialWay);
 }
 
 /// Header with a subtle line-colored tint, a colored badge for the line and
@@ -382,20 +393,10 @@ class _SublineTile extends StatelessWidget {
               child: FilledButton.tonalIcon(
                 icon: const Icon(Icons.map_outlined),
                 label: Text(l10n.viewOnMap),
-                onPressed: () {
-                  // Load the full line (keeping the way switcher) but
-                  // pre-select the tapped direction. Switch to the map tab
-                  // first, since viewRoute only auto-switches when not already
-                  // on the routes tab. viewRoute closes any open station sheet
-                  // itself.
-                  Provider.of<NavigationProvider>(context, listen: false)
-                      .setIndex(1);
-                  Provider.of<MapProvider>(context, listen: false).viewRoute(
-                    subline.parentLine,
-                    context,
-                    initialWay: subline.way,
-                  );
-                },
+                // Load the full line (keeping the way switcher) but pre-select
+                // the tapped direction.
+                onPressed: () => _openOnMap(context, subline.parentLine,
+                    initialWay: subline.way),
               ),
             ),
           ),

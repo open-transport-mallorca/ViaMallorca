@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:mallorca_transit_services/mallorca_transit_services.dart';
 
 /// View model for the route details screen.
@@ -12,8 +13,6 @@ class RouteDetailsViewModel extends ChangeNotifier {
     _loadDetails();
   }
 
-  /// The route as it came from the list. Used for the header while the full
-  /// details are still loading.
   final RouteLine initialLine;
 
   /// The full route line, populated once [RouteLinesApi.getLine] completes.
@@ -21,6 +20,14 @@ class RouteDetailsViewModel extends ChangeNotifier {
 
   bool isLoading = true;
   bool hasError = false;
+
+  /// The shape of the main direction, for the map preview. Empty until it
+  /// loads, and left empty if it fails - the preview is then simply not shown,
+  /// the "view on map" button still works.
+  List<LatLng> previewPoints = const [];
+
+  List<Station> previewStations = const [];
+  bool isPreviewLoading = true;
 
   /// The line to display: the full one if available, otherwise the initial one.
   RouteLine get line => fullLine ?? initialLine;
@@ -38,9 +45,35 @@ class RouteDetailsViewModel extends ChangeNotifier {
       isLoading = false;
       if (!_isDisposed) notifyListeners();
     }
+    if (!hasError) await _loadPreviewShape();
   }
 
-  Future<void> retry() => _loadDetails();
+  Future<void> _loadPreviewShape() async {
+    final subline = sublines.firstOrNull;
+    if (subline == null) {
+      isPreviewLoading = false;
+      if (!_isDisposed) notifyListeners();
+      return;
+    }
+    try {
+      final path = await RouteLinesApi.getPath(subline);
+      previewPoints = path.paths.expand((segment) => segment).toList();
+      previewStations = subline.stations;
+    } catch (_) {
+      previewPoints = const [];
+      previewStations = const [];
+    } finally {
+      isPreviewLoading = false;
+      if (!_isDisposed) notifyListeners();
+    }
+  }
+
+  Future<void> retry() {
+    previewPoints = const [];
+    previewStations = const [];
+    isPreviewLoading = true;
+    return _loadDetails();
+  }
 
   /// Operating sessions, with the currently active one(s) first.
   List<RouteSession> get sessions {
