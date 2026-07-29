@@ -17,6 +17,7 @@ import 'package:via_mallorca/components/bottom_sheets/station/station_view.dart'
 import 'package:via_mallorca/components/map/bus_info.dart';
 import 'package:via_mallorca/components/map/bus_tracker.dart';
 import 'package:via_mallorca/components/map/route_way_switcher.dart';
+import 'package:via_mallorca/components/map/station_marker.dart';
 import 'package:via_mallorca/components/map/tracked_route_polylines.dart';
 import 'package:via_mallorca/components/map/untrack_buttons.dart';
 import 'package:via_mallorca/components/map/update_location_buttons.dart';
@@ -24,7 +25,6 @@ import 'package:via_mallorca/providers/map_provider.dart';
 import 'package:via_mallorca/providers/navigation_provider.dart';
 import 'package:via_mallorca/providers/notifications_provider.dart';
 import 'package:via_mallorca/providers/tracking_provider.dart';
-import 'package:via_mallorca/utils/adapt_color.dart';
 import 'package:mallorca_transit_services/mallorca_transit_services.dart';
 import 'package:via_mallorca/utils/dark_tile_builder.dart';
 
@@ -281,8 +281,8 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
         },
         markers: viewModel.cachedStations
             .map((station) => Marker(
-                  width: 50,
-                  height: 50,
+                  width: StationMarker.defaultSize,
+                  height: StationMarker.defaultSize,
                   alignment: Alignment.topCenter,
                   point: LatLng(station.lat, station.long),
                   child: GestureDetector(
@@ -296,8 +296,9 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                       Provider.of<MapProvider>(context, listen: false)
                           .registerStationSheet(sheet);
                     },
-                    child: Image.asset(
-                      "assets/stop_icon.png",
+                    child: StationMarker(
+                      color: Theme.of(context).colorScheme.primary,
+                      onColor: Theme.of(context).colorScheme.onPrimary,
                     ),
                   ),
                 ))
@@ -316,8 +317,8 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                 : mapProvider
                     .customStations[mapProvider.customWay == Way.way ? 0 : 1])
             .map((station) => Marker(
-                  width: 40,
-                  height: 40,
+                  width: StationMarker.defaultSize,
+                  height: StationMarker.defaultSize,
                   alignment: Alignment.topCenter,
                   point: LatLng(station.lat, station.long),
                   child: GestureDetector(
@@ -331,17 +332,17 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                       Provider.of<MapProvider>(context, listen: false)
                           .registerStationSheet(sheet);
                     },
-                    child: ColorFiltered(
-                      colorFilter: ColorFilter.matrix(
-                          ColorUtils.createHueShiftMatrix(
-                              station.id == trackingProvider.trackingFromStation
-                                  ? 100
-                                  : 0)),
-                      child: Image.asset(
-                        "assets/stop_icon.png",
-                        height: 50,
-                      ),
-                    ),
+                    // The stop the trip departs from is picked out in a distinct
+                    // colour; the rest of the route's stops share one accent.
+                    child: station.id == trackingProvider.trackingFromStation
+                        ? StationMarker(
+                            color: Theme.of(context).colorScheme.tertiary,
+                            onColor: Theme.of(context).colorScheme.onTertiary,
+                          )
+                        : StationMarker(
+                            color: Theme.of(context).colorScheme.primary,
+                            onColor: Theme.of(context).colorScheme.onPrimary,
+                          ),
                   ),
                 ))
             .toList());

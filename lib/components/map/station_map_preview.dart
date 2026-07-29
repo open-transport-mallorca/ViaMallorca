@@ -3,6 +3,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:mallorca_transit_services/mallorca_transit_services.dart';
 import 'package:via_mallorca/components/map/map_preview.dart';
+import 'package:via_mallorca/components/map/station_marker.dart';
 
 /// A [MapPreview] centred on a stop, marked with the same pin the main map
 /// uses.
@@ -16,7 +17,7 @@ class StationMapPreview extends StatelessWidget {
   final Station station;
   final VoidCallback onTap;
 
-  static const double _pinSize = 40;
+  static const double _pinSize = 48;
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +35,11 @@ class StationMapPreview extends StatelessWidget {
               height: _pinSize,
               alignment: Alignment.topCenter,
               point: point,
-              child: Image.asset('assets/stop_icon.png'),
+              child: StationMarker(
+                color: Theme.of(context).colorScheme.primary,
+                onColor: Theme.of(context).colorScheme.onPrimary,
+                size: _pinSize,
+              ),
             ),
           ],
         ),
