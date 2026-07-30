@@ -7,6 +7,21 @@ import 'package:via_mallorca/providers/tracking_provider.dart';
 class RouteWaySwitcher extends StatelessWidget {
   const RouteWaySwitcher({super.key});
 
+  /// The destination on show, or nothing while the route is still arriving.
+  ///
+  /// [MapProvider.viewRoute] settles the way before it has fetched the
+  /// destinations that back it, and notifies listeners once per subline on the
+  /// way through. Between those moments the list is shorter than the index the
+  /// way implies, so the way alone cannot be trusted to pick an entry - a loop
+  /// has one destination however it is being travelled, and a two-way line has
+  /// one until its second subline lands.
+  static String _destination(MapProvider mapProvider) {
+    final destinations = mapProvider.customRouteDestinations;
+    if (destinations == null || destinations.isEmpty) return "";
+    final isBack = mapProvider.customWay == Way.back && destinations.length > 1;
+    return destinations[isBack ? 1 : 0];
+  }
+
   @override
   Widget build(BuildContext context) {
     return Consumer2<MapProvider, TrackingProvider>(
@@ -32,10 +47,7 @@ class RouteWaySwitcher extends StatelessWidget {
                   ConstrainedBox(
                       constraints: const BoxConstraints(maxWidth: 200),
                       child: FittedBox(
-                        child: Text(mapProvider.customRouteDestinations != null
-                            ? mapProvider.customRouteDestinations![
-                                mapProvider.customWay == Way.way ? 0 : 1]
-                            : ""),
+                        child: Text(_destination(mapProvider)),
                       )),
                   const SizedBox(
                     width: 10,
