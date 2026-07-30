@@ -71,14 +71,14 @@ class StationLineLabels extends StatelessWidget {
                   ),
                 ),
                 child: Padding(
-                  padding: const EdgeInsets.all(8.0),
+                  padding: const EdgeInsets.all(6.0),
                   child: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
                         line.code,
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 14,
                           color:
                               Theme.of(context).colorScheme.onPrimaryContainer,
                           fontWeight: FontWeight.bold,
@@ -87,7 +87,7 @@ class StationLineLabels extends StatelessWidget {
                       if (line.summerOnly == true) ...[
                         const SizedBox(width: 4),
                         Icon(Icons.wb_sunny,
-                            size: 16, color: Colors.orange.shade700),
+                            size: 14, color: Colors.orange.shade700),
                       ],
                     ],
                   ),
