@@ -1,14 +1,14 @@
 [
   {
     "language": "en-US",
-    "text": "Fixed PDF timetables & bus details while tracking certain bus routes"
+    "text": "New route & station sections, improved tracking of buses in real time."
   },
   {
     "language": "es-ES",
-    "text": "Corregido horarios en PDF y detalles de autobús al rastrear ciertas rutas"
+    "text": "Nuevas secciones de rutas y estaciones, mejora en el seguimiento de autobuses en tiempo real"
   },
   {
     "language": "de-DE",
-    "text": "PDF-Fahrpläne und Busdetails beim Verfolgen bestimmter Buslinien behoben"
+    "text": "Neue Routen- und Stationsabschnitte, verbesserte Echtzeitverfolgung von Bussen."
   }
 ]
