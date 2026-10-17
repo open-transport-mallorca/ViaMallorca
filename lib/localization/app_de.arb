@@ -183,5 +183,67 @@
   "clearCacheDialogTitle": "Gespeicherte Daten löschen?",
   "clearCacheDialogSubtitle": "Haltestellen, Linien und Kartenkacheln werden bei Bedarf erneut geladen. Deine Favoriten und Einstellungen bleiben erhalten.",
   "clear": "Löschen",
-  "cacheCleared": "Gespeicherte Daten gelöscht"
+  "cacheCleared": "Gespeicherte Daten gelöscht",
+  "trackingChannelName": "Live-Verfolgung",
+  "trackingChannelDescription": "Zeigt den verfolgten Bus, während die App im Hintergrund läuft.",
+  "trackingConnecting": "Verbindung zum Bus wird hergestellt…",
+  "trackingReconnecting": "Verbindung wird wiederhergestellt…",
+  "trackingArrivingAt": "Ankunft: {stop}",
+  "@trackingArrivingAt": {
+    "placeholders": {
+      "stop": {
+        "type": "String"
+      }
+    }
+  },
+  "trackingNextStop": "Nächster Halt: {stop}",
+  "@trackingNextStop": {
+    "placeholders": {
+      "stop": {
+        "type": "String"
+      }
+    }
+  },
+  "trackingFinalStopAt": "{stop} um {time}",
+  "@trackingFinalStopAt": {
+    "placeholders": {
+      "stop": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "stopsAway": "{count, plural, =0{Nächster Halt} one{Noch 1 Halt} other{Noch {count} Halte}}",
+  "@stopsAway": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "tripFinished": "Fahrt beendet",
+  "trackingDistanceAway": "{distance} entfernt",
+  "@trackingDistanceAway": {
+    "placeholders": {
+      "distance": {
+        "type": "String"
+      }
+    }
+  },
+  "lineTowards": "{line} nach {destination}",
+  "@lineTowards": {
+    "placeholders": {
+      "line": {
+        "type": "String"
+      },
+      "destination": {
+        "type": "String"
+      }
+    }
+  },
+  "yourStop": "Deine Haltestelle",
+  "minutesUnit": "Min.",
+  "hoursUnit": "h"
 }

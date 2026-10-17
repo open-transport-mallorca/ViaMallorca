@@ -10,6 +10,8 @@ import 'package:via_mallorca/utils/adapt_color.dart';
 import 'package:via_mallorca/utils/route_follower.dart';
 import 'package:mallorca_transit_services/mallorca_transit_services.dart';
 
+typedef TrackedRoute = ({RouteProgress route, Station? station});
+
 /// A provider class that manages the map-related functionality.
 class MapProvider extends ChangeNotifier {
   AnimatedMapController? mapController;
@@ -66,6 +68,23 @@ class MapProvider extends ChangeNotifier {
     return _progress = RouteProgress(points);
   }
 
+  /// The tracked route measured for progress, and the station [stationId] on
+  /// the way on show, if it is one of its stops
+  TrackedRoute? trackedRoute(int? stationId) {
+    final points = basePolyline(Brightness.light)?.points;
+    if (points == null) return null;
+
+    final stations = switch (customStations.length) {
+      0 => const <Station>[],
+      1 => customStations[0],
+      _ => customStations[customWay == Way.way ? 0 : 1],
+    };
+    return (
+      route: progressFor(points),
+      station: stations.where((s) => s.id == stationId).firstOrNull,
+    );
+  }
+
   /// The highlighted route as drawn today: one of the two colour variants held
   /// in [customRoutes], and for a line with separate directions the one
   /// matching the way on show.
@@ -97,6 +116,14 @@ class MapProvider extends ChangeNotifier {
   void closeStationSheet() {
     _stationSheet?.close();
     _stationSheet = null;
+  }
+
+  /// Takes the previewed or tracked route off the map
+  void clearRoute() {
+    setCustomPolylines(null);
+    setCustomStations([]);
+    setCustomWay(null);
+    setCustomRouteDestinations(null);
   }
 
   /// Sets the custom polylines for the map.

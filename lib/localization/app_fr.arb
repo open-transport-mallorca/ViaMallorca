@@ -183,5 +183,67 @@
   "clearCacheDialogTitle": "Effacer les données enregistrées ?",
   "clearCacheDialogSubtitle": "Les arrêts, les lignes et les tuiles de carte seront téléchargés à nouveau lorsqu'ils seront nécessaires. Vos favoris et vos paramètres ne sont pas affectés.",
   "clear": "Effacer",
-  "cacheCleared": "Données enregistrées effacées"
+  "cacheCleared": "Données enregistrées effacées",
+  "trackingChannelName": "Suivi en direct",
+  "trackingChannelDescription": "Affiche le bus que vous suivez lorsque l'application est en arrière-plan.",
+  "trackingConnecting": "Connexion au bus…",
+  "trackingReconnecting": "Reconnexion…",
+  "trackingArrivingAt": "Arrivée à {stop}",
+  "@trackingArrivingAt": {
+    "placeholders": {
+      "stop": {
+        "type": "String"
+      }
+    }
+  },
+  "trackingNextStop": "Prochain arrêt : {stop}",
+  "@trackingNextStop": {
+    "placeholders": {
+      "stop": {
+        "type": "String"
+      }
+    }
+  },
+  "trackingFinalStopAt": "{stop} à {time}",
+  "@trackingFinalStopAt": {
+    "placeholders": {
+      "stop": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "stopsAway": "{count, plural, =0{Prochain arrêt} one{À 1 arrêt} other{À {count} arrêts}}",
+  "@stopsAway": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "tripFinished": "Trajet terminé",
+  "trackingDistanceAway": "À {distance}",
+  "@trackingDistanceAway": {
+    "placeholders": {
+      "distance": {
+        "type": "String"
+      }
+    }
+  },
+  "lineTowards": "{line} vers {destination}",
+  "@lineTowards": {
+    "placeholders": {
+      "line": {
+        "type": "String"
+      },
+      "destination": {
+        "type": "String"
+      }
+    }
+  },
+  "yourStop": "Votre arrêt",
+  "minutesUnit": "min",
+  "hoursUnit": "h"
 }

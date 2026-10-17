@@ -373,7 +373,10 @@ class DepartureCard extends StatelessWidget {
                                           departure.lineCode,
                                           LatLng(departure.realTrip!.lat,
                                               departure.realTrip!.long),
-                                          station.id);
+                                          station.id,
+                                          expectedArrival:
+                                              departure.estimatedArrival,
+                                          boardingStopName: station.name);
                                   // A new trip always starts followed, even if
                                   // the user had panned away from the last one.
                                   Provider.of<MapProvider>(context,
