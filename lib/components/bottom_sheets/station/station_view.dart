@@ -61,6 +61,20 @@ class _StationSheetState extends State<StationSheet> {
 
   @override
   Widget build(BuildContext context) {
+    // With predictive back, Android asks up front whether the app handles back.
+    // A sheet from showBottomSheet is only a local history entry, which Flutter
+    // doesn't report, so the system closed the app instead. PopScope reports
+    // it, and back then closes the sheet
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, _) {
+        if (!didPop) Navigator.of(context).pop();
+      },
+      child: _buildSheet(context),
+    );
+  }
+
+  Widget _buildSheet(BuildContext context) {
     return Consumer<FavoritesProvider>(
         builder: (context, favoritesProvider, child) {
       return MultiProvider(

@@ -339,14 +339,6 @@
       }
     }
   },
-  "minutesShort": "{count} min",
-  "@minutesShort": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "tripFinished": "Trip finished",
   "trackingDistanceAway": "{distance} away",
   "@trackingDistanceAway": {
@@ -366,5 +358,8 @@
         "type": "String"
       }
     }
-  }
+  },
+  "yourStop": "Your stop",
+  "minutesUnit": "min",
+  "hoursUnit": "h"
 }

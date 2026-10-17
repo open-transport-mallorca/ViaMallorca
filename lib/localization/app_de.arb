@@ -223,14 +223,6 @@
       }
     }
   },
-  "minutesShort": "{count} Min.",
-  "@minutesShort": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "tripFinished": "Fahrt beendet",
   "trackingDistanceAway": "{distance} entfernt",
   "@trackingDistanceAway": {
@@ -250,5 +242,8 @@
         "type": "String"
       }
     }
-  }
+  },
+  "yourStop": "Deine Haltestelle",
+  "minutesUnit": "Min.",
+  "hoursUnit": "h"
 }

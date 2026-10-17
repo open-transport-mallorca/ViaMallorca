@@ -14,7 +14,7 @@ import 'package:quick_actions/quick_actions.dart';
 import 'package:via_mallorca/apis/notification.dart';
 import 'package:via_mallorca/cache/cache_manager.dart';
 import 'package:via_mallorca/components/bottom_sheets/station/station_view.dart';
-import 'package:via_mallorca/components/map/bus_info.dart';
+import 'package:via_mallorca/components/bottom_sheets/tracking/tracking_sheet.dart';
 import 'package:via_mallorca/components/map/bus_tracker.dart';
 import 'package:via_mallorca/components/map/route_way_switcher.dart';
 import 'package:via_mallorca/components/map/station_marker.dart';
@@ -230,9 +230,6 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                   BusTracker()
                 ],
               ),
-              // Bus Info Container
-              IgnorePointer(child: BusInfo()),
-
               // Bottom Buttons
               Align(alignment: Alignment.bottomLeft, child: UntrackButtons()),
 
@@ -243,10 +240,14 @@ class _MapScreenState extends State<MapScreen> with TickerProviderStateMixin {
                 Align(
                     alignment: Alignment.bottomLeft, child: RouteWaySwitcher()),
 
-              // Update location button
-              Align(
-                  alignment: Alignment.bottomRight,
-                  child: UpdateLocationButtons()),
+              // While tracking, the location buttons ride on the sheet
+              if (trackingProvider.currentLocation != null)
+                const Positioned.fill(
+                    child: TrackingSheet(floating: UpdateLocationButtons()))
+              else
+                Align(
+                    alignment: Alignment.bottomRight,
+                    child: UpdateLocationButtons()),
             ]);
           },
         );

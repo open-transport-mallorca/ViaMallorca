@@ -36,7 +36,8 @@ class DistanceFormatter {
         if (meters >= 1000) {
           return '${formatter.format(meters / 1000)} km';
         }
-        return '${formatter.format(meters)} m';
+        // Whole metres, like feet below: decimals are past GPS accuracy
+        return '${wholeNumbers.format(meters)} m';
       case DistanceUnits.imperial:
         if (meters >= _milesThreshold) {
           return '${formatter.format(meters / _metresPerMile)} mi';

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -13,12 +14,58 @@ import 'package:via_mallorca/localization/generated/app_localizations.dart';
 import 'package:via_mallorca/providers/locale_provider.dart';
 import 'package:via_mallorca/providers/map_provider.dart';
 import 'package:via_mallorca/utils/distance_formatter.dart';
+import 'package:via_mallorca/utils/eta_format.dart';
 
 typedef _RouteMeasure = ({
   double bus,
   ({double distance, String name})? boarding,
   double end,
 });
+
+enum TripPhase {
+  /// The bus is on its way to the stop the user is tracking from
+  approaching,
+
+  /// The bus has passed it, so the user is presumably aboard
+  riding,
+}
+
+class TripSummary {
+  const TripSummary({
+    required this.phase,
+    required this.target,
+    this.nextStop,
+    this.finalStop,
+    this.arrival,
+    this.minutes,
+    this.stopsLeft,
+    this.metersLeft,
+    this.progress,
+    this.progressSpan,
+  });
+
+  final TripPhase phase;
+
+  /// The boarding stop while approaching, the end of the route while riding
+  final String target;
+  final String? nextStop;
+  final String? finalStop;
+
+  /// Arrival at [target]; null with [minutes] until the socket sends the stops
+  final DateTime? arrival;
+  final int? minutes;
+
+  /// Stops before [target] while approaching, stops left while riding
+  final int? stopsLeft;
+
+  /// Along the drawn route, null when the bus can't be placed on it
+  final double? metersLeft;
+  final double? progress;
+
+  /// Metres along the drawn route that [progress] runs between, when it is
+  /// distance based, so the sheet can follow the bus marker frame by frame
+  final ({double from, double to})? progressSpan;
+}
 
 enum ConnectionStatus {
   disconnected,
@@ -44,6 +91,9 @@ class TrackingProvider extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   final TrackedRoute? Function(int? stationId)? _trackedRoute;
+
+  DateTime? _expectedArrival;
+  String? _boardingStopName;
 
   LatLng? currentLocation;
   RouteStationInfo? routeStationInfo;
@@ -145,18 +195,29 @@ class TrackingProvider extends ChangeNotifier with WidgetsBindingObserver {
   bool _notificationActive = false;
   TrackingNotificationContent? _lastNotification;
 
+  /// The notification's progress eases from one fix's value to the next over
+  /// a fix interval, re-posted every couple of seconds, instead of jumping
+  double? _progressFrom;
+  double? _progressTo;
+  DateTime? _progressSince;
+  Timer? _progressTicker;
+
   /// Where and when the wait for the bus / the ride began, for the progress bar
   double? _approachStartDistance;
   double? _rideStartDistance;
   DateTime? _approachStartedAt;
   DateTime? _rideStartedAt;
 
+  /// [expectedArrival] and [boardingStopName] come from the departure tracked
+  /// from, and stand in until the socket sends the stops
   Future<void> startTracking(
     int tripId,
     String lineCode,
     LatLng initialCoords,
-    int trackingFrom,
-  ) async {
+    int trackingFrom, {
+    DateTime? expectedArrival,
+    String? boardingStopName,
+  }) async {
     await stopTracking();
     WidgetsBinding.instance.addObserver(this);
     _isTracking = true;
@@ -168,9 +229,16 @@ class TrackingProvider extends ChangeNotifier with WidgetsBindingObserver {
     trackingTripId = tripId;
     trackingFromStation = trackingFrom;
     currentLocation = initialCoords;
+    _expectedArrival = expectedArrival;
+    _boardingStopName = boardingStopName;
 
     _connect();
     _watchdog = Timer.periodic(const Duration(seconds: 15), (_) => _checkIn());
+    // Android only: iOS budgets Live Activity updates far too tightly for this
+    if (Platform.isAndroid) {
+      _progressTicker = Timer.periodic(
+          const Duration(seconds: 2), (_) => _publishNotification());
+    }
 
     // Before any await: the foreground service must start from the foreground
     _notificationActive = true;
@@ -311,6 +379,7 @@ class TrackingProvider extends ChangeNotifier with WidgetsBindingObserver {
     _tripFinished = true;
     _reconnectTimer?.cancel();
     _watchdog?.cancel();
+    _progressTicker?.cancel();
     if (!_notificationActive) return;
     _notificationActive = false;
 
@@ -350,6 +419,11 @@ class TrackingProvider extends ChangeNotifier with WidgetsBindingObserver {
     _reconnectTimer = null;
     _watchdog?.cancel();
     _watchdog = null;
+    _progressTicker?.cancel();
+    _progressTicker = null;
+    _progressFrom = null;
+    _progressTo = null;
+    _progressSince = null;
     _reconnectAttempt = 0;
     _lastMessageAt = null;
     _tripFinished = false;
@@ -370,6 +444,8 @@ class TrackingProvider extends ChangeNotifier with WidgetsBindingObserver {
 
     trackingTripId = null;
     trackingFromStation = null;
+    _expectedArrival = null;
+    _boardingStopName = null;
     currentLocation = null;
     stationsOnRoute = null;
     routeStationInfo = null;
@@ -387,52 +463,82 @@ class TrackingProvider extends ChangeNotifier with WidgetsBindingObserver {
 
   void _publishNotification() {
     if (!_notificationActive) return;
-    final content = _notificationContent(_localizations());
+    var content = _notificationContent(_localizations());
+    final progress = _easedProgress(content.progress);
+    if (progress != content.progress) {
+      content = TrackingNotificationContent(
+        title: content.title,
+        body: content.body,
+        subtitle: content.subtitle,
+        chip: content.chip,
+        progress: progress,
+      );
+    }
     if (content == _lastNotification) return;
     _lastNotification = content;
     TrackingNotificationApi.update(content);
   }
 
+  /// [target] reached gradually; rounded to the 1% a notification can show,
+  /// so a settled bar doesn't re-post
+  double? _easedProgress(double? target) {
+    if (target == null || !Platform.isAndroid) {
+      _progressFrom = _progressTo = target;
+      return target;
+    }
+
+    final now = DateTime.now();
+    if (target != _progressTo) {
+      final current = _progressAt(now) ?? target;
+      // A new phase starts the bar over; easing back down would look wrong
+      _progressFrom = target < current - 0.2 ? target : current;
+      _progressTo = target;
+      _progressSince = now;
+    }
+    return ((_progressAt(now) ?? target) * 100).round() / 100;
+  }
+
+  double? _progressAt(DateTime now) {
+    final from = _progressFrom;
+    final to = _progressTo;
+    final since = _progressSince;
+    if (from == null || to == null || since == null) return to;
+    final t = now.difference(since).inMilliseconds / fixInterval.inMilliseconds;
+    return from + (to - from) * t.clamp(0.0, 1.0);
+  }
+
+  /// Where the trip stands, shared by the tracking sheet and the notification
+  ///
   /// About the boarding stop until the bus passes it, then (user presumably
-  /// aboard) about the next stop and the end of the route
-  TrackingNotificationContent _notificationContent(
-    AppLocalizations l10n, {
-    String? fallbackLine,
-  }) {
-    final line = routeCode ?? fallbackLine ?? '';
+  /// aboard) about the end of the route. Null until there is anything to say.
+  /// Not a pure getter: the first call of each phase fixes where its progress
+  /// is measured from.
+  TripSummary? tripSummary() {
     final stops = stationsOnRoute;
     final measured = _measureRoute();
-    final reconnecting = _connectionStatus == ConnectionStatus.disconnected;
-    final delay = delayMinutes;
-    final notes = [
-      if (delay != null && delay > 0) l10n.minutesLate(delay),
-      if (reconnecting) l10n.trackingReconnecting,
-    ];
 
-    // The socket can take a while to send the stops, but the drawn route
-    // already says how far the bus is from the boarding stop
+    // The socket can take a while to send the stops; until then the departure
+    // tracked from and the drawn route still say when and how far
     if (stops == null || stops.isEmpty) {
       final boarding = measured?.boarding;
-      if (measured == null ||
-          boarding == null ||
-          measured.bus >= boarding.distance) {
-        return TrackingNotificationContent(
-          title: line,
-          body: hasBusPosition
-              ? (notes.isEmpty ? null : notes.join(' · '))
-              : reconnecting
-                  ? l10n.trackingReconnecting
-                  : l10n.trackingConnecting,
-        );
+      final metersLeft = measured == null || boarding == null
+          ? null
+          : boarding.distance - measured.bus;
+      final target = boarding?.name ?? _boardingStopName;
+      final expected = _expectedArrival;
+      if (target == null ||
+          (metersLeft != null && metersLeft <= 0) ||
+          (metersLeft == null && expected == null)) {
+        return null;
       }
-
-      final distance = _formatDistance(boarding.distance - measured.bus);
-      return TrackingNotificationContent(
-        title: l10n.trackingArrivingAt(boarding.name),
-        body: [l10n.trackingDistanceAway(distance), ...notes].join(' · '),
-        subtitle: line,
-        chip: distance,
-        progress: _approachProgress(measured, null),
+      return TripSummary(
+        phase: TripPhase.approaching,
+        target: target,
+        arrival: expected,
+        minutes: expected == null ? null : _minutesTo(expected),
+        metersLeft: metersLeft,
+        progress: _approachProgress(measured, expected),
+        progressSpan: _approachSpan(measured),
       );
     }
 
@@ -441,31 +547,101 @@ class TrackingProvider extends ChangeNotifier with WidgetsBindingObserver {
         stops.indexWhere((stop) => stop.stopId == trackingFromStation);
     if (boardingIndex >= 0) {
       final boarding = stops[boardingIndex];
-      final minutes = _minutesUntil(boarding);
-      return TrackingNotificationContent(
-        title: l10n.trackingArrivingAt(boarding.stopName),
-        body: [
-          l10n.arrivingIn(minutes),
-          l10n.stopsAway(boardingIndex),
-          ...notes
-        ].join(' · '),
-        subtitle: l10n.lineTowards(line, finalStop.stopName),
-        chip: minutes == 0 ? l10n.arrivingIn(0) : l10n.minutesShort(minutes),
-        progress: _approachProgress(measured, _arrivalOf(boarding)),
+      final boardingDistance = measured?.boarding?.distance;
+      final arrival = _arrivalOf(boarding);
+      return TripSummary(
+        phase: TripPhase.approaching,
+        target: boarding.stopName,
+        nextStop: stops.first.stopName,
+        finalStop: finalStop.stopName,
+        arrival: arrival,
+        minutes: _minutesUntil(boarding),
+        stopsLeft: boardingIndex,
+        metersLeft: measured == null || boardingDistance == null
+            ? null
+            : max(0, boardingDistance - measured.bus),
+        progress: _approachProgress(measured, arrival),
+        progressSpan: _approachSpan(measured),
       );
     }
 
     final arrival = _arrivalOf(finalStop);
+    return TripSummary(
+      phase: TripPhase.riding,
+      target: finalStop.stopName,
+      nextStop: stops.first.stopName,
+      finalStop: finalStop.stopName,
+      arrival: arrival,
+      minutes: _minutesUntil(finalStop),
+      stopsLeft: stops.length,
+      metersLeft: measured == null ? null : max(0, measured.end - measured.bus),
+      progress: _rideProgress(measured, arrival),
+      progressSpan: _rideSpan(measured),
+    );
+  }
+
+  TrackingNotificationContent _notificationContent(
+    AppLocalizations l10n, {
+    String? fallbackLine,
+  }) {
+    final line = routeCode ?? fallbackLine ?? '';
+    final reconnecting = _connectionStatus == ConnectionStatus.disconnected;
+    final delay = delayMinutes;
+    final notes = [
+      if (delay != null && delay > 0) l10n.minutesLate(delay),
+      if (reconnecting) l10n.trackingReconnecting,
+    ];
+
+    final trip = tripSummary();
+    if (trip == null) {
+      return TrackingNotificationContent(
+        title: line,
+        body: hasBusPosition
+            ? (notes.isEmpty ? null : notes.join(' · '))
+            : reconnecting
+                ? l10n.trackingReconnecting
+                : l10n.trackingConnecting,
+      );
+    }
+
+    final minutes = trip.minutes;
+    final arrival = trip.arrival;
+    if (minutes == null || arrival == null) {
+      final distance = _formatDistance(trip.metersLeft ?? 0);
+      return TrackingNotificationContent(
+        title: l10n.trackingArrivingAt(trip.target),
+        body: [l10n.trackingDistanceAway(distance), ...notes].join(' · '),
+        subtitle: line,
+        chip: distance,
+        progress: trip.progress,
+      );
+    }
+
+    if (trip.phase == TripPhase.approaching) {
+      return TrackingNotificationContent(
+        title: l10n.trackingArrivingAt(trip.target),
+        body: [
+          l10n.arrivingIn(minutes),
+          if (trip.stopsLeft != null) l10n.stopsAway(trip.stopsLeft!),
+          ...notes
+        ].join(' · '),
+        subtitle: trip.finalStop == null
+            ? line
+            : l10n.lineTowards(line, trip.finalStop!),
+        chip: minutes == 0 ? l10n.arrivingIn(0) : formatEtaShort(minutes, l10n),
+        progress: trip.progress,
+      );
+    }
+
     return TrackingNotificationContent(
-      title: l10n.trackingNextStop(stops.first.stopName),
+      title: l10n.trackingNextStop(trip.nextStop ?? trip.target),
       body: [
-        l10n.trackingFinalStopAt(
-            finalStop.stopName, DateFormat.Hm().format(arrival)),
+        l10n.trackingFinalStopAt(trip.target, DateFormat.Hm().format(arrival)),
         ...notes,
       ].join(' · '),
       subtitle: line,
-      chip: l10n.minutesShort(_minutesUntil(finalStop)),
-      progress: _rideProgress(measured, arrival),
+      chip: formatEtaShort(minutes, l10n),
+      progress: trip.progress,
     );
   }
 
@@ -515,6 +691,21 @@ class TrackingProvider extends ChangeNotifier with WidgetsBindingObserver {
     return _timeProgress(startedAt, arrival);
   }
 
+  ({double from, double to})? _approachSpan(_RouteMeasure? measured) {
+    final boarding = measured?.boarding;
+    if (measured == null || boarding == null) return null;
+    final start = _approachStartDistance ??= measured.bus;
+    if (boarding.distance <= start) return null;
+    return (from: start, to: boarding.distance);
+  }
+
+  ({double from, double to})? _rideSpan(_RouteMeasure? measured) {
+    if (measured == null) return null;
+    final start = _rideStartDistance ??= measured.bus;
+    if (measured.end <= start) return null;
+    return (from: start, to: measured.end);
+  }
+
   double? _distanceProgress(double start, double bus, double target) {
     final span = target - start;
     if (span <= 0) return null;
@@ -540,8 +731,10 @@ class TrackingProvider extends ChangeNotifier with WidgetsBindingObserver {
         now.year, now.month, now.day, scheduled.hour, scheduled.minute);
   }
 
-  int _minutesUntil(StationOnRoute stop) {
-    final seconds = _arrivalOf(stop).difference(DateTime.now()).inSeconds;
+  int _minutesUntil(StationOnRoute stop) => _minutesTo(_arrivalOf(stop));
+
+  int _minutesTo(DateTime arrival) {
+    final seconds = arrival.difference(DateTime.now()).inSeconds;
     return max(0, (seconds / 60).ceil());
   }
 

@@ -223,14 +223,6 @@
       }
     }
   },
-  "minutesShort": "{count} min",
-  "@minutesShort": {
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "tripFinished": "Trajecte finalitzat",
   "trackingDistanceAway": "A {distance}",
   "@trackingDistanceAway": {
@@ -250,5 +242,8 @@
         "type": "String"
       }
     }
-  }
+  },
+  "yourStop": "La teva parada",
+  "minutesUnit": "min",
+  "hoursUnit": "h"
 }
