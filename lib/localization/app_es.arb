@@ -183,5 +183,72 @@
   "clearCacheDialogTitle": "¿Borrar los datos guardados?",
   "clearCacheDialogSubtitle": "Las paradas, las líneas y las teselas del mapa se descargarán de nuevo cuando se necesiten. Tus favoritos y ajustes no se ven afectados.",
   "clear": "Borrar",
-  "cacheCleared": "Datos guardados borrados"
+  "cacheCleared": "Datos guardados borrados",
+  "trackingChannelName": "Seguimiento en directo",
+  "trackingChannelDescription": "Muestra el autobús que sigues mientras la aplicación está en segundo plano.",
+  "trackingConnecting": "Conectando con el autobús…",
+  "trackingReconnecting": "Reconectando…",
+  "trackingArrivingAt": "Llegando a {stop}",
+  "@trackingArrivingAt": {
+    "placeholders": {
+      "stop": {
+        "type": "String"
+      }
+    }
+  },
+  "trackingNextStop": "Próxima parada: {stop}",
+  "@trackingNextStop": {
+    "placeholders": {
+      "stop": {
+        "type": "String"
+      }
+    }
+  },
+  "trackingFinalStopAt": "{stop} a las {time}",
+  "@trackingFinalStopAt": {
+    "placeholders": {
+      "stop": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "stopsAway": "{count, plural, =0{Próxima parada} one{A 1 parada} other{A {count} paradas}}",
+  "@stopsAway": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "minutesShort": "{count} min",
+  "@minutesShort": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "tripFinished": "Trayecto finalizado",
+  "trackingDistanceAway": "A {distance}",
+  "@trackingDistanceAway": {
+    "placeholders": {
+      "distance": {
+        "type": "String"
+      }
+    }
+  },
+  "lineTowards": "{line} hacia {destination}",
+  "@lineTowards": {
+    "placeholders": {
+      "line": {
+        "type": "String"
+      },
+      "destination": {
+        "type": "String"
+      }
+    }
+  }
 }

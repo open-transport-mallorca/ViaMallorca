@@ -49,10 +49,7 @@ class UntrackButtons extends StatelessWidget {
                       color: Theme.of(context).colorScheme.error,
                       onTap: () async {
                         await context.read<TrackingProvider>().stopTracking();
-                        mapProvider.setCustomPolylines(null);
-                        mapProvider.setCustomStations([]);
-                        mapProvider.setCustomWay(null);
-                        mapProvider.setCustomRouteDestinations(null);
+                        mapProvider.clearRoute();
                       },
                     ),
                   ],
@@ -68,12 +65,7 @@ class UntrackButtons extends StatelessWidget {
         return Padding(
           padding: const EdgeInsets.symmetric(vertical: 82.0, horizontal: 24.0),
           child: ElevatedButton.icon(
-              onPressed: () {
-                mapProvider.setCustomPolylines(null);
-                mapProvider.setCustomStations([]);
-                mapProvider.setCustomWay(null);
-                mapProvider.setCustomRouteDestinations(null);
-              },
+              onPressed: mapProvider.clearRoute,
               style: ButtonStyle(
                 backgroundColor: WidgetStateProperty.all(
                     Theme.of(context).colorScheme.tertiaryContainer),

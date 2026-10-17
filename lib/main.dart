@@ -56,7 +56,12 @@ class ViaMallorca extends StatelessWidget {
         ChangeNotifierProvider(create: (context) => NavigationProvider()),
         ChangeNotifierProvider(create: (context) => FavoritesProvider()),
         ChangeNotifierProvider(create: (context) => MapProvider()),
-        ChangeNotifierProvider(create: (context) => TrackingProvider()),
+        ChangeNotifierProvider(
+            create: (context) => TrackingProvider(
+                onStoppedFromNotification: () =>
+                    context.read<MapProvider>().clearRoute(),
+                trackedRoute: (stationId) =>
+                    context.read<MapProvider>().trackedRoute(stationId))),
         ChangeNotifierProvider(create: (context) => ThemeProvider()),
         ChangeNotifierProvider(create: (context) => LocaleProvider()),
         ChangeNotifierProvider(create: (context) => NotificationsProvider()),

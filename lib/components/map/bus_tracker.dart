@@ -60,6 +60,10 @@ class _BusTrackerState extends State<BusTracker>
   /// new connection is placed outright rather than animated to.
   bool _hadRealFix = false;
 
+  /// When [_lastFix] arrived. A longer gap than a fix or two means a reconnect
+  /// or a frozen process, and the bus has moved too far to animate to
+  DateTime? _lastFixSyncedAt;
+
   @override
   void initState() {
     super.initState();
@@ -142,6 +146,7 @@ class _BusTrackerState extends State<BusTracker>
       _fromDistance = null;
       _toDistance = null;
       _hadRealFix = false;
+      _lastFixSyncedAt = null;
       _map.busRouteDistance.value = null;
       if (notify && mounted) setState(() {});
       return;
@@ -154,13 +159,23 @@ class _BusTrackerState extends State<BusTracker>
     // position tracking started from, not a live one.
     final isPlaceholder = !_tracking.hasBusPosition;
     _lastFix = fix;
+    final now = DateTime.now();
+    final previousSync = _lastFixSyncedAt;
+    _lastFixSyncedAt = now;
+    final isAfterGap = previousSync != null &&
+        now.difference(previousSync) > _tracking.fixInterval * 2;
 
     // Put the bus straight where it belongs instead of animating when there is
     // nothing to animate from, when this is the position carried over a
-    // reconnect, or when it is the first real fix after one. The bus can have
+    // reconnect, when it is the first real fix after one, or while the app is
+    // in the background (see [_isDrawing]) or after a gap. The bus can have
     // moved a long way while the socket was down, and gliding across that gap
     // over a fix interval reads as the bus slowly driving there.
-    if (from == null || isPlaceholder || !_hadRealFix) {
+    if (from == null ||
+        isPlaceholder ||
+        !_hadRealFix ||
+        !_isDrawing ||
+        isAfterGap) {
       _hadRealFix = !isPlaceholder;
       _controller.stop();
       _path = null;
@@ -190,6 +205,13 @@ class _BusTrackerState extends State<BusTracker>
     _controller.forward(from: 0);
     if (notify && mounted) setState(() {});
   }
+
+  /// No frames are drawn in the background, so an animation started there
+  /// would only play out on resume, from wherever the marker was left
+  bool get _isDrawing => switch (WidgetsBinding.instance.lifecycleState) {
+        AppLifecycleState.resumed || AppLifecycleState.inactive || null => true,
+        _ => false,
+      };
 
   /// The tracked route, measured so positions can be placed along it.
   RouteProgress? _routeProgress() {

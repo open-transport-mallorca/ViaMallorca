@@ -18,15 +18,18 @@ class DistanceFormatter {
   ///
   /// Example: 1500 → "1.5 km" or "0.9 mi", 500 → "500 m" or "1,640 ft"
   static String formatDistance(double meters, BuildContext context) {
-    return _format(
-        meters, context, context.watch<SettingsProvider>().distanceUnits);
+    return _format(meters, Localizations.localeOf(context),
+        context.watch<SettingsProvider>().distanceUnits);
   }
 
-  static String _format(
-      double meters, BuildContext context, DistanceUnits units) {
-    final locale = Localizations.localeOf(context).toString();
-    final formatter = NumberFormat("#,##0.#", locale); // 1 decimal place
-    final wholeNumbers = NumberFormat("#,##0", locale);
+  /// For text drawn outside the widget tree, like notifications
+  static String formatDistanceIn(double meters, Locale locale) =>
+      _format(meters, locale, LocalStorageApi.getDistanceUnits());
+
+  static String _format(double meters, Locale locale, DistanceUnits units) {
+    final localeName = locale.toString();
+    final formatter = NumberFormat("#,##0.#", localeName); // 1 decimal place
+    final wholeNumbers = NumberFormat("#,##0", localeName);
 
     switch (units) {
       case DistanceUnits.metric:

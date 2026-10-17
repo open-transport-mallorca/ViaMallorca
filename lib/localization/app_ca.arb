@@ -183,5 +183,72 @@
   "clearCacheDialogTitle": "Vols esborrar les dades desades?",
   "clearCacheDialogSubtitle": "Les parades, les línies i les tessel·les del mapa es tornaran a descarregar quan calguin. Els teus preferits i la configuració no es veuen afectats.",
   "clear": "Esborra",
-  "cacheCleared": "Dades desades esborrades"
+  "cacheCleared": "Dades desades esborrades",
+  "trackingChannelName": "Seguiment en directe",
+  "trackingChannelDescription": "Mostra el bus que segueixes mentre l'aplicació és en segon pla.",
+  "trackingConnecting": "Connectant amb el bus…",
+  "trackingReconnecting": "Reconnectant…",
+  "trackingArrivingAt": "Arribant a {stop}",
+  "@trackingArrivingAt": {
+    "placeholders": {
+      "stop": {
+        "type": "String"
+      }
+    }
+  },
+  "trackingNextStop": "Propera parada: {stop}",
+  "@trackingNextStop": {
+    "placeholders": {
+      "stop": {
+        "type": "String"
+      }
+    }
+  },
+  "trackingFinalStopAt": "{stop} a les {time}",
+  "@trackingFinalStopAt": {
+    "placeholders": {
+      "stop": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "stopsAway": "{count, plural, =0{Propera parada} one{A 1 parada} other{A {count} parades}}",
+  "@stopsAway": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "minutesShort": "{count} min",
+  "@minutesShort": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "tripFinished": "Trajecte finalitzat",
+  "trackingDistanceAway": "A {distance}",
+  "@trackingDistanceAway": {
+    "placeholders": {
+      "distance": {
+        "type": "String"
+      }
+    }
+  },
+  "lineTowards": "{line} cap a {destination}",
+  "@lineTowards": {
+    "placeholders": {
+      "line": {
+        "type": "String"
+      },
+      "destination": {
+        "type": "String"
+      }
+    }
+  }
 }

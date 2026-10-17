@@ -299,5 +299,72 @@
   "clearCacheDialogTitle": "Clear cached data?",
   "clearCacheDialogSubtitle": "Stops, lines and map tiles will be downloaded again the next time they are needed. Your favourites and settings are not affected.",
   "clear": "Clear",
-  "cacheCleared": "Cached data cleared"
+  "cacheCleared": "Cached data cleared",
+  "trackingChannelName": "Live tracking",
+  "trackingChannelDescription": "Shows the bus you are following while the app is in the background.",
+  "trackingConnecting": "Connecting to the bus…",
+  "trackingReconnecting": "Reconnecting…",
+  "trackingArrivingAt": "Arriving at {stop}",
+  "@trackingArrivingAt": {
+    "placeholders": {
+      "stop": {
+        "type": "String"
+      }
+    }
+  },
+  "trackingNextStop": "Next stop: {stop}",
+  "@trackingNextStop": {
+    "placeholders": {
+      "stop": {
+        "type": "String"
+      }
+    }
+  },
+  "trackingFinalStopAt": "{stop} at {time}",
+  "@trackingFinalStopAt": {
+    "placeholders": {
+      "stop": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "stopsAway": "{count, plural, =0{Next stop} one{1 stop away} other{{count} stops away}}",
+  "@stopsAway": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "minutesShort": "{count} min",
+  "@minutesShort": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "tripFinished": "Trip finished",
+  "trackingDistanceAway": "{distance} away",
+  "@trackingDistanceAway": {
+    "placeholders": {
+      "distance": {
+        "type": "String"
+      }
+    }
+  },
+  "lineTowards": "{line} to {destination}",
+  "@lineTowards": {
+    "placeholders": {
+      "line": {
+        "type": "String"
+      },
+      "destination": {
+        "type": "String"
+      }
+    }
+  }
 }

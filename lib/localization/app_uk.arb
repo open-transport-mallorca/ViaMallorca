@@ -183,5 +183,72 @@
   "clearCacheDialogTitle": "Очистити збережені дані?",
   "clearCacheDialogSubtitle": "Зупинки, маршрути й фрагменти карти буде завантажено знову, коли вони знадобляться. Ваші вибрані та налаштування не постраждають.",
   "clear": "Очистити",
-  "cacheCleared": "Збережені дані очищено"
+  "cacheCleared": "Збережені дані очищено",
+  "trackingChannelName": "Відстеження наживо",
+  "trackingChannelDescription": "Показує автобус, який ви відстежуєте, коли застосунок у фоні.",
+  "trackingConnecting": "Підключення до автобуса…",
+  "trackingReconnecting": "Повторне підключення…",
+  "trackingArrivingAt": "Прибуває на {stop}",
+  "@trackingArrivingAt": {
+    "placeholders": {
+      "stop": {
+        "type": "String"
+      }
+    }
+  },
+  "trackingNextStop": "Наступна зупинка: {stop}",
+  "@trackingNextStop": {
+    "placeholders": {
+      "stop": {
+        "type": "String"
+      }
+    }
+  },
+  "trackingFinalStopAt": "{stop} о {time}",
+  "@trackingFinalStopAt": {
+    "placeholders": {
+      "stop": {
+        "type": "String"
+      },
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "stopsAway": "{count, plural, =0{Наступна зупинка} one{За {count} зупинку} few{За {count} зупинки} many{За {count} зупинок} other{За {count} зупинки}}",
+  "@stopsAway": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "minutesShort": "{count} хв",
+  "@minutesShort": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "tripFinished": "Поїздку завершено",
+  "trackingDistanceAway": "За {distance}",
+  "@trackingDistanceAway": {
+    "placeholders": {
+      "distance": {
+        "type": "String"
+      }
+    }
+  },
+  "lineTowards": "{line} до {destination}",
+  "@lineTowards": {
+    "placeholders": {
+      "line": {
+        "type": "String"
+      },
+      "destination": {
+        "type": "String"
+      }
+    }
+  }
 }
