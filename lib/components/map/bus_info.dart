@@ -57,8 +57,13 @@ class _StatusPanel extends StatelessWidget {
         ? ''
         : destinations[(way == Way.back && destinations.length > 1) ? 1 : 0];
 
-    final occupancyOk = stationInfo != null &&
-        stationInfo.passangers.inBus < stationInfo.passangers.totalCapacity;
+    final passengers = stationInfo?.passangers;
+    final occupancyOk =
+        passengers != null && passengers.inBus < passengers.totalCapacity;
+    // TIB has sent 0 / 0 since October 2026, which says nothing about the bus
+    final noCount = passengers != null &&
+        passengers.inBus == 0 &&
+        passengers.totalCapacity == 0;
 
     return Container(
       width: 230,
@@ -103,16 +108,18 @@ class _StatusPanel extends StatelessWidget {
           ),
           const Divider(height: 12),
           // Occupancy + speed.
-          Skeletonizer(
-            enabled: !hasStationInfo,
-            child: _Stat(
-              icon: Icons.people,
-              text:
-                  "${stationInfo?.passangers.inBus ?? '-'} / ${stationInfo?.passangers.totalCapacity ?? '-'}",
-              color: hasStationInfo && !occupancyOk ? scheme.error : null,
+          if (!noCount) ...[
+            Skeletonizer(
+              enabled: !hasStationInfo,
+              child: _Stat(
+                icon: Icons.people,
+                text:
+                    "${passengers?.inBus ?? '-'} / ${passengers?.totalCapacity ?? '-'}",
+                color: hasStationInfo && !occupancyOk ? scheme.error : null,
+              ),
             ),
-          ),
-          const SizedBox(height: 4),
+            const SizedBox(height: 4),
+          ],
           Skeletonizer(
             enabled: !hasBusPosition,
             child: _Stat(
