@@ -1,14 +1,14 @@
 [
   {
     "language": "en-US",
-    "text": "New route & station sections, improved tracking of buses in real time."
+    "text": "Fixed stations and routes not loading after changes to the TIB service. Passenger counts are hidden while TIB doesn't provide them."
   },
   {
     "language": "es-ES",
-    "text": "Nuevas secciones de rutas y estaciones, mejora en el seguimiento de autobuses en tiempo real"
+    "text": "Corregida la carga de paradas y rutas tras los cambios en el servicio de TIB. El número de pasajeros se oculta mientras TIB no lo proporcione."
   },
   {
     "language": "de-DE",
-    "text": "Neue Routen- und Stationsabschnitte, verbesserte Echtzeitverfolgung von Bussen."
+    "text": "Laden von Haltestellen und Linien nach Änderungen am TIB-Dienst behoben. Die Fahrgastzahl wird ausgeblendet, solange TIB sie nicht bereitstellt."
   }
 ]
